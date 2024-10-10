@@ -9,6 +9,7 @@ import java.util.List;
 public class Staff {
     //Define fields for staff class
     @Id
+    @OneToMany
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "staffID")
     private int staffID;
