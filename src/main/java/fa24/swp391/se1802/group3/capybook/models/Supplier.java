@@ -1,3 +1,4 @@
+
 package fa24.swp391.se1802.group3.capybook.models;
 
 import jakarta.persistence.*;
@@ -10,7 +11,7 @@ public class Supplier {
     //Define fields for supplier class
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "supID")
+    @OneToMany(mappedBy = "supID")
     private int supID;
     @Column(name = "supName")
     private String supName;
@@ -20,11 +21,8 @@ public class Supplier {
     private String supPhone;
     @Column(name = "supAddress")
     private String supAddress;
-    @Column(name = "status")
-    private int status;
+    @Column(name = "supstatus")
+    private int supstatus;
 
-    
+
 }
-
-
-

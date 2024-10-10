@@ -13,9 +13,10 @@ public class ImportStockDetail {
     @Column(name = "ISDID")
     private int ISDID;
 
-    @Column(name = "bookID")
+    @ManyToOne
+    @JoinColumn(name = "bookID")
     private Book bookID;
-    
+
     @Column(name = "ISID")
     private ImportStock ISID;
 

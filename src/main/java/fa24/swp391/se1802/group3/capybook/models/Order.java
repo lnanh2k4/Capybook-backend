@@ -1,8 +1,9 @@
+
 package fa24.swp391.se1802.group3.capybook.models;
 
 import jakarta.persistence.*;
 
-        import java.util.Date;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -10,17 +11,20 @@ import java.util.List;
 public class Order {
 
     @Id
-    @Column(name = "orderID")
+    @OneToMany(mappedBy = "orderID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int orderID;
 
-    @Column(name = "proID")
+    @ManyToOne
+    @JoinColumn(name = "proID")
     private Promotion proID;
 
-    @Column(name = "username")
+    @ManyToOne
+    @JoinColumn(name = "username")
     private Account username;
 
-    @Column(name = "staffID")
+    @ManyToOne
+    @JoinColumn(name = "staffID")
     private Staff staffID;
 
     @Column(name = "orderDate")

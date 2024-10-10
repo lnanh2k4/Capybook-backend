@@ -1,7 +1,8 @@
+
 package fa24.swp391.se1802.group3.capybook.models;
 
 import jakarta.persistence.*;
-        import org.hibernate.engine.internal.Cascade;
+import org.hibernate.engine.internal.Cascade;
 
 import javax.naming.Name;
 import java.util.Date;
@@ -10,14 +11,16 @@ import java.util.Date;
 @Table(name = "Promotion")
 public class Promotion {
     @Id
-    @Column(name = "proID")
+    @OneToMany(mappedBy = "proID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int proID;
 
-    @Column(name = "createBy")
+    @ManyToOne
+    @JoinColumn(name = "createBy")
     private Staff createBy;
 
-    @Column(name = "approvedBy")
+    @ManyToOne
+    @JoinColumn(name = "approvedBy")
     private Staff approvedBy;
 
     @Column(name = "proName")

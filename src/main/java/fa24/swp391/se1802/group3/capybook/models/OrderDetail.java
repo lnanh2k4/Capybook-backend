@@ -1,3 +1,4 @@
+
 package fa24.swp391.se1802.group3.capybook.models;
 import jakarta.persistence.*;
 import java.util.List;
@@ -9,10 +10,12 @@ public class OrderDetail {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int ODID;
 
-    @Column(name = "bookID")
+    @ManyToOne
+    @JoinColumn(name ="bookID" )
     private Book bookID;
 
-    @Column(name = "orderID")
+    @ManyToOne
+    @JoinColumn(name = "orderID")
     private Order orderID;
 
     @Column(name = "quantity")

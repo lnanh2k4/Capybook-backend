@@ -7,7 +7,7 @@ import jakarta.persistence.*;
 public class Book {
     //Define fields for book class
     @Id
-    @Column(name = "bookID")
+    @OneToMany(mappedBy = "bookID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int bookID;
 
@@ -53,8 +53,8 @@ public class Book {
     @Column(name = "bookStatus")
     private int bookStatus;
 
-    // Many-to-One relationship with Category
-    @Column(name = "catID")
+    @ManyToOne
+    @JoinColumn(name = "catID")
     private Category catID;
 
 

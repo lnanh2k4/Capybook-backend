@@ -15,11 +15,13 @@ public class ImportStock {
     @Column(name = "ISID")
     private int ISID;
 
-    @Column(name = "supID")
-    private Supplier supplier;
+    @ManyToOne
+    @JoinColumn(name = "supID")
+    private Supplier supID;
 
-    @Column(name = "StaffID")
-    private Staff staff;
+    @ManyToOne
+    @JoinColumn(name = "staffID")
+    private Staff staffID;
 
     @Column(name = "importDate")
     private Date importDate;
