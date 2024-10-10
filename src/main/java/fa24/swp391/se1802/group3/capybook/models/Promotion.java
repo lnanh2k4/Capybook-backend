@@ -2,11 +2,15 @@
 package fa24.swp391.se1802.group3.capybook.models;
 
 import jakarta.persistence.*;
-import org.hibernate.engine.internal.Cascade;
 
-import javax.naming.Name;
+
 import java.util.Date;
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@ToString
 @Entity
 @Table(name = "Promotion")
 public class Promotion {
