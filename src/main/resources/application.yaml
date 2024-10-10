@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    url: "jdbc:sqlserver://localhost:1433;databaseName=Capybook;encrypt=true;trustServerCertificate=true;"
+    username: sa
+    password: sa
+  application:
+    name: capybook
+
+server:
+  port: 8080
+
+servlet:
+  context-path: /capybook
