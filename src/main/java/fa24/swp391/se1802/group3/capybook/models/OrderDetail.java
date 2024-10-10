@@ -9,7 +9,7 @@ public class OrderDetail {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int ODID;
 
-   
+
     private Book book;
 
 
