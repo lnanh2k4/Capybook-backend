@@ -4,17 +4,21 @@ import fa24.swp391.se1802.group3.capybook.models.Account;
 import fa24.swp391.se1802.group3.capybook.models.Staff;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 public class StaffDAOImpl implements  StaffDAO{
     EntityManager entityManager;
 
+    @Autowired
     public StaffDAOImpl(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 
     @Override
+    @Transactional
     public void save(Staff staff) {
         entityManager.persist(staff);
     }
@@ -25,6 +29,7 @@ public class StaffDAOImpl implements  StaffDAO{
     }
 
     @Override
+    @Transactional
     public void update(Staff staff) {
         entityManager.merge(staff);
     }
