@@ -59,7 +59,10 @@ public class Book {
     private Category category;
 
     //Define constructor for class
-    public Book(String bookTitle, String author, String translator, String publisher, int publicationYear, String isbn, String image, String bookDescription, int hardcover, String dimension, float weight, int bookPrice, int bookQuantity, int bookStatus) {
+
+
+    public Book(int bookID, String bookTitle, String author, String translator, String publisher, int publicationYear, String isbn, String image, String bookDescription, int hardcover, String dimension, float weight, int bookPrice, int bookQuantity, int bookStatus, Category category) {
+        this.bookID = bookID;
         this.bookTitle = bookTitle;
         this.author = author;
         this.translator = translator;
@@ -74,11 +77,12 @@ public class Book {
         this.bookPrice = bookPrice;
         this.bookQuantity = bookQuantity;
         this.bookStatus = bookStatus;
+        this.category = category;
     }
-
-    //Define getters/setters method
     public Book() {
     }
+    //Define getters/setters method
+
 
     public int getBookID() {
         return bookID;
@@ -200,6 +204,8 @@ public class Book {
         this.bookStatus = bookStatus;
     }
     //Define toString method
+
+
     @Override
     public String toString() {
         return "Book{" +
@@ -218,6 +224,7 @@ public class Book {
                 ", bookPrice=" + bookPrice +
                 ", bookQuantity=" + bookQuantity +
                 ", bookStatus=" + bookStatus +
+                ", category=" + category +
                 '}';
     }
 }

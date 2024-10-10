@@ -11,7 +11,7 @@ public class ImportStock {
     //Define fields for account class
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ISID") // Khóa chính ISID
+    @Column(name = "ISID")
     private int ISID;
 
     @ManyToOne
@@ -20,7 +20,7 @@ public class ImportStock {
 
     @ManyToOne
     @JoinColumn(name = "StaffID", referencedColumnName = "StaffID")
-    private Staff staff;
+    private Staff staffID;
 
     @Column(name = "importDate")
     private Date importDate;
