@@ -18,4 +18,5 @@ public class OrderDetail {
     @Column(name = "quantity")
     private int quantity;
 
+
 }
