@@ -3,6 +3,7 @@ package fa24.swp391.se1802.group3.capybook.models;
 import jakarta.persistence.*;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "ImportStock")
@@ -20,7 +21,7 @@ public class ImportStock {
 
     @ManyToOne
     @JoinColumn(name = "StaffID", referencedColumnName = "StaffID")
-    private Staff staffID;
+    private Staff staff;
 
     @Column(name = "importDate")
     private Date importDate;

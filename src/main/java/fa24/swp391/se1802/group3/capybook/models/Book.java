@@ -58,6 +58,7 @@ public class Book {
     @JoinColumn(name = "catID", referencedColumnName = "catID")
     private Category category;
 
+
     //Define constructor for class
 
 
