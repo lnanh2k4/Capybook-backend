@@ -22,7 +22,7 @@ public class ImportStockDetail {
     @ManyToOne
     @JoinColumn(name = "bookID")
     private Book bookID;
-    
+
     @Column(name = "ISID")
     private ImportStock ISID;
 

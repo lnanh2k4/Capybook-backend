@@ -1,21 +1,30 @@
 package fa24.swp391.se1802.group3.capybook.models;
 
-
 import jakarta.persistence.*;
+import lombok.*;
 
+import java.util.List;
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@ToString
 @Entity
-@Table(name = "Category")
+@Table(name = "category")
 public class Category {
     @Id
-    @OneToMany(mappedBy = "catID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int catID;
+    @Column(name = "catID")
+    private String catID;
     @Column(name = "catName")
     private String catName;
     @Column(name = "parentCatID")
-    private Category parentCatID;
+    private int parentCatID;
     @Column(name = "catStatus")
     private int catStatus;
+
+    public Category() {
+    }
 
 
 }
