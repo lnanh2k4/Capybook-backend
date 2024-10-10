@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Date;
+import java.util.List;
+
 @Entity
 @Table(name = "Account")
 public class Account {
@@ -32,6 +34,10 @@ public class Account {
     private int sex;
     @Column(name = "status")
     private int status;
+
+    // One-to-Many relationship with Order
+    @OneToMany(mappedBy = "username", cascade = CascadeType.ALL)
+    private List<Order> orders;
 
     //Define constructor for class
 
