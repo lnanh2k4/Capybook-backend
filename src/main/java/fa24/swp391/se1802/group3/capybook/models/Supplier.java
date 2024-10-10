@@ -20,10 +20,10 @@ public class Supplier {
     private String supPhone;
     @Column(name = "supAddress")
     private String supAddress;
-    @Column(name = "status")
-    private int status;
+    @Column(name = "supstatus")
+    private int supstatus;
 
-    
+
 }
 
 
