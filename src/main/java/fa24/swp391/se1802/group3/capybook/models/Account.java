@@ -33,6 +33,8 @@ public class Account {
     @Column(name = "status")
     private int status;
 
+    @OneToMany(mappedBy = "username", cascade = CascadeType.ALL)
+    private List<Order> orders;
 
     //Define constructor for class
 

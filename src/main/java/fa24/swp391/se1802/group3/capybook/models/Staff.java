@@ -15,6 +15,16 @@ public class Staff {
     @Column(name = "managerID")
     private int managerID;
 
+
+    @OneToMany(mappedBy = "createBy", cascade = CascadeType.ALL)
+    private List<Promotion> createdPromotions;
+
+    @OneToMany(mappedBy = "approvedBy", cascade = CascadeType.ALL)
+    private List<Promotion> approvedPromotions;
+
+    // One-to-Many relationship with Order
+    @OneToMany(mappedBy = "staffID", cascade = CascadeType.ALL)
+    private List<Order> orders;
     //Define constructor for staff
 
 
