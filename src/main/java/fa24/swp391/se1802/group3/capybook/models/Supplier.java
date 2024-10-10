@@ -2,9 +2,14 @@
 package fa24.swp391.se1802.group3.capybook.models;
 
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.util.List;
-
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@ToString
 @Entity
 @Table(name = "Supplier")
 public class Supplier {
