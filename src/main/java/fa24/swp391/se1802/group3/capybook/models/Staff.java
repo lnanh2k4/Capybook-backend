@@ -9,72 +9,12 @@ import java.util.List;
 public class Staff {
     //Define fields for staff class
     @Id
-    @OneToMany
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "staffID")
     private int staffID;
-    @OneToOne(mappedBy = "username", cascade = CascadeType.ALL)
-    private Account account;
+    @Column(name = "username")
+    private Account username;
     @Column(name = "managerID")
     private int managerID;
 
-
-    @OneToMany(mappedBy = "createBy", cascade = CascadeType.ALL)
-    private List<Promotion> createdPromotions;
-
-    @OneToMany(mappedBy = "approvedBy", cascade = CascadeType.ALL)
-    private List<Promotion> approvedPromotions;
-
-    // One-to-Many relationship with Order
-    @OneToMany(mappedBy = "staffID", cascade = CascadeType.ALL)
-    private List<Order> orders;
-    //Define constructor for staff
-
-
-    public Staff(int staffID, Account account, int managerID) {
-        this.staffID = staffID;
-        this.account = account;
-        this.managerID = managerID;
-    }
-
-    public Staff() {
-    }
-//Define getters and setters method
-
-    public int getStaffID() {
-        return staffID;
-    }
-
-    public void setStaffID(int staffID) {
-        this.staffID = staffID;
-    }
-
-
-    public int getManagerID() {
-        return managerID;
-    }
-
-    public void setManagerID(int managerID) {
-        this.managerID = managerID;
-    }
-
-    public Account getAccount() {
-        return account;
-    }
-
-    public void setAccount(Account account) {
-        this.account = account;
-    }
-
-    //Define toString method
-
-
-    @Override
-    public String toString() {
-        return "Staff{" +
-                "staffID=" + staffID +
-                ", account=" + account +
-                ", managerID=" + managerID +
-                '}';
-    }
 }

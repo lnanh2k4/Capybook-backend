@@ -15,8 +15,7 @@ public class ImportStockDetail {
 
     @Column(name = "bookID")
     private Book bookID;
-
-
+    
     @Column(name = "ISID")
     private ImportStock ISID;
 
