@@ -2,13 +2,15 @@ package fa24.swp391.se1802.group3.capybook.models;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "Supplier")
 public class Supplier {
     //Define fields for supplier class
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "supID")
+        @Column(name = "supID")
     private int supID;
     @Column(name = "supName")
     private String supName;
@@ -20,14 +22,17 @@ public class Supplier {
     private String supAddress;
     @Column(name = "status")
     private int status;
-    //Define constructor for supplier class
-    public Supplier(int supID, String supName, String supEmail, String supPhone, String supAddress, int status) {
+    @OneToMany(mappedBy = "supplier", cascade = CascadeType.ALL)
+    private List<ImportStock> importStocks;
+
+    public Supplier(int supID, String supName, String supEmail, String supPhone, String supAddress, int status, List<ImportStock> importStocks) {
         this.supID = supID;
         this.supName = supName;
         this.supEmail = supEmail;
         this.supPhone = supPhone;
         this.supAddress = supAddress;
         this.status = status;
+        this.importStocks = importStocks;
     }
 
     public Supplier() {
@@ -81,7 +86,19 @@ public class Supplier {
     public void setStatus(int status) {
         this.status = status;
     }
+
+    public List<ImportStock> getImportStocks() {
+        return importStocks;
+    }
+
+    public void setImportStocks(List<ImportStock> importStocks) {
+        this.importStocks = importStocks;
+    }
+
+
     //Define toString for supplier class
+
+
     @Override
     public String toString() {
         return "Supplier{" +
@@ -91,12 +108,9 @@ public class Supplier {
                 ", supPhone='" + supPhone + '\'' +
                 ", supAddress='" + supAddress + '\'' +
                 ", status=" + status +
+                ", importStocks=" + importStocks +
                 '}';
-
-
     }
-
-
 }
 
 
