@@ -5,6 +5,7 @@ import lombok.*;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Date;
+import java.util.Collection;
 import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,7 +17,8 @@ import java.util.List;
 public class Account {
     //Define fields for account class
     @Id
-    @OneToMany(mappedBy = "username")
+    @Basic(optional = false)
+    @Column(name = "username")
     private String username;
     @Column(name = "firstName")
     private String firstName;
@@ -25,18 +27,24 @@ public class Account {
     @Column(name = "password")
     private String password;
     @Column(name = "dob")
+    @Temporal(TemporalType.DATE)
     private Date dob;
     @Column(name = "email")
     private String email;
     @Column(name = "phone")
     private String phone;
     @Column(name = "role")
-    private int role;
+    private Integer role;
     @Column(name = "address")
     private String address;
     @Column(name = "sex")
-    private int sex;
+    private Integer sex;
     @Column(name = "accStatus")
-    private int accStatus;
+    private Integer accStatus;
+    @OneToMany(mappedBy = "username")
+    private Collection<Order> orderCollection;
+    @OneToMany(mappedBy = "username")
+    private Collection<Staff> staffCollection;
+
 
 }

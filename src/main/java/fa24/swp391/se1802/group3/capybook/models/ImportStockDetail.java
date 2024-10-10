@@ -4,6 +4,8 @@ package fa24.swp391.se1802.group3.capybook.models;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -12,26 +14,22 @@ import lombok.*;
 @Entity
 @Table(name = "ImportStockDetail")
 public class ImportStockDetail {
-
-    //Define fields for account class
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
     @Column(name = "ISDID")
-    private int ISDID;
-
-    @ManyToOne
-    @JoinColumn(name = "bookID")
-    private Book bookID;
-
-    @Column(name = "ISID")
-    private ImportStock ISID;
-
+    private Integer isdid;
     @Column(name = "ISDQuantity")
-    private int ISDQuantity;
-
+    private Integer iSDQuantity;
+    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "importPrice")
-    private double importPrice;
+    private BigDecimal importPrice;
+    @JoinColumn(name = "bookID", referencedColumnName = "bookID")
+    @ManyToOne
+    private Book bookID;
+    @JoinColumn(name = "ISID", referencedColumnName = "ISID")
+    @ManyToOne
+    private ImportStock isid;
 
-    //Define constructor for class
 
 }

@@ -3,6 +3,7 @@ package fa24.swp391.se1802.group3.capybook.models;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 @NoArgsConstructor
@@ -14,27 +15,23 @@ import java.util.List;
 @Table(name = "ImportStock")
 public class ImportStock {
 
-    //Define fields for account class
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
     @Column(name = "ISID")
-    private int ISID;
-
-    @ManyToOne
-    @JoinColumn(name = "supID")
-    private Supplier supID;
-
-    @ManyToOne
-    @JoinColumn(name = "staffID")
-    private Staff staffID;
-
+    private Integer isid;
     @Column(name = "importDate")
+    @Temporal(TemporalType.DATE)
     private Date importDate;
-
     @Column(name = "ISStatus")
-    private int ISStatus;
-
-
-    //Define constructor for class ImportStock
+    private Integer iSStatus;
+    @OneToMany(mappedBy = "isid")
+    private Collection<ImportStockDetail> importStockDetailCollection;
+    @JoinColumn(name = "staffID", referencedColumnName = "staffID")
+    @ManyToOne
+    private Staff staffID;
+    @JoinColumn(name = "supID", referencedColumnName = "supID")
+    @ManyToOne
+    private Supplier supID;
 
 }

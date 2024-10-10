@@ -12,21 +12,19 @@ import lombok.*;
 @Entity
 @Table(name = "OrderDetail")
 public class OrderDetail {
+
     @Id
-    @Column(name = "ODID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int ODID;
-
-    @ManyToOne
-    @JoinColumn(name ="bookID" )
-    private Book bookID;
-
-    @ManyToOne
-    @JoinColumn(name = "orderID")
-    private Order orderID;
-
+    @Basic(optional = false)
+    @Column(name = "ODID")
+    private Integer odid;
     @Column(name = "quantity")
-    private int quantity;
-
+    private Integer quantity;
+    @JoinColumn(name = "bookID", referencedColumnName = "bookID")
+    @ManyToOne
+    private Book bookID;
+    @JoinColumn(name = "orderID", referencedColumnName = "orderID")
+    @ManyToOne
+    private Order orderID;
 
 }

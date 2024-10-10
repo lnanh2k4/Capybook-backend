@@ -3,6 +3,7 @@ package fa24.swp391.se1802.group3.capybook.models;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Collection;
 import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
@@ -13,18 +14,21 @@ import java.util.List;
 @Table(name = "category")
 public class Category {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
     @Column(name = "catID")
-    private String catID;
+    private Integer catID;
     @Column(name = "catName")
     private String catName;
-    @Column(name = "parentCatID")
-    private int parentCatID;
     @Column(name = "catStatus")
-    private int catStatus;
+    private Integer catStatus;
+    @OneToMany(mappedBy = "parentCatID")
+    private Collection<Category> categoryCollection;
+    @JoinColumn(name = "parentCatID", referencedColumnName = "catID")
+    @ManyToOne
+    private Category parentCatID;
+    @OneToMany(mappedBy = "catID")
+    private Collection<Book> bookCollection;
 
-    public Category() {
-    }
 
 
 }

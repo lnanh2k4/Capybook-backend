@@ -3,6 +3,9 @@ package fa24.swp391.se1802.group3.capybook.models;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+import java.util.Collection;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -13,61 +16,48 @@ import lombok.*;
 public class Book {
     //Define fields for book class
     @Id
-    @OneToMany(mappedBy = "bookID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int bookID;
-
-    @Column(name = "bookTitle", nullable = false)
+    @Basic(optional = false)
+    @Column(name = "bookID")
+    private Integer bookID;
+    @Column(name = "bookTitle")
     private String bookTitle;
-
     @Column(name = "author")
     private String author;
-
     @Column(name = "translator")
     private String translator;
-
     @Column(name = "publisher")
     private String publisher;
-
     @Column(name = "publicationYear")
-    private int publicationYear;
-
+    private Integer publicationYear;
     @Column(name = "isbn")
     private String isbn;
-
+    @Lob
     @Column(name = "image")
     private String image;
-
-    @Column(name = "bookDescription", columnDefinition = "TEXT")
+    @Lob
+    @Column(name = "bookDescription")
     private String bookDescription;
-
     @Column(name = "hardcover")
-    private int hardcover;
-
+    private Integer hardcover;
     @Column(name = "dimension")
     private String dimension;
-
+    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "weight")
-    private float weight;
-
-    @Column(name = "bookPrice", precision = 10, scale = 2)
-    private int bookPrice;
-
+    private Double weight;
+    @Column(name = "bookPrice")
+    private BigDecimal bookPrice;
     @Column(name = "bookQuantity")
-    private int bookQuantity;
-
+    private Integer bookQuantity;
     @Column(name = "bookStatus")
-    private int bookStatus;
-
+    private Integer bookStatus;
+    @OneToMany(mappedBy = "bookID")
+    private Collection<OrderDetail> orderDetailCollection;
+    @OneToMany(mappedBy = "bookID")
+    private Collection<ImportStockDetail> importStockDetailCollection;
+    @JoinColumn(name = "catID", referencedColumnName = "catID")
     @ManyToOne
-    @JoinColumn(name = "catID")
     private Category catID;
-
-
-    //Define constructor for class
-
-
-    //Define getters/setters method
 
 
 

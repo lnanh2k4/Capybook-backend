@@ -4,6 +4,7 @@ package fa24.swp391.se1802.group3.capybook.models;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Collection;
 import java.util.Date;
 
 
@@ -17,26 +18,25 @@ import java.util.Date;
 public class Order {
 
     @Id
-    @OneToMany(mappedBy = "orderID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int orderID;
-
-    @ManyToOne
-    @JoinColumn(name = "proID")
-    private Promotion proID;
-
-    @ManyToOne
-    @JoinColumn(name = "username")
-    private Account username;
-
-    @ManyToOne
-    @JoinColumn(name = "staffID")
-    private Staff staffID;
-
+    @Basic(optional = false)
+    @Column(name = "orderID")
+    private Integer orderID;
     @Column(name = "orderDate")
+    @Temporal(TemporalType.DATE)
     private Date orderDate;
-
     @Column(name = "orderStatus")
-    private String orderStatus;
+    private Integer orderStatus;
+    @JoinColumn(name = "username", referencedColumnName = "username")
+    @ManyToOne
+    private Account username;
+    @JoinColumn(name = "proID", referencedColumnName = "proID")
+    @ManyToOne
+    private Promotion proID;
+    @JoinColumn(name = "staffID", referencedColumnName = "staffID")
+    @ManyToOne
+    private Staff staffID;
+    @OneToMany(mappedBy = "orderID")
+    private Collection<OrderDetail> orderDetailCollection;
 
 }

@@ -4,6 +4,7 @@ package fa24.swp391.se1802.group3.capybook.models;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Collection;
 import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,8 +17,9 @@ public class Supplier {
     //Define fields for supplier class
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @OneToMany(mappedBy = "supID")
-    private int supID;
+    @Basic(optional = false)
+    @Column(name = "supID")
+    private Integer supID;
     @Column(name = "supName")
     private String supName;
     @Column(name = "supEmail")
@@ -26,8 +28,10 @@ public class Supplier {
     private String supPhone;
     @Column(name = "supAddress")
     private String supAddress;
-    @Column(name = "supstatus")
-    private int supstatus;
+    @Column(name = "supStatus")
+    private Integer supStatus;
+    @OneToMany(mappedBy = "supID")
+    private Collection<ImportStock> importStockCollection;
 
 
 }

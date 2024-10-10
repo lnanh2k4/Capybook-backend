@@ -9,7 +9,7 @@ spring:
     banner-mode: off
 
 server:
-  port: 8080
+  port: 6789
 
 servlet:
   context-path: /capybook
