@@ -14,7 +14,7 @@ public class ImportStockDetail {
     private int ISDID;
 
     @ManyToOne
-    @JoinColumn(name = "bookID", referencedColumnName = "bookID")
+    @JoinColumn(name = "bookID")
     private Book book;
 
     @ManyToOne

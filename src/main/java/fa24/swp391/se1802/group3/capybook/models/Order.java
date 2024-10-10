@@ -10,9 +10,8 @@ import java.util.List;
 public class Order {
 
     @Id
-    @ManyToOne(cascade = CascadeType.ALL)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "orderID")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int orderID;
 
     @ManyToOne
