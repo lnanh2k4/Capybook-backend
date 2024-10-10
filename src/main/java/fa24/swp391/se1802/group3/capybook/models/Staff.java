@@ -10,7 +10,6 @@ public class Staff {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "staffID")
     private int staffID;
-    @Column(name = "username")
     @OneToOne(mappedBy = "username", cascade = CascadeType.ALL)
     private Account account;
     @Column(name = "managerID")
