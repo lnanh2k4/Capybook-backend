@@ -11,7 +11,6 @@ import java.util.List;
 public class Account {
     //Define fields for account class
     @Id
-    @Column(name = "username")
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "username")
     private String username;
@@ -36,7 +35,6 @@ public class Account {
     @Column(name = "status")
     private int status;
 
-    // One-to-Many relationship with Order
     @OneToMany(mappedBy = "username", cascade = CascadeType.ALL)
     private List<Order> orders;
 

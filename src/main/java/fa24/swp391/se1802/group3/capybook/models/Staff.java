@@ -10,7 +10,6 @@ public class Staff {
     //Define fields for staff class
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @OneToMany
     @Column(name = "staffID")
     private int staffID;
     @Column(name = "username")
@@ -19,11 +18,10 @@ public class Staff {
     @Column(name = "managerID")
     private int managerID;
 
-    // Mối quan hệ One-to-Many cho các Promotion mà Staff đã tạo
+    // One-to-Many relation for Promotion that Staff created
     @OneToMany(mappedBy = "createBy", cascade = CascadeType.ALL)
     private List<Promotion> createdPromotions;
-
-    // Mối quan hệ One-to-Many cho các Promotion mà Staff đã phê duyệt
+    // One-to-Many for Promotion that Staff approved
     @OneToMany(mappedBy = "approvedBy", cascade = CascadeType.ALL)
     private List<Promotion> approvedPromotions;
     //Define constructor for staff
@@ -31,6 +29,8 @@ public class Staff {
     // One-to-Many relationship with Order
     @OneToMany(mappedBy = "staffID", cascade = CascadeType.ALL)
     private List<Order> orders;
+    //Define constructor for staff
+
 
     public Staff(int staffID, Account username, int managerID) {
         this.staffID = staffID;
