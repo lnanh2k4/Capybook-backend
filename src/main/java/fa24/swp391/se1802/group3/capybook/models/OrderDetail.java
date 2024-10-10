@@ -1,6 +1,13 @@
 package fa24.swp391.se1802.group3.capybook.models;
 import jakarta.persistence.*;
-import java.util.List;
+import lombok.*;
+
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@ToString
 @Entity
 @Table(name = "OrderDetail")
 public class OrderDetail {
