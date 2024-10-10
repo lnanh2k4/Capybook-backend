@@ -10,6 +10,7 @@ import java.util.List;
 public class Order {
 
     @Id
+    @ManyToOne(cascade = CascadeType.ALL)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "orderID")
     private int orderID;

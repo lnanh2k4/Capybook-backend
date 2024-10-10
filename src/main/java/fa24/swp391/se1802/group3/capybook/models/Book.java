@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 public class Book {
     //Define fields for book class
     @Id
+    @OneToMany(cascade = CascadeType.ALL)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "bookID")
     private int bookID;

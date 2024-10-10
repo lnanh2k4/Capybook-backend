@@ -6,7 +6,7 @@ import java.util.List;
 public class OrderDetail {
     @Id
     @Column(name = "ODID")
-    @OneToMany
+    @ManyToOne
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int ODID;
     @ManyToOne
@@ -49,6 +49,7 @@ public class OrderDetail {
     public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
+
     @Override
     public String toString() {
         return "OrderDetail{" +

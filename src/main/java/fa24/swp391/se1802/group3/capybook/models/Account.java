@@ -11,6 +11,7 @@ import java.util.List;
 public class Account {
     //Define fields for account class
     @Id
+    @OneToMany(cascade = CascadeType.ALL)
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "username")
     private String username;
