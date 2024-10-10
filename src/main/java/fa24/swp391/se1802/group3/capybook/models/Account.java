@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Date;
+import java.util.List;
+
 @Entity
 @Table(name = "Account")
 public class Account {
