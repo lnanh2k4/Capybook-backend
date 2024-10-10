@@ -10,7 +10,7 @@ public class Supplier {
     //Define fields for supplier class
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-        @Column(name = "supID")
+    @Column(name = "supID")
     private int supID;
     @Column(name = "supName")
     private String supName;
@@ -22,95 +22,8 @@ public class Supplier {
     private String supAddress;
     @Column(name = "status")
     private int status;
-    @OneToMany(mappedBy = "supplier", cascade = CascadeType.ALL)
-    private List<ImportStock> importStocks;
 
-    public Supplier(int supID, String supName, String supEmail, String supPhone, String supAddress, int status, List<ImportStock> importStocks) {
-        this.supID = supID;
-        this.supName = supName;
-        this.supEmail = supEmail;
-        this.supPhone = supPhone;
-        this.supAddress = supAddress;
-        this.status = status;
-        this.importStocks = importStocks;
-    }
-
-    public Supplier() {
-    }
-    //Define getter/setter for supplier class
-
-    public int getSupID() {
-        return supID;
-    }
-
-    public void setSupID(int supID) {
-        this.supID = supID;
-    }
-
-    public String getSupName() {
-        return supName;
-    }
-
-    public void setSupName(String supName) {
-        this.supName = supName;
-    }
-
-    public String getSupEmail() {
-        return supEmail;
-    }
-
-    public void setSupEmail(String supEmail) {
-        this.supEmail = supEmail;
-    }
-
-    public String getSupPhone() {
-        return supPhone;
-    }
-
-    public void setSupPhone(String supPhone) {
-        this.supPhone = supPhone;
-    }
-
-    public String getSupAddress() {
-        return supAddress;
-    }
-
-    public void setSupAddress(String supAddress) {
-        this.supAddress = supAddress;
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
-    public List<ImportStock> getImportStocks() {
-        return importStocks;
-    }
-
-    public void setImportStocks(List<ImportStock> importStocks) {
-        this.importStocks = importStocks;
-    }
-
-
-    //Define toString for supplier class
-
-
-    @Override
-    public String toString() {
-        return "Supplier{" +
-                "supID=" + supID +
-                ", supName='" + supName + '\'' +
-                ", supEmail='" + supEmail + '\'' +
-                ", supPhone='" + supPhone + '\'' +
-                ", supAddress='" + supAddress + '\'' +
-                ", status=" + status +
-                ", importStocks=" + importStocks +
-                '}';
-    }
+    
 }
 
 
