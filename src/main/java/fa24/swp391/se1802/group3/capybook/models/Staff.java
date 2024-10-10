@@ -12,16 +12,16 @@ public class Staff {
     private int staffID;
     @Column(name = "username")
     @OneToOne(mappedBy = "username", cascade = CascadeType.ALL)
-    private Account username;
+    private Account account;
     @Column(name = "managerID")
     private int managerID;
 
     //Define constructor for staff
 
 
-    public Staff(int staffID, Account username, int managerID) {
+    public Staff(int staffID, Account account, int managerID) {
         this.staffID = staffID;
-        this.username = username;
+        this.account = account;
         this.managerID = managerID;
     }
 
@@ -37,13 +37,6 @@ public class Staff {
         this.staffID = staffID;
     }
 
-    public Account getUsername() {
-        return username;
-    }
-
-    public void setUsername(Account username) {
-        this.username = username;
-    }
 
     public int getManagerID() {
         return managerID;
@@ -53,13 +46,22 @@ public class Staff {
         this.managerID = managerID;
     }
 
+    public Account getAccount() {
+        return account;
+    }
+
+    public void setAccount(Account account) {
+        this.account = account;
+    }
+
     //Define toString method
+
 
     @Override
     public String toString() {
         return "Staff{" +
                 "staffID=" + staffID +
-                ", username='" + username + '\'' +
+                ", account=" + account +
                 ", managerID=" + managerID +
                 '}';
     }

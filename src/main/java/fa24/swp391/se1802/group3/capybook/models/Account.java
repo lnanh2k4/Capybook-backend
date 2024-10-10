@@ -33,6 +33,7 @@ public class Account {
     @Column(name = "status")
     private int status;
 
+
     //Define constructor for class
 
     public Account(String username, String firstName, String lastName, String password, Date dob, String email, String phone, int role, String address, int sex, int status) {
