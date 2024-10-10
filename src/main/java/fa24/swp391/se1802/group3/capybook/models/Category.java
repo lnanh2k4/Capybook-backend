@@ -9,8 +9,7 @@ import java.util.List;
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JoinColumn(name = "catID")
-    @OneToMany(mappedBy = "catID", cascade = CascadeType.ALL)
+    @Column(name = "catID")
     private String catID;
     @Column(name = "catName")
     private String catName;
@@ -18,8 +17,6 @@ public class Category {
     private int parentCatID;
     @Column(name = "catStatus")
     private int catStatus;
-
-
 
     public Category() {
     }

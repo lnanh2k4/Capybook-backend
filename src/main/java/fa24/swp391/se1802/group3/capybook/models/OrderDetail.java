@@ -6,21 +6,20 @@ import java.util.List;
 public class OrderDetail {
     @Id
     @Column(name = "ODID")
-    @ManyToOne
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int ODID;
-    @ManyToOne
-    @JoinColumn(name = "bookID", referencedColumnName = "bookID")
-    private Book bookID;
-    @ManyToOne
-    @JoinColumn(name = "orderID", referencedColumnName = "orderID")
-    private Order orderID;
+
+   
+    private Book book;
+
+
+    private Order order;
     @Column(name = "quantity")
     private int quantity;
-    public OrderDetail(int ODID, Book bookID, Order orderID, int quantity) {
+    public OrderDetail(int ODID, Book book, Order order, int quantity) {
         this.ODID = ODID;
-        this.bookID = bookID;
-        this.orderID = orderID;
+        this.book = book;
+        this.order = order;
         this.quantity = quantity;
     }
     public OrderDetail() {
@@ -31,17 +30,17 @@ public class OrderDetail {
     public void setODID(int ODID) {
         this.ODID = ODID;
     }
-    public Book getBookID() {
-        return bookID;
+    public Book getBook() {
+        return book;
     }
-    public void setBookID(Book bookID) {
-        this.bookID = bookID;
+    public void setBook(Book book) {
+        this.book = book;
     }
     public Order getOrderID() {
-        return orderID;
+        return order;
     }
-    public void setOrderID(Order orderID) {
-        this.orderID = orderID;
+    public void setOrder(Order order) {
+        this.order = order;
     }
     public int getQuantity() {
         return quantity;
@@ -54,8 +53,8 @@ public class OrderDetail {
     public String toString() {
         return "OrderDetail{" +
                 "ODID=" + ODID +
-                ", bookID=" + bookID +
-                ", orderID=" + orderID +
+                ", book=" + book +
+                ", order=" + order +
                 ", quantity=" + quantity +
                 '}';
     }
