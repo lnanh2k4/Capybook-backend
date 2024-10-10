@@ -5,9 +5,15 @@ spring:
     password: sa
   application:
     name: capybook
+  main:
+    banner-mode: off
 
 server:
   port: 8080
 
 servlet:
   context-path: /capybook
+
+logging:
+  level:
+    root: warn
