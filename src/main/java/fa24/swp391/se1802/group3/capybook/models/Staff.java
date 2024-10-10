@@ -10,11 +10,11 @@ public class Staff {
     //Define fields for staff class
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "staffID")
+    @OneToMany(mappedBy = "staffID")
     private int staffID;
-    @Column(name = "username")
+    @OneToOne(mappedBy = "username")
     private Account username;
-    @Column(name = "managerID")
-    private int managerID;
+    @OneToOne(mappedBy = "staffID")
+    private Staff managerID;
 
 }

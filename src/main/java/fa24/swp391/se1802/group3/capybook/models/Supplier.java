@@ -10,7 +10,7 @@ public class Supplier {
     //Define fields for supplier class
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "supID")
+    @OneToMany(mappedBy = "supID")
     private int supID;
     @Column(name = "supName")
     private String supName;

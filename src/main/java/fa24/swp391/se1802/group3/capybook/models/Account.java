@@ -1,17 +1,22 @@
 package fa24.swp391.se1802.group3.capybook.models;
 
 import jakarta.persistence.*;
+import lombok.*;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Date;
 import java.util.List;
-
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@ToString
 @Entity
 @Table(name = "Account")
 public class Account {
     //Define fields for account class
     @Id
-    @Column(name = "username")
+    @OneToMany(mappedBy = "username")
     private String username;
     @Column(name = "firstName")
     private String firstName;

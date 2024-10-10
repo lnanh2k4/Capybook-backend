@@ -10,17 +10,20 @@ import java.util.List;
 public class Order {
 
     @Id
-    @Column(name = "orderID")
+    @OneToMany(mappedBy = "orderID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int orderID;
 
-    @Column(name = "proID")
+    @ManyToOne
+    @JoinColumn(name = "proID")
     private Promotion proID;
 
-    @Column(name = "username")
+    @ManyToOne
+    @JoinColumn(name = "username")
     private Account username;
 
-    @Column(name = "staffID")
+    @ManyToOne
+    @JoinColumn(name = "staffID")
     private Staff staffID;
 
     @Column(name = "orderDate")

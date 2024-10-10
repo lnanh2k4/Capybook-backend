@@ -10,14 +10,16 @@ import java.util.Date;
 @Table(name = "Promotion")
 public class Promotion {
     @Id
-    @Column(name = "proID")
+    @OneToMany(mappedBy = "proID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int proID;
 
-    @Column(name = "createBy")
+    @ManyToOne
+    @JoinColumn(name = "createBy")
     private Staff createBy;
 
-    @Column(name = "approvedBy")
+    @ManyToOne
+    @JoinColumn(name = "approvedBy")
     private Staff approvedBy;
 
     @Column(name = "proName")
