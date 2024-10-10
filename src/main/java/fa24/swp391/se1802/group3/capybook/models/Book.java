@@ -1,7 +1,13 @@
 package fa24.swp391.se1802.group3.capybook.models;
 
 import jakarta.persistence.*;
+import lombok.*;
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@ToString
 @Entity
 @Table(name = "Book")
 public class Book {
