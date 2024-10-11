@@ -5,33 +5,33 @@ import lombok.*;
 
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @ToString
 @Entity
-@Table(name = "ImportStock")
-public class ImportStock {
+@Table(name = "importstock")
+public class ImportStockDTO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
-    @Column(name = "ISID")
+    @Column(name = "isid")
     private Integer isid;
-    @Column(name = "importDate")
+    @Column(name = "importdate")
     @Temporal(TemporalType.DATE)
     private Date importDate;
-    @Column(name = "ISStatus")
+    @Column(name = "isstatus")
     private Integer iSStatus;
     @OneToMany(mappedBy = "isid")
-    private Collection<ImportStockDetail> importStockDetailCollection;
-    @JoinColumn(name = "staffID", referencedColumnName = "staffID")
+    private Collection<ImportStockDetailDTO> importStockDetailCollection;
+    @JoinColumn(name = "staffid", referencedColumnName = "staffid")
     @ManyToOne
-    private Staff staffID;
-    @JoinColumn(name = "supID", referencedColumnName = "supID")
+    private StaffDTO staffID;
+    @JoinColumn(name = "supid", referencedColumnName = "supid")
     @ManyToOne
-    private Supplier supID;
+    private SupplierDTO supID;
 
 }

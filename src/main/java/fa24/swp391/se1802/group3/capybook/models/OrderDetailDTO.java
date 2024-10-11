@@ -10,21 +10,21 @@ import lombok.*;
 @Setter
 @ToString
 @Entity
-@Table(name = "OrderDetail")
-public class OrderDetail {
+@Table(name = "orderdetail")
+public class OrderDetailDTO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
-    @Column(name = "ODID")
+    @Column(name = "odid")
     private Integer odid;
     @Column(name = "quantity")
     private Integer quantity;
-    @JoinColumn(name = "bookID", referencedColumnName = "bookID")
+    @JoinColumn(name = "bookid", referencedColumnName = "bookid")
     @ManyToOne
-    private Book bookID;
-    @JoinColumn(name = "orderID", referencedColumnName = "orderID")
+    private BookDTO bookID;
+    @JoinColumn(name = "orderid", referencedColumnName = "orderid")
     @ManyToOne
-    private Order orderID;
+    private OrderDTO orderID;
 
 }

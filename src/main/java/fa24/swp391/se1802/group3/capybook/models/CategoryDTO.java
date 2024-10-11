@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Collection;
-import java.util.List;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -12,22 +12,22 @@ import java.util.List;
 @ToString
 @Entity
 @Table(name = "category")
-public class Category {
+public class CategoryDTO {
     @Id
     @Basic(optional = false)
-    @Column(name = "catID")
+    @Column(name = "catid")
     private Integer catID;
-    @Column(name = "catName")
+    @Column(name = "catname")
     private String catName;
-    @Column(name = "catStatus")
+    @Column(name = "catstatus")
     private Integer catStatus;
     @OneToMany(mappedBy = "parentCatID")
-    private Collection<Category> categoryCollection;
-    @JoinColumn(name = "parentCatID", referencedColumnName = "catID")
+    private Collection<CategoryDTO> categoryCollection;
+    @JoinColumn(name = "parentcatid", referencedColumnName = "catid")
     @ManyToOne
-    private Category parentCatID;
+    private CategoryDTO parentCatID;
     @OneToMany(mappedBy = "catID")
-    private Collection<Book> bookCollection;
+    private Collection<BookDTO> bookCollection;
 
 
 

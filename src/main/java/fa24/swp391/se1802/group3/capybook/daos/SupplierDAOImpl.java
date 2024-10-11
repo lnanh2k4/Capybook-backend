@@ -1,6 +1,6 @@
 package fa24.swp391.se1802.group3.capybook.daos;
 
-import fa24.swp391.se1802.group3.capybook.models.Supplier;
+import fa24.swp391.se1802.group3.capybook.models.SupplierDTO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import org.springframework.stereotype.Repository;
@@ -16,18 +16,18 @@ public class SupplierDAOImpl implements SupplierDAO {
     }
 
     @Override
-    public void save(Supplier supplier) {
-        entityManager.persist(supplier);
+    public void save(SupplierDTO supplierDTO) {
+        entityManager.persist(supplierDTO);
     }
 
     @Override
-    public Supplier find(int supID) {
-        return entityManager.find(Supplier.class,supID);
+    public SupplierDTO find(int supID) {
+        return entityManager.find(SupplierDTO.class,supID);
     }
 
     @Override
-    public void update(Supplier supplier) {
-        entityManager.merge(supplier);
+    public void update(SupplierDTO supplierDTO) {
+        entityManager.merge(supplierDTO);
     }
 
     @Override
@@ -36,8 +36,8 @@ public class SupplierDAOImpl implements SupplierDAO {
     }
 
     @Override
-    public List<Supplier> findAll() {
-        TypedQuery<Supplier> query = entityManager.createQuery("From Supplier", Supplier.class);
+    public List<SupplierDTO> findAll() {
+        TypedQuery<SupplierDTO> query = entityManager.createQuery("From Supplier", SupplierDTO.class);
         return query.getResultList();
 
     }

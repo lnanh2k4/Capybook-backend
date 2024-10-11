@@ -12,15 +12,15 @@ import java.util.Collection;
 @Setter
 @ToString
 @Entity
-@Table(name = "Book")
-public class Book {
+@Table(name = "book")
+public class BookDTO {
     //Define fields for book class
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
-    @Column(name = "bookID")
+    @Column(name = "bookid")
     private Integer bookID;
-    @Column(name = "bookTitle")
+    @Column(name = "booktitle")
     private String bookTitle;
     @Column(name = "author")
     private String author;
@@ -28,7 +28,7 @@ public class Book {
     private String translator;
     @Column(name = "publisher")
     private String publisher;
-    @Column(name = "publicationYear")
+    @Column(name = "publicationyear")
     private Integer publicationYear;
     @Column(name = "isbn")
     private String isbn;
@@ -36,7 +36,7 @@ public class Book {
     @Column(name = "image")
     private String image;
     @Lob
-    @Column(name = "bookDescription")
+    @Column(name = "bookdescription")
     private String bookDescription;
     @Column(name = "hardcover")
     private Integer hardcover;
@@ -45,19 +45,19 @@ public class Book {
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "weight")
     private Double weight;
-    @Column(name = "bookPrice")
+    @Column(name = "bookprice")
     private BigDecimal bookPrice;
-    @Column(name = "bookQuantity")
+    @Column(name = "bookquantity")
     private Integer bookQuantity;
-    @Column(name = "bookStatus")
+    @Column(name = "bookstatus")
     private Integer bookStatus;
     @OneToMany(mappedBy = "bookID")
-    private Collection<OrderDetail> orderDetailCollection;
+    private Collection<OrderDetailDTO> orderDetailCollection;
     @OneToMany(mappedBy = "bookID")
-    private Collection<ImportStockDetail> importStockDetailCollection;
-    @JoinColumn(name = "catID", referencedColumnName = "catID")
+    private Collection<ImportStockDetailDTO> importStockDetailCollection;
+    @JoinColumn(name = "catid", referencedColumnName = "catid")
     @ManyToOne
-    private Category catID;
+    private CategoryDTO catID;
 
 
 

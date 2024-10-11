@@ -1,7 +1,6 @@
 package fa24.swp391.se1802.group3.capybook.daos;
 
-import fa24.swp391.se1802.group3.capybook.models.Account;
-import fa24.swp391.se1802.group3.capybook.models.Staff;
+import fa24.swp391.se1802.group3.capybook.models.StaffDTO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,19 +18,19 @@ public class StaffDAOImpl implements  StaffDAO{
 
     @Override
     @Transactional
-    public void save(Staff staff) {
-        entityManager.persist(staff);
+    public void save(StaffDTO staffDTO) {
+        entityManager.persist(staffDTO);
     }
 
     @Override
-    public Staff find(int staffID) {
-        return entityManager.find(Staff.class,staffID);
+    public StaffDTO find(int staffID) {
+        return entityManager.find(StaffDTO.class,staffID);
     }
 
     @Override
     @Transactional
-    public void update(Staff staff) {
-        entityManager.merge(staff);
+    public void update(StaffDTO staffDTO) {
+        entityManager.merge(staffDTO);
     }
 
     @Override
@@ -40,8 +39,8 @@ public class StaffDAOImpl implements  StaffDAO{
     }
 
     @Override
-    public List<Staff> findAll() {
-        TypedQuery<Staff> query = entityManager.createQuery("From Staff", Staff.class);
+    public List<StaffDTO> findAll() {
+        TypedQuery<StaffDTO> query = entityManager.createQuery("From Staff", StaffDTO.class);
         return query.getResultList();
     }
 }

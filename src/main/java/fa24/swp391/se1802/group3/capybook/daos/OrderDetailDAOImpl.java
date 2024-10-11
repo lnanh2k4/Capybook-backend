@@ -1,6 +1,6 @@
 package fa24.swp391.se1802.group3.capybook.daos;
 
-import fa24.swp391.se1802.group3.capybook.models.OrderDetail;
+import fa24.swp391.se1802.group3.capybook.models.OrderDetailDTO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,19 +20,19 @@ public class OrderDetailDAOImpl implements OrderDetailDAO{
 
     @Override
     @Transactional
-    public void save(OrderDetail orderDetail) {
-        entityManager.persist(orderDetail);
+    public void save(OrderDetailDTO orderDetailDTO) {
+        entityManager.persist(orderDetailDTO);
     }
 
     @Override
-    public OrderDetail find(int ODID) {
-        return entityManager.find(OrderDetail.class,ODID);
+    public OrderDetailDTO find(int ODID) {
+        return entityManager.find(OrderDetailDTO.class,ODID);
     }
 
     @Override
     @Transactional
-    public void update(OrderDetail orderDetail) {
-        entityManager.merge(orderDetail);
+    public void update(OrderDetailDTO orderDetailDTO) {
+        entityManager.merge(orderDetailDTO);
     }
 
     @Override
@@ -41,8 +41,8 @@ public class OrderDetailDAOImpl implements OrderDetailDAO{
     }
 
     @Override
-    public List<OrderDetail> findAll() {
-        TypedQuery<OrderDetail> query = entityManager.createQuery("From OrderDetail", OrderDetail.class);
+    public List<OrderDetailDTO> findAll() {
+        TypedQuery<OrderDetailDTO> query = entityManager.createQuery("From OrderDetail", OrderDetailDTO.class);
         return query.getResultList();
     }
 }

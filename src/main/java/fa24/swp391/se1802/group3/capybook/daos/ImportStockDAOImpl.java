@@ -1,7 +1,6 @@
 package fa24.swp391.se1802.group3.capybook.daos;
 
-import fa24.swp391.se1802.group3.capybook.models.Book;
-import fa24.swp391.se1802.group3.capybook.models.ImportStock;
+import fa24.swp391.se1802.group3.capybook.models.ImportStockDTO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,18 +17,18 @@ public class ImportStockDAOImpl implements ImportStockDAO  {
 
 
     @Override
-    public void save(ImportStock importStock) {
-        entityManager.persist(importStock);
+    public void save(ImportStockDTO importStockDTO) {
+        entityManager.persist(importStockDTO);
     }
 
     @Override
-    public ImportStock find(int ISID) {
-        return entityManager.find(ImportStock.class,ISID);
+    public ImportStockDTO find(int ISID) {
+        return entityManager.find(ImportStockDTO.class,ISID);
     }
 
     @Override
-    public void update(ImportStock importStock) {
-        entityManager.merge(importStock);
+    public void update(ImportStockDTO importStockDTO) {
+        entityManager.merge(importStockDTO);
     }
 
     @Override
@@ -38,8 +37,8 @@ public class ImportStockDAOImpl implements ImportStockDAO  {
     }
 
     @Override
-    public List<ImportStock> findAll() {
-        TypedQuery<ImportStock> query = entityManager.createQuery("From ImportStock", ImportStock.class);
+    public List<ImportStockDTO> findAll() {
+        TypedQuery<ImportStockDTO> query = entityManager.createQuery("From ImportStock", ImportStockDTO.class);
         return query.getResultList();
     }
 }

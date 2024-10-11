@@ -1,6 +1,6 @@
 package fa24.swp391.se1802.group3.capybook.daos;
 
-import fa24.swp391.se1802.group3.capybook.models.Promotion;
+import fa24.swp391.se1802.group3.capybook.models.PromotionDTO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,19 +20,19 @@ public class PromotionDAOImpl implements PromotionDAO {
 
     @Override
     @Transactional
-    public void save(Promotion promotion) {
-        entityManager.persist(promotion);
+    public void save(PromotionDTO promotionDTO) {
+        entityManager.persist(promotionDTO);
     }
 
     @Override
-    public Promotion find(int proID) {
-        return entityManager.find(Promotion.class,proID);
+    public PromotionDTO find(int proID) {
+        return entityManager.find(PromotionDTO.class,proID);
     }
 
     @Override
     @Transactional
-    public void update(Promotion promotion) {
-        entityManager.merge(promotion);
+    public void update(PromotionDTO promotionDTO) {
+        entityManager.merge(promotionDTO);
     }
 
     @Override
@@ -41,8 +41,8 @@ public class PromotionDAOImpl implements PromotionDAO {
     }
 
     @Override
-    public List<Promotion> findAll() {
-        TypedQuery<Promotion> query = entityManager.createQuery("From Promotion", Promotion.class);
+    public List<PromotionDTO> findAll() {
+        TypedQuery<PromotionDTO> query = entityManager.createQuery("From Promotion", PromotionDTO.class);
         return query.getResultList();
     }
 }

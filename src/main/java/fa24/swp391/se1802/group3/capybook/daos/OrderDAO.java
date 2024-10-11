@@ -1,14 +1,13 @@
 package fa24.swp391.se1802.group3.capybook.daos;
 
-import fa24.swp391.se1802.group3.capybook.models.Order;
-import fa24.swp391.se1802.group3.capybook.models.Promotion;
+import fa24.swp391.se1802.group3.capybook.models.OrderDTO;
 
 import java.util.List;
 
 public interface OrderDAO {
-    void save(Order order);
-    Order find(int orderID);
-    void update(Order order);
+    void save(OrderDTO orderDTO);
+    OrderDTO find(int orderID);
+    void update(OrderDTO orderDTO);
     void delete(int orderID);
-    List<Order> findAll();
+    List<OrderDTO> findAll();
 }

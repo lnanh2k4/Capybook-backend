@@ -14,29 +14,29 @@ import java.util.Date;
 @Setter
 @ToString
 @Entity
-@Table(name = "Order")
-public class Order {
+@Table(name = "`order`")
+public class OrderDTO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
-    @Column(name = "orderID")
+    @Column(name = "orderid")
     private Integer orderID;
-    @Column(name = "orderDate")
+    @Column(name = "orderdate")
     @Temporal(TemporalType.DATE)
     private Date orderDate;
-    @Column(name = "orderStatus")
+    @Column(name = "orderstatus")
     private Integer orderStatus;
     @JoinColumn(name = "username", referencedColumnName = "username")
     @ManyToOne
-    private Account username;
-    @JoinColumn(name = "proID", referencedColumnName = "proID")
+    private AccountDTO username;
+    @JoinColumn(name = "proid", referencedColumnName = "proid")
     @ManyToOne
-    private Promotion proID;
-    @JoinColumn(name = "staffID", referencedColumnName = "staffID")
+    private PromotionDTO proID;
+    @JoinColumn(name = "staffid", referencedColumnName = "staffid")
     @ManyToOne
-    private Staff staffID;
+    private StaffDTO staffID;
     @OneToMany(mappedBy = "orderID")
-    private Collection<OrderDetail> orderDetailCollection;
+    private Collection<OrderDetailDTO> orderDetailCollection;
 
 }

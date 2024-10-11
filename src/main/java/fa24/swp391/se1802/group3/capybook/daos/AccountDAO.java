@@ -1,13 +1,13 @@
 package fa24.swp391.se1802.group3.capybook.daos;
 
-import fa24.swp391.se1802.group3.capybook.models.Account;
+import fa24.swp391.se1802.group3.capybook.models.AccountDTO;
 
 import java.util.List;
 
 public interface AccountDAO {
-    void save(Account account);
-    Account find(String username);
-    void update(Account account);
+    void save(AccountDTO accountDTO);
+    AccountDTO find(String username);
+    void update(AccountDTO accountDTO);
     void delete(String username);
-    List<Account> findAll();
+    List<AccountDTO> findAll();
 }

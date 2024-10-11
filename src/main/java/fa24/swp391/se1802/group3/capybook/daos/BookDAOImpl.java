@@ -1,7 +1,6 @@
 package fa24.swp391.se1802.group3.capybook.daos;
 
-import fa24.swp391.se1802.group3.capybook.models.Account;
-import fa24.swp391.se1802.group3.capybook.models.Book;
+import fa24.swp391.se1802.group3.capybook.models.BookDTO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,19 +17,19 @@ public class BookDAOImpl implements BookDAO{
     public BookDAOImpl(EntityManager entityManager) { this.entityManager = entityManager; }
 
     @Override
-    public void save(Book book) {
-        entityManager.persist(book);
+    public void save(BookDTO bookDTO) {
+        entityManager.persist(bookDTO);
     }
 
     @Override
-    public Book find(int bookID) {
-        return entityManager.find(Book.class,bookID);
+    public BookDTO find(int bookID) {
+        return entityManager.find(BookDTO.class,bookID);
     }
 
     @Override
     @Transactional
-    public void update(Book book) {
-        entityManager.merge(book);
+    public void update(BookDTO bookDTO) {
+        entityManager.merge(bookDTO);
     }
 
     @Override
@@ -39,8 +38,8 @@ public class BookDAOImpl implements BookDAO{
     }
 
     @Override
-    public List<Book> findAll() {
-        TypedQuery<Book> query = entityManager.createQuery("From Book", Book.class);
+    public List<BookDTO> findAll() {
+        TypedQuery<BookDTO> query = entityManager.createQuery("From Book", BookDTO.class);
         return query.getResultList();
     }
 }

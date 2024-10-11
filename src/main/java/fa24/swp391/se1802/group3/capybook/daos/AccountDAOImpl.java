@@ -1,9 +1,8 @@
 package fa24.swp391.se1802.group3.capybook.daos;
 
-import fa24.swp391.se1802.group3.capybook.models.Account;
+import fa24.swp391.se1802.group3.capybook.models.AccountDTO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
-import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,19 +23,19 @@ public class AccountDAOImpl implements AccountDAO{
     //implements method
     @Override
     @Transactional
-    public void save(Account account) {
-            entityManager.persist(account);
+    public void save(AccountDTO accountDTO) {
+            entityManager.persist(accountDTO);
     }
 
     @Override
-    public Account find(String username) {
-        return entityManager.find(Account.class,username);
+    public AccountDTO find(String username) {
+        return entityManager.find(AccountDTO.class,username);
     }
 
     @Override
     @Transactional
-    public void update(Account account) {
-        entityManager.merge(account);
+    public void update(AccountDTO accountDTO) {
+        entityManager.merge(accountDTO);
     }
 
     @Override
@@ -45,8 +44,8 @@ public class AccountDAOImpl implements AccountDAO{
     }
 
     @Override
-    public List<Account> findAll() {
-        TypedQuery<Account> query = entityManager.createQuery("From Account", Account.class);
+    public List<AccountDTO> findAll() {
+        TypedQuery<AccountDTO> query = entityManager.createQuery("From AccountDTO", AccountDTO.class);
         return query.getResultList();
     }
 }

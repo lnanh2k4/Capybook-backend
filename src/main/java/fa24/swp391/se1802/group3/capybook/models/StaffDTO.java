@@ -4,33 +4,32 @@ package fa24.swp391.se1802.group3.capybook.models;
 import jakarta.persistence.*;
 
 import java.util.Collection;
-import java.util.List;
 
 @Entity
-@Table(name = "Staff")
-public class Staff {
+@Table(name = "staff")
+public class StaffDTO {
     //Define fields for staff class
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
-    @Column(name = "staffID")
+    @Column(name = "staffid")
     private Integer staffID;
     @OneToMany(mappedBy = "staffID")
-    private Collection<Order> order1Collection;
+    private Collection<OrderDTO> orderDTO1Collection;
     @JoinColumn(name = "username", referencedColumnName = "username")
     @ManyToOne
-    private Account username;
+    private AccountDTO username;
     @OneToMany(mappedBy = "managerID")
-    private Collection<Staff> staffCollection;
-    @JoinColumn(name = "managerID", referencedColumnName = "staffID")
+    private Collection<StaffDTO> staffDTOCollection;
+    @JoinColumn(name = "managerid", referencedColumnName = "staffid")
     @ManyToOne
-    private Staff managerID;
+    private StaffDTO managerID;
     @OneToMany(mappedBy = "createdBy")
-    private Collection<Promotion> promotionCollection;
+    private Collection<PromotionDTO> promotionDTOCollection;
     @OneToMany(mappedBy = "approvedBy")
-    private Collection<Promotion> promotionCollection1;
+    private Collection<PromotionDTO> promotionDTOCollection1;
     @OneToMany(mappedBy = "staffID")
-    private Collection<ImportStock> importStockCollection;
+    private Collection<ImportStockDTO> importStockDTOCollection;
 
 
 }

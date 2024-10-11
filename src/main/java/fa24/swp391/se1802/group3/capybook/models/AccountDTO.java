@@ -2,27 +2,26 @@ package fa24.swp391.se1802.group3.capybook.models;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.stereotype.Repository;
 
 import java.sql.Date;
 import java.util.Collection;
-import java.util.List;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @ToString
 @Entity
-@Table(name = "Account")
-public class Account {
+@Table(name = "account")
+public class AccountDTO {
     //Define fields for account class
     @Id
     @Basic(optional = false)
     @Column(name = "username")
     private String username;
-    @Column(name = "firstName")
+    @Column(name = "firstname")
     private String firstName;
-    @Column(name = "lastName")
+    @Column(name = "lastname")
     private String lastName;
     @Column(name = "password")
     private String password;
@@ -39,12 +38,11 @@ public class Account {
     private String address;
     @Column(name = "sex")
     private Integer sex;
-    @Column(name = "accStatus")
+    @Column(name = "accstatus")
     private Integer accStatus;
     @OneToMany(mappedBy = "username")
-    private Collection<Order> orderCollection;
+    private Collection<OrderDTO> orderDTOCollection;
     @OneToMany(mappedBy = "username")
-    private Collection<Staff> staffCollection;
-
+    private Collection<StaffDTO> staffDTOCollection;
 
 }

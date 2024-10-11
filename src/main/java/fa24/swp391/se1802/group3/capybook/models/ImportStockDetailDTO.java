@@ -12,24 +12,24 @@ import java.math.BigDecimal;
 @Setter
 @ToString
 @Entity
-@Table(name = "ImportStockDetail")
-public class ImportStockDetail {
+@Table(name = "importstockdetail")
+public class ImportStockDetailDTO {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
-    @Column(name = "ISDID")
+    @Column(name = "isdid")
     private Integer isdid;
-    @Column(name = "ISDQuantity")
+    @Column(name = "isdquantity")
     private Integer iSDQuantity;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
-    @Column(name = "importPrice")
+    @Column(name = "importprice")
     private BigDecimal importPrice;
-    @JoinColumn(name = "bookID", referencedColumnName = "bookID")
+    @JoinColumn(name = "bookid", referencedColumnName = "bookid")
     @ManyToOne
-    private Book bookID;
-    @JoinColumn(name = "ISID", referencedColumnName = "ISID")
+    private BookDTO bookID;
+    @JoinColumn(name = "isid", referencedColumnName = "isid")
     @ManyToOne
-    private ImportStock isid;
+    private ImportStockDTO isid;
 
 
 }

@@ -5,33 +5,33 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Collection;
-import java.util.List;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @ToString
 @Entity
-@Table(name = "Supplier")
-public class Supplier {
+@Table(name = "supplier")
+public class SupplierDTO {
     //Define fields for supplier class
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
-    @Column(name = "supID")
+    @Column(name = "supid")
     private Integer supID;
-    @Column(name = "supName")
+    @Column(name = "supname")
     private String supName;
-    @Column(name = "supEmail")
+    @Column(name = "supemail")
     private String supEmail;
-    @Column(name = "supPhone")
+    @Column(name = "supphone")
     private String supPhone;
-    @Column(name = "supAddress")
+    @Column(name = "supaddress")
     private String supAddress;
-    @Column(name = "supStatus")
+    @Column(name = "supstatus")
     private Integer supStatus;
     @OneToMany(mappedBy = "supID")
-    private Collection<ImportStock> importStockCollection;
+    private Collection<ImportStockDTO> importStockDTOCollection;
 
 
 }

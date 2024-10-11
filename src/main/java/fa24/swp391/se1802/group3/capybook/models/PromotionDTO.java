@@ -14,35 +14,35 @@ import java.util.Date;
 @Setter
 @ToString
 @Entity
-@Table(name = "Promotion")
-public class Promotion {
+@Table(name = "promotion")
+public class PromotionDTO {
     @Id
     @Basic(optional = false)
-    @Column(name = "proID")
+    @Column(name = "proid")
     private Integer proID;
-    @Column(name = "proName")
+    @Column(name = "proname")
     private String proName;
-    @Column(name = "proCode")
+    @Column(name = "procode")
     private String proCode;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "discount")
     private Double discount;
-    @Column(name = "startDate")
+    @Column(name = "startdate")
     @Temporal(TemporalType.DATE)
     private Date startDate;
-    @Column(name = "endDate")
+    @Column(name = "enddate")
     @Temporal(TemporalType.DATE)
     private Date endDate;
     @Column(name = "quantity")
     private Integer quantity;
-    @Column(name = "proStatus")
+    @Column(name = "prostatus")
     private Integer proStatus;
     @OneToMany(mappedBy = "proID")
-    private Collection<Order> order1Collection;
-    @JoinColumn(name = "createdBy", referencedColumnName = "staffID")
+    private Collection<OrderDTO> orderDTO1Collection;
+    @JoinColumn(name = "createdby", referencedColumnName = "staffid")
     @ManyToOne
-    private Staff createdBy;
-    @JoinColumn(name = "approvedBy", referencedColumnName = "staffID")
+    private StaffDTO createdBy;
+    @JoinColumn(name = "approvedby", referencedColumnName = "staffid")
     @ManyToOne
-    private Staff approvedBy;
+    private StaffDTO approvedBy;
 }
