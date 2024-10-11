@@ -23,8 +23,4 @@ public class Category {
     @Column(name = "catStatus")
     private int catStatus;
 
-    public Category() {
-    }
-
-
 }
