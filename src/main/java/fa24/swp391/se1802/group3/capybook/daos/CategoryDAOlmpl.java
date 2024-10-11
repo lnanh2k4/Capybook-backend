@@ -1,7 +1,6 @@
 package fa24.swp391.se1802.group3.capybook.daos;
 
-import fa24.swp391.se1802.group3.capybook.models.Account;
-import fa24.swp391.se1802.group3.capybook.models.Category;
+import fa24.swp391.se1802.group3.capybook.models.CategoryDTO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,18 +20,18 @@ public class CategoryDAOlmpl implements CategoryDAO{
     //implements method
     @Override
     @Transactional
-    public void save(Category category) {
+    public void save(CategoryDTO category) {
         entityManager.persist(category);
     }
 
     @Override
-    public Category find(int catID) {
-        return entityManager.find(Category.class,catID);
+    public CategoryDTO find(int catID) {
+        return entityManager.find(CategoryDTO.class,catID);
     }
 
     @Override
     @Transactional
-    public void update(Category category) {
+    public void update(CategoryDTO category) {
         entityManager.merge(category);
     }
 
@@ -42,8 +41,8 @@ public class CategoryDAOlmpl implements CategoryDAO{
     }
 
     @Override
-    public List<Category> findAll() {
-        TypedQuery<Category> query = entityManager.createQuery("From Category", Category.class);
+    public List<CategoryDTO> findAll() {
+        TypedQuery<CategoryDTO> query = entityManager.createQuery("From Category", CategoryDTO.class);
         return query.getResultList();
     }
 }
