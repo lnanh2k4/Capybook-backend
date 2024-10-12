@@ -4,10 +4,12 @@ import fa24.swp391.se1802.group3.capybook.models.StaffDTO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Repository
 public class StaffDAOImpl implements  StaffDAO{
     EntityManager entityManager;
 
@@ -40,7 +42,7 @@ public class StaffDAOImpl implements  StaffDAO{
 
     @Override
     public List<StaffDTO> findAll() {
-        TypedQuery<StaffDTO> query = entityManager.createQuery("From Staff", StaffDTO.class);
+        TypedQuery<StaffDTO> query = entityManager.createQuery("From StaffDTO", StaffDTO.class);
         return query.getResultList();
     }
 }

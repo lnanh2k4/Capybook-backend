@@ -37,7 +37,7 @@ public class SupplierDAOImpl implements SupplierDAO {
 
     @Override
     public List<SupplierDTO> findAll() {
-        TypedQuery<SupplierDTO> query = entityManager.createQuery("From Supplier", SupplierDTO.class);
+        TypedQuery<SupplierDTO> query = entityManager.createQuery("From SupplierDTO", SupplierDTO.class);
         return query.getResultList();
 
     }

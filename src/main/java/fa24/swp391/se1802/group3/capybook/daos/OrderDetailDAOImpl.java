@@ -42,7 +42,7 @@ public class OrderDetailDAOImpl implements OrderDetailDAO{
 
     @Override
     public List<OrderDetailDTO> findAll() {
-        TypedQuery<OrderDetailDTO> query = entityManager.createQuery("From OrderDetail", OrderDetailDTO.class);
+        TypedQuery<OrderDetailDTO> query = entityManager.createQuery("From OrderDetailDTO", OrderDetailDTO.class);
         return query.getResultList();
     }
 }
