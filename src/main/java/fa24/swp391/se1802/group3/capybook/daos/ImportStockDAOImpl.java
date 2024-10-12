@@ -38,7 +38,7 @@ public class ImportStockDAOImpl implements ImportStockDAO  {
 
     @Override
     public List<ImportStockDTO> findAll() {
-        TypedQuery<ImportStockDTO> query = entityManager.createQuery("From ImportStock", ImportStockDTO.class);
+        TypedQuery<ImportStockDTO> query = entityManager.createQuery("From ImportStockDTO", ImportStockDTO.class);
         return query.getResultList();
     }
 }

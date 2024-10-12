@@ -39,7 +39,7 @@ public class BookDAOImpl implements BookDAO{
 
     @Override
     public List<BookDTO> findAll() {
-        TypedQuery<BookDTO> query = entityManager.createQuery("From Book", BookDTO.class);
+        TypedQuery<BookDTO> query = entityManager.createQuery("From BookDTO", BookDTO.class);
         return query.getResultList();
     }
 }

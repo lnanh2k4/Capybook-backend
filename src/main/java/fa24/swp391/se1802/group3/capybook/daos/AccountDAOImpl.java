@@ -1,5 +1,6 @@
 package fa24.swp391.se1802.group3.capybook.daos;
 
+import fa24.swp391.se1802.group3.capybook.exceptions.AccountExceptionNotFound;
 import fa24.swp391.se1802.group3.capybook.models.AccountDTO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class AccountDAOImpl implements AccountDAO{
@@ -23,22 +25,23 @@ public class AccountDAOImpl implements AccountDAO{
     //implements method
     @Override
     @Transactional
-    public void save(AccountDTO accountDTO) {
-            entityManager.persist(accountDTO);
+    public AccountDTO save(AccountDTO accountDTO) {
+            return entityManager.merge(accountDTO);
     }
 
     @Override
     public AccountDTO find(String username) {
-        return entityManager.find(AccountDTO.class,username);
+        AccountDTO object = entityManager.find(AccountDTO.class,username);
+        if(object!=null){
+            return object;
+        } else{
+            throw new AccountExceptionNotFound();
+        }
     }
+
 
     @Override
     @Transactional
-    public void update(AccountDTO accountDTO) {
-        entityManager.merge(accountDTO);
-    }
-
-    @Override
     public void delete(String username) {
         entityManager.remove(this.find(username));
     }

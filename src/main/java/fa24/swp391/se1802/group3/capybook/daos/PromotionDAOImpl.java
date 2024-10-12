@@ -42,7 +42,7 @@ public class PromotionDAOImpl implements PromotionDAO {
 
     @Override
     public List<PromotionDTO> findAll() {
-        TypedQuery<PromotionDTO> query = entityManager.createQuery("From Promotion", PromotionDTO.class);
+        TypedQuery<PromotionDTO> query = entityManager.createQuery("From PromotionDTO", PromotionDTO.class);
         return query.getResultList();
     }
 }
