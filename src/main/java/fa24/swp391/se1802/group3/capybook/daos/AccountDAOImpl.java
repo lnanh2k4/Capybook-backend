@@ -39,7 +39,6 @@ public class AccountDAOImpl implements AccountDAO{
         }
     }
 
-
     @Override
     @Transactional
     public void delete(String username) {
