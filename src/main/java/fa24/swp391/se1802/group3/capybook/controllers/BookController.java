@@ -23,6 +23,11 @@ import java.util.List;
 public class BookController {
     private final BookDAO bookDAO;
 
+    @RequestMapping(value = "/{id}", method = RequestMethod.OPTIONS)
+    public ResponseEntity<Void> handleOptions() {
+        return ResponseEntity.ok().build();
+    }
+
     @Autowired
     public BookController(BookDAO bookDAO) {
         this.bookDAO = bookDAO;
@@ -45,34 +50,132 @@ public class BookController {
 
     @PostMapping("/")
     public ResponseEntity<BookDTO> addBook(
-            @RequestPart("book") BookDTO book,
+            @RequestPart("book") String bookData,
             @RequestPart("image") MultipartFile image) {
-
         try {
-            // Kiểm tra và lưu file ảnh nếu có
+            System.out.println("Request received");
+            ObjectMapper objectMapper = new ObjectMapper();
+            BookDTO book = objectMapper.readValue(bookData, BookDTO.class);
+            System.out.println("Parsed book data: " + book);
+
+            // Đặt trạng thái bookStatus là 1
+            book.setBookStatus(1);
+
+            // Lưu book trước để lấy bookID
+            bookDAO.save(book);
+            Integer bookID = book.getBookID(); // Lấy bookID sau khi lưu
+
             if (image != null && !image.isEmpty()) {
-                String fileName = StringUtils.cleanPath(image.getOriginalFilename());
+                // Tạo một tên file độc nhất với bookID
+                String originalFileName = StringUtils.cleanPath(image.getOriginalFilename());
+                String extension = originalFileName.substring(originalFileName.lastIndexOf(".")); // Lấy đuôi file (ví dụ: .jpg, .png)
 
-                // Đường dẫn lưu hình ảnh trong thư mục public/uploads
-                Path uploadPath = Paths.get("public/uploads/");
+                // Sử dụng bookID và ngày giờ hiện tại để tạo tên file độc nhất
+                String uniqueFileName = "book_" + bookID + "_" + System.currentTimeMillis() + extension;
+
+                System.out.println("Generated unique file name: " + uniqueFileName);
+
+                // Xác định thư mục lưu file
+                String uploadDir = System.getProperty("user.dir") + "/uploads/";
+                Path uploadPath = Paths.get(uploadDir);
+
+                // Tạo thư mục nếu chưa tồn tại
                 if (!Files.exists(uploadPath)) {
-                    Files.createDirectories(uploadPath); // Tạo thư mục nếu chưa tồn tại
+                    Files.createDirectories(uploadPath);
+                    System.out.println("Directory created: " + uploadDir);
                 }
 
-                // Sử dụng InputStream để lưu file
+                // Lưu file ảnh vào thư mục
                 try (InputStream inputStream = image.getInputStream()) {
-                    Path filePath = uploadPath.resolve(fileName);
-                    Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
-
-                    // Lưu đường dẫn của ảnh vào cơ sở dữ liệu (chỉ lưu đường dẫn)
-                    String imagePath = "/uploads/" + fileName;
-                    book.setImage(imagePath);  // setImage để lưu đường dẫn vào DB
+                    Path targetPath = uploadPath.resolve(uniqueFileName);
+                    Files.copy(inputStream, targetPath, StandardCopyOption.REPLACE_EXISTING);
+                    System.out.println("File saved at: " + targetPath);
                 }
+
+                // Lưu đường dẫn của ảnh vào đối tượng book
+                book.setImage("/uploads/" + uniqueFileName);
+                System.out.println("Image path set in book object");
+
+                // Cập nhật lại thông tin book với đường dẫn ảnh
+                bookDAO.save(book);
             }
 
-            // Lưu thông tin sách vào DB
-            bookDAO.save(book);
+            System.out.println("Book saved in database");
             return ResponseEntity.status(HttpStatus.CREATED).body(book);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+    @PutMapping("/{bookId}")
+    public ResponseEntity<BookDTO> updateBook(
+            @PathVariable int bookId,
+            @RequestPart("book") String bookData,
+            @RequestPart(value = "image", required = false) MultipartFile image) {
+        try {
+            System.out.println("Request received for updating book with ID: " + bookId);
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            BookDTO book = objectMapper.readValue(bookData, BookDTO.class);
+            System.out.println("Parsed book data: " + book);
+
+            // Tìm sách hiện có trong cơ sở dữ liệu
+            BookDTO existingBook = bookDAO.find(bookId);
+            if (existingBook == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // Trả về 404 nếu sách không tồn tại
+            }
+
+            // Cập nhật thông tin sách (ngoại trừ ảnh)
+            existingBook.setBookTitle(book.getBookTitle());
+            existingBook.setAuthor(book.getAuthor());
+            existingBook.setPublisher(book.getPublisher());
+            existingBook.setPublicationYear(book.getPublicationYear());
+            existingBook.setTranslator(book.getTranslator());
+            existingBook.setHardcover(book.getHardcover());
+            existingBook.setDimension(book.getDimension());
+            existingBook.setWeight(book.getWeight());
+            existingBook.setBookPrice(book.getBookPrice());
+            existingBook.setBookDescription(book.getBookDescription());
+            existingBook.setBookStatus(book.getBookStatus());
+
+            if (image != null && !image.isEmpty()) {
+                // Tạo một tên file độc nhất với bookID
+                String originalFileName = StringUtils.cleanPath(image.getOriginalFilename());
+                String extension = originalFileName.substring(originalFileName.lastIndexOf(".")); // Lấy đuôi file (ví dụ: .jpg, .png)
+
+                // Sử dụng bookID và ngày giờ hiện tại để tạo tên file độc nhất
+                String uniqueFileName = "book_" + bookId + "_" + System.currentTimeMillis() + extension;
+
+                System.out.println("Generated unique file name: " + uniqueFileName);
+
+                // Xác định thư mục lưu file
+                String uploadDir = System.getProperty("user.dir") + "/uploads/";
+                Path uploadPath = Paths.get(uploadDir);
+
+                // Tạo thư mục nếu chưa tồn tại
+                if (!Files.exists(uploadPath)) {
+                    Files.createDirectories(uploadPath);
+                    System.out.println("Directory created: " + uploadDir);
+                }
+
+                // Lưu file ảnh vào thư mục
+                try (InputStream inputStream = image.getInputStream()) {
+                    Path targetPath = uploadPath.resolve(uniqueFileName);
+                    Files.copy(inputStream, targetPath, StandardCopyOption.REPLACE_EXISTING);
+                    System.out.println("File saved at: " + targetPath);
+                }
+
+                // Cập nhật đường dẫn của ảnh mới trong đối tượng sách
+                existingBook.setImage("/uploads/" + uniqueFileName);
+                System.out.println("Image path updated in book object");
+            }
+
+            // Cập nhật sách trong cơ sở dữ liệu
+            bookDAO.update(existingBook);
+            System.out.println("Book updated in database");
+
+            return ResponseEntity.ok(existingBook);
+
         } catch (IOException e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -80,18 +183,6 @@ public class BookController {
     }
 
 
-
-    @PutMapping("/{bookId}")
-    public ResponseEntity<BookDTO> updateBook(@PathVariable int bookId, @RequestBody BookDTO book) {
-        BookDTO existingBook = bookDAO.find(bookId);
-        if (existingBook != null) {
-            book.setBookID(bookId); // Đảm bảo cập nhật đúng cuốn sách
-            bookDAO.update(book);
-            return ResponseEntity.ok(book);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // Trả về 404 nếu không tìm thấy sách
-        }
-    }
 
     @DeleteMapping("/{bookId}")
     public ResponseEntity<String> deleteBook(@PathVariable int bookId) {
@@ -103,4 +194,5 @@ public class BookController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Book not found");
         }
     }
+
 }
