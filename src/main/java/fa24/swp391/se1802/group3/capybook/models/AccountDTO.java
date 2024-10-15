@@ -3,6 +3,8 @@ package fa24.swp391.se1802.group3.capybook.models;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.sql.Date;
 import java.util.Collection;
 
@@ -13,8 +15,10 @@ import java.util.Collection;
 @ToString
 @Entity
 @Table(name = "account")
-public class AccountDTO {
+public class AccountDTO implements Serializable {
     //Define fields for account class
+    @Serial
+    private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
     @Column(name = "username")

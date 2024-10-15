@@ -3,6 +3,8 @@ package fa24.swp391.se1802.group3.capybook.models;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Collection;
 
 @NoArgsConstructor
@@ -12,7 +14,9 @@ import java.util.Collection;
 @ToString
 @Entity
 @Table(name = "category")
-public class CategoryDTO {
+public class CategoryDTO implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
     @Column(name = "catid")

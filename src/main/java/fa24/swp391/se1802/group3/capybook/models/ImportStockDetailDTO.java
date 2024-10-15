@@ -4,6 +4,7 @@ package fa24.swp391.se1802.group3.capybook.models;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 @NoArgsConstructor
@@ -13,7 +14,8 @@ import java.math.BigDecimal;
 @ToString
 @Entity
 @Table(name = "importstockdetail")
-public class ImportStockDetailDTO {
+public class ImportStockDetailDTO implements Serializable {
+    private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)

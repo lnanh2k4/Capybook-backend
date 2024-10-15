@@ -3,11 +3,15 @@ package fa24.swp391.se1802.group3.capybook.models;
 
 import jakarta.persistence.*;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Collection;
 
 @Entity
 @Table(name = "staff")
-public class StaffDTO {
+public class StaffDTO implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     //Define fields for staff class
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -3,6 +3,8 @@ package fa24.swp391.se1802.group3.capybook.models;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Collection;
 
@@ -13,8 +15,10 @@ import java.util.Collection;
 @ToString
 @Entity
 @Table(name = "book")
-public class BookDTO {
+public class BookDTO implements Serializable {
     //Define fields for book class
+    @Serial
+    private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
