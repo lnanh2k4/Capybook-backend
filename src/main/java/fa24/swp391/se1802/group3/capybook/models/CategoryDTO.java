@@ -40,6 +40,7 @@ public class CategoryDTO implements Serializable {
     @OneToMany(mappedBy = "catID", fetch = FetchType.LAZY)
     @JsonManagedReference
     @JsonIgnore
+
     private Collection<BookDTO> bookCollection;
 
 
