@@ -25,12 +25,12 @@ public class CategoryDTO implements Serializable {
     private String catName;
     @Column(name = "catstatus")
     private Integer catStatus;
-    @OneToMany(mappedBy = "parentCatID")
+    @OneToMany(mappedBy = "parentCatID", fetch = FetchType.LAZY)
     private Collection<CategoryDTO> categoryCollection;
     @JoinColumn(name = "parentcatid", referencedColumnName = "catid")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private CategoryDTO parentCatID;
-    @OneToMany(mappedBy = "catID")
+    @OneToMany(mappedBy = "catID", fetch = FetchType.LAZY)
     private Collection<BookDTO> bookCollection;
 
 
