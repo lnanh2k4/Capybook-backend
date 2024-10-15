@@ -10,36 +10,47 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Repository
-public class BookDAOImpl implements BookDAO{
-    EntityManager entityManager;
+public class BookDAOImpl implements BookDAO {
+    private final EntityManager entityManager;
 
     @Autowired
-    public BookDAOImpl(EntityManager entityManager) { this.entityManager = entityManager; }
+    public BookDAOImpl(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
 
     @Override
+    @Transactional
     public void save(BookDTO bookDTO) {
-        entityManager.persist(bookDTO);
+        if (bookDTO.getBookID() == null) {
+            entityManager.persist(bookDTO); // Thêm mới nếu chưa có ID
+        } else {
+            entityManager.merge(bookDTO); // Cập nhật nếu đã có ID
+        }
     }
 
     @Override
     public BookDTO find(int bookID) {
-        return entityManager.find(BookDTO.class,bookID);
+        return entityManager.find(BookDTO.class, bookID);
     }
 
     @Override
     @Transactional
     public void update(BookDTO bookDTO) {
-        entityManager.merge(bookDTO);
+        entityManager.merge(bookDTO); // Cập nhật thông tin sách
     }
 
     @Override
+    @Transactional
     public void delete(int bookID) {
-        entityManager.remove(this.find(bookID));
+        BookDTO book = this.find(bookID);
+        if (book != null) {
+            entityManager.remove(book); // Xóa cuốn sách nếu tồn tại
+        }
     }
 
     @Override
     public List<BookDTO> findAll() {
-        TypedQuery<BookDTO> query = entityManager.createQuery("From BookDTO", BookDTO.class);
+        TypedQuery<BookDTO> query = entityManager.createQuery("FROM BookDTO", BookDTO.class);
         return query.getResultList();
     }
 }
