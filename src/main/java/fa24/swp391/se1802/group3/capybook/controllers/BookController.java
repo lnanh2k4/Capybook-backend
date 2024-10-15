@@ -1,12 +1,21 @@
 package fa24.swp391.se1802.group3.capybook.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import fa24.swp391.se1802.group3.capybook.daos.BookDAO;
 import fa24.swp391.se1802.group3.capybook.models.BookDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 @RestController
@@ -35,10 +44,42 @@ public class BookController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<BookDTO> addBook(@RequestBody BookDTO book) {
-        bookDAO.save(book);
-        return ResponseEntity.status(HttpStatus.CREATED).body(book);
+    public ResponseEntity<BookDTO> addBook(
+            @RequestPart("book") BookDTO book,
+            @RequestPart("image") MultipartFile image) {
+
+        try {
+            // Kiểm tra và lưu file ảnh nếu có
+            if (image != null && !image.isEmpty()) {
+                String fileName = StringUtils.cleanPath(image.getOriginalFilename());
+
+                // Đường dẫn lưu hình ảnh trong thư mục public/uploads
+                Path uploadPath = Paths.get("public/uploads/");
+                if (!Files.exists(uploadPath)) {
+                    Files.createDirectories(uploadPath); // Tạo thư mục nếu chưa tồn tại
+                }
+
+                // Sử dụng InputStream để lưu file
+                try (InputStream inputStream = image.getInputStream()) {
+                    Path filePath = uploadPath.resolve(fileName);
+                    Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+
+                    // Lưu đường dẫn của ảnh vào cơ sở dữ liệu (chỉ lưu đường dẫn)
+                    String imagePath = "/uploads/" + fileName;
+                    book.setImage(imagePath);  // setImage để lưu đường dẫn vào DB
+                }
+            }
+
+            // Lưu thông tin sách vào DB
+            bookDAO.save(book);
+            return ResponseEntity.status(HttpStatus.CREATED).body(book);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
+
+
 
     @PutMapping("/{bookId}")
     public ResponseEntity<BookDTO> updateBook(@PathVariable int bookId, @RequestBody BookDTO book) {
