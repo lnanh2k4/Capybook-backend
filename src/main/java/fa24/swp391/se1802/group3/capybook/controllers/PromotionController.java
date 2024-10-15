@@ -30,7 +30,9 @@ public class PromotionController {
     // Lấy chi tiết một khuyến mãi dựa trên proID
     @GetMapping("/{proID}")
     public ResponseEntity<PromotionDTO> getPromotionById(@PathVariable int proID) {
+
         PromotionDTO promotion = promotionDAO.find(proID); // Gọi hàm find từ DAO
+
         if (promotion != null) {
             return new ResponseEntity<>(promotion, HttpStatus.OK);
         } else {
@@ -70,6 +72,7 @@ public class PromotionController {
         } catch (Exception e) {
             System.err.println("Error marking promotion as deleted: " + e.getMessage());
             return new ResponseEntity<>("Failed to mark promotion as deleted due to an internal error.", HttpStatus.INTERNAL_SERVER_ERROR);
+
         }
     }
 
