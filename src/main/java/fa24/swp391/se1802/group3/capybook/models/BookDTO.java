@@ -55,12 +55,13 @@ public class BookDTO implements Serializable {
     private Integer bookQuantity;
     @Column(name = "bookstatus")
     private Integer bookStatus;
-    @OneToMany(mappedBy = "bookID")
+
+    @OneToMany(mappedBy = "bookID", fetch = FetchType.LAZY)
     private Collection<OrderDetailDTO> orderDetailCollection;
-    @OneToMany(mappedBy = "bookID")
+    @OneToMany(mappedBy = "bookID", fetch = FetchType.LAZY)
     private Collection<ImportStockDetailDTO> importStockDetailCollection;
     @JoinColumn(name = "catid", referencedColumnName = "catid")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private CategoryDTO catID;
 
 
