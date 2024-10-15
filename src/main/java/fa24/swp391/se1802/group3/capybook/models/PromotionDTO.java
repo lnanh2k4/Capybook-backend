@@ -1,6 +1,9 @@
 
 package fa24.swp391.se1802.group3.capybook.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -42,11 +45,17 @@ public class PromotionDTO implements Serializable {
     @Column(name = "prostatus")
     private Integer proStatus;
     @OneToMany(mappedBy = "proID")
+    @JsonManagedReference
+    @JsonIgnore
     private Collection<OrderDTO> orderDTO1Collection;
     @JoinColumn(name = "createdby", referencedColumnName = "staffid")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference
+    @JsonIgnore
     private StaffDTO createdBy;
     @JoinColumn(name = "approvedby", referencedColumnName = "staffid")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference
+    @JsonIgnore
     private StaffDTO approvedBy;
 }

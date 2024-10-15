@@ -1,6 +1,8 @@
 package fa24.swp391.se1802.group3.capybook.models;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,10 +29,14 @@ public class ImportStockDetailDTO implements Serializable {
     @Column(name = "importprice")
     private BigDecimal importPrice;
     @JoinColumn(name = "bookid", referencedColumnName = "bookid")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference
+    @JsonIgnore
     private BookDTO bookID;
     @JoinColumn(name = "isid", referencedColumnName = "isid")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference
+    @JsonIgnore
     private ImportStockDTO isid;
 
 

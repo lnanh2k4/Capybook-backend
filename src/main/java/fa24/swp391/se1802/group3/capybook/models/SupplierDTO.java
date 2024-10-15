@@ -1,6 +1,8 @@
 
 package fa24.swp391.se1802.group3.capybook.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -34,7 +36,9 @@ public class SupplierDTO implements Serializable {
     private String supAddress;
     @Column(name = "supstatus")
     private Integer supStatus;
-    @OneToMany(mappedBy = "supID")
+    @OneToMany(mappedBy = "supID", fetch = FetchType.LAZY)
+    @JsonManagedReference
+    @JsonIgnore
     private Collection<ImportStockDTO> importStockDTOCollection;
 
 
