@@ -1,6 +1,7 @@
 package fa24.swp391.se1802.group3.capybook.daos;
 
 import fa24.swp391.se1802.group3.capybook.models.BookDTO;
+import fa24.swp391.se1802.group3.capybook.models.CategoryDTO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,12 @@ public class BookDAOImpl implements BookDAO{
     @Override
     public List<BookDTO> findAll() {
         TypedQuery<BookDTO> query = entityManager.createQuery("From BookDTO", BookDTO.class);
+        return query.getResultList();
+    }
+
+    @Override
+    public List<CategoryDTO> findAllCategory() {
+        TypedQuery<CategoryDTO> query = entityManager.createQuery("FROM CategoryDTO", CategoryDTO.class);
         return query.getResultList();
     }
 }
