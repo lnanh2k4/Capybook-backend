@@ -24,6 +24,7 @@ public class PromotionDTO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "proid")
     private Integer proID;
