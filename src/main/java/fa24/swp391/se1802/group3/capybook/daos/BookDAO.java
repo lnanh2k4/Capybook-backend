@@ -11,5 +11,5 @@ public interface BookDAO {
     void update(BookDTO bookDTO);
     void delete(int bookID);
     List<BookDTO> findAll();
-    List<CategoryDTO> findAllCategory();
+    List<BookDTO> searchBooks(String searchTerm);
 }
