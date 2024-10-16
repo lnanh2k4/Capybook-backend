@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 @Repository
@@ -100,4 +99,21 @@ public class AccountDAOImpl implements AccountDAO {
         return accountDTO;
     }
 
+    @Override
+    @Transactional
+    public void addAccount(AccountDTO account) {
+        String jpql = "INSERT INTO AccountDTO (username, firstName, lastName, dob, email, phone, role, address, sex) "
+                + "VALUES (:username, :firstName, :lastName,  :dob, :email, :phone, :role, :address, :sex)";
+        Query query = entityManager.createQuery(jpql);
+        query.setParameter("username", account.getUsername());
+        query.setParameter("firstName", account.getFirstName());
+        query.setParameter("lastName", account.getLastName());
+        query.setParameter("dob", account.getDob());
+        query.setParameter("email", account.getEmail());
+        query.setParameter("phone", account.getPhone());
+        query.setParameter("role", account.getRole());
+        query.setParameter("address", account.getAddress());
+        query.setParameter("sex", account.getSex());
+        query.executeUpdate();
+    }
 }

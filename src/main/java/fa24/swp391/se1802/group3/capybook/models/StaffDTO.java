@@ -37,17 +37,17 @@ public class StaffDTO implements Serializable {
 
     @JoinColumn(name = "username", referencedColumnName = "username")
     @ManyToOne
-    @JsonBackReference
+    @JsonBackReference("account-staff")
     private AccountDTO username;
 
     @OneToMany(mappedBy = "managerID", fetch = FetchType.EAGER)
-    @JsonManagedReference
+    @JsonManagedReference("staff-staff")
     @JsonIgnore
     private Collection<StaffDTO> staffDTOCollection;
 
     @JoinColumn(name = "managerid", referencedColumnName = "staffid")
     @ManyToOne(fetch = FetchType.EAGER)
-    @JsonManagedReference
+    @JsonBackReference("staff-manager")
     private StaffDTO managerID;
 
     @OneToMany(mappedBy = "createdBy", fetch = FetchType.LAZY)

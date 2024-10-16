@@ -12,4 +12,5 @@ public interface AccountDAO {
     void deleteByUsername(String username);
     List<AccountDTO> findAll();
     public AccountDTO findDetailByUsernameAndStaff(String username, StaffDTO staff);
+    public void addAccount(AccountDTO account);
 }

@@ -52,7 +52,7 @@ public class AccountDTO implements Serializable {
     @JsonIgnore
     private Collection<OrderDTO> orderDTOCollection;
     @OneToMany(mappedBy = "username", fetch = FetchType.EAGER)
-    @JsonManagedReference
+    @JsonManagedReference("account-staff")
 //    @JsonIgnore
     private Collection<StaffDTO> staffDTOCollection;
 }
