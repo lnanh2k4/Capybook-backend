@@ -31,7 +31,8 @@ public class SupplierDAOImpl implements SupplierDAO {
     }
 
     @Override
-    public void delete(int supID) {
+    public void delete(int supID)
+    {
         entityManager.remove(this.find(supID));
     }
 

@@ -1,29 +1,126 @@
 package fa24.swp391.se1802.group3.capybook.controllers;
 
-import fa24.swp391.se1802.group3.capybook.daos.AccountDAO;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import fa24.swp391.se1802.group3.capybook.daos.SupplierDAO;
-import fa24.swp391.se1802.group3.capybook.models.AccountDTO;
+import fa24.swp391.se1802.group3.capybook.models.BookDTO;
 import fa24.swp391.se1802.group3.capybook.models.SupplierDTO;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/suppliers")
+@RequestMapping("api/v1/suppliers")
 public class SupplierController {
-    SupplierDAO supplierDAO;
+    @Autowired
+    private final SupplierDAO supplierDAO;
 
     @Autowired
     public SupplierController(SupplierDAO supplierDAO) {
         this.supplierDAO = supplierDAO;
     }
 
+    @RequestMapping(value = "/{id}", method = RequestMethod.OPTIONS)
+    public ResponseEntity<Void> handleOptions() {
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/")
     public List<SupplierDTO> getSuppliersList() {
         return supplierDAO.findAll();
     }
-}
+
+    @GetMapping("/{supID}")
+    public ResponseEntity<SupplierDTO> getSupplier(@PathVariable Integer supID) {
+        SupplierDTO supplier = supplierDAO.find(supID);
+        if (supplier != null) {
+            return ResponseEntity.ok(supplier);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+
+    // Fixing the method for adding supplier
+    @PostMapping("/")
+    @Transactional
+    public ResponseEntity<SupplierDTO> addSupplier(@RequestBody SupplierDTO supplier) {
+        try {
+            System.out.println("Request received");
+
+            // Set supplier status (this will be handled automatically from the front end)
+            supplier.setSupStatus(1);
+
+            // Save the supplier to the database
+            supplierDAO.save(supplier);
+            Integer supID = supplier.getSupID(); // Get supplier ID after saving
+
+            System.out.println("Supplier saved in database with ID: " + supID);
+            return ResponseEntity.status(HttpStatus.CREATED).body(supplier);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PutMapping("/{supID}")
+    @Transactional
+    public ResponseEntity<SupplierDTO> updateSupplier(
+            @PathVariable Integer supID,
+            @RequestBody SupplierDTO supplier) { // Change to @RequestBody
+
+        try {
+            System.out.println("Request received for updating supplier with ID: " + supID);
+
+            // Find existing supplier in the database
+            SupplierDTO existingSupplier = supplierDAO.find(supID);
+            if (existingSupplier == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // Return 404 if supplier not found
+            }
+
+            // Update supplier information
+            existingSupplier.setSupName(supplier.getSupName());
+            existingSupplier.setSupEmail(supplier.getSupEmail());
+            existingSupplier.setSupPhone(supplier.getSupPhone());
+            existingSupplier.setSupAddress(supplier.getSupAddress());
+            existingSupplier.setSupStatus(supplier.getSupStatus());
+
+            // Update supplier in the database
+            supplierDAO.update(existingSupplier);
+            System.out.println("Supplier updated in database");
+
+            return ResponseEntity.ok(existingSupplier);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
+    }
+
+    @DeleteMapping("/{supID}")
+    @Transactional
+    public ResponseEntity<String> deleteSupplier(@PathVariable int supID) {
+        SupplierDTO supplier = supplierDAO.find(supID);
+        if (supplier != null) {
+            supplierDAO.delete(supID);
+            return ResponseEntity.ok("Supplier deleted successfully!");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Supplier not found");
+        }
+    }
+    }
+
+
+
 
