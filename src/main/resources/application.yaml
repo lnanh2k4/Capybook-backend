@@ -20,6 +20,8 @@ spring:
     user:
       name: sa
       password: sa
+  jpa:
+    open-in-view: false
 
 server:
   port: 6789

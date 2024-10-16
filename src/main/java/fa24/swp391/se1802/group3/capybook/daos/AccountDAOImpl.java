@@ -1,18 +1,22 @@
 package fa24.swp391.se1802.group3.capybook.daos;
 
-import fa24.swp391.se1802.group3.capybook.exceptions.AccountExceptionNotFound;
 import fa24.swp391.se1802.group3.capybook.models.AccountDTO;
+import fa24.swp391.se1802.group3.capybook.models.StaffDTO;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Date;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
-public class AccountDAOImpl implements AccountDAO{
+public class AccountDAOImpl implements AccountDAO {
     //define entity manager
     EntityManager entityManager;
     //inject entity manager using constructor injection
@@ -25,24 +29,37 @@ public class AccountDAOImpl implements AccountDAO{
     //implements method
     @Override
     @Transactional
-    public AccountDTO save(AccountDTO accountDTO) {
-            return entityManager.merge(accountDTO);
-    }
-
-    @Override
-    public AccountDTO find(String username) {
-        AccountDTO object = entityManager.find(AccountDTO.class,username);
-        if(object!=null){
-            return object;
-        } else{
-            throw new AccountExceptionNotFound();
+    public void save(AccountDTO accountDTO) {
+        AccountDTO account = this.findByUsername(accountDTO.getUsername());
+        if (account != null) {
+            entityManager.merge(accountDTO);
+        } else {
+            entityManager.persist(accountDTO);
         }
     }
 
     @Override
+    public AccountDTO findByUsername(String username) {
+        Query query = entityManager.createQuery("Select a.username, a.firstName, a.lastName, a.dob, a.address, a.email, a.role, a.sex, a.phone From AccountDTO a WHERE a.username=:username");
+        query.setParameter("username", username);
+        Object[] result = (Object[]) query.getSingleResult();
+        AccountDTO account = new AccountDTO();
+        account.setUsername((String) result[0]);
+        account.setFirstName((String) result[1]);
+        account.setLastName((String) result[2]);
+        account.setDob((Date) result[3]);
+        account.setAddress((String) result[4]);
+        account.setEmail((String) result[5]);
+        account.setRole((Integer) result[6]);
+        account.setSex((Integer) result[7]);
+        account.setPhone((String) result[8]);
+        return account;
+    }
+
+    @Override
     @Transactional
-    public void delete(String username) {
-        entityManager.remove(this.find(username));
+    public void deleteByUsername(String username) {
+        entityManager.remove(this.findByUsername(username));
     }
 
     @Override
@@ -50,4 +67,37 @@ public class AccountDAOImpl implements AccountDAO{
         TypedQuery<AccountDTO> query = entityManager.createQuery("From AccountDTO", AccountDTO.class);
         return query.getResultList();
     }
+
+    @Override
+    public AccountDTO findDetailByUsernameAndStaff(String username, StaffDTO staff) {
+        Query query = entityManager.createQuery(
+                "SELECT a.username, a.firstName, a.lastName, a.dob, a.email, a.phone, " +
+                        "a.role, a.address, a.sex " +
+                        "FROM AccountDTO a " +
+                        "WHERE a.username = :username");
+
+        query.setParameter("username", username);
+
+
+        Object[] result = (Object[]) query.getSingleResult();
+
+        AccountDTO accountDTO = new AccountDTO();
+        accountDTO.setUsername((String) result[0]);
+        accountDTO.setFirstName((String) result[1]);
+        accountDTO.setLastName((String) result[2]);
+        accountDTO.setDob((Date) result[3]);
+        accountDTO.setEmail((String) result[4]);
+        accountDTO.setPhone((String) result[5]);
+        accountDTO.setRole((Integer) result[6]);
+        accountDTO.setAddress((String) result[7]);
+        accountDTO.setSex((Integer) result[8]);
+        System.out.println("Staff ID: "+staff.getStaffID());
+        System.out.println("Staff manager ID: "+ staff.getManagerID().getStaffID());
+        Collection<StaffDTO> collection = new ArrayList<>();
+        collection.add(staff);
+        System.out.println(staff.getUsername().getFirstName());
+        accountDTO.setStaffDTOCollection(collection);
+        return accountDTO;
+    }
+
 }
