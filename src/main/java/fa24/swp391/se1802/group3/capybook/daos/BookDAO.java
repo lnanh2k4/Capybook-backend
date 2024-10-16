@@ -1,6 +1,7 @@
 package fa24.swp391.se1802.group3.capybook.daos;
 
 import fa24.swp391.se1802.group3.capybook.models.BookDTO;
+import fa24.swp391.se1802.group3.capybook.models.CategoryDTO;
 
 import java.util.List;
 
@@ -10,4 +11,5 @@ public interface BookDAO {
     void update(BookDTO bookDTO);
     void delete(int bookID);
     List<BookDTO> findAll();
+    List<CategoryDTO> findAllCategory();
 }
