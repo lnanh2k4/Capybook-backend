@@ -2,8 +2,6 @@ package fa24.swp391.se1802.group3.capybook.daos;
 
 import fa24.swp391.se1802.group3.capybook.models.PromotionDTO;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityNotFoundException;
-import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -38,18 +36,12 @@ public class PromotionDAOImpl implements PromotionDAO {
         entityManager.merge(promotionDTO);
     }
 
-    @Transactional
+
+
     @Override
     public void delete(int proID) {
-        // Tạo truy vấn JPQL để xóa khuyến mãi dựa trên proID
-        Query query = entityManager.createQuery("DELETE FROM PromotionDTO p WHERE p.proID = :proID");
-        query.setParameter("proID", proID);
-        int result = query.executeUpdate();  // Trả về số dòng bị ảnh hưởng
-        if (result == 0) {
-            throw new EntityNotFoundException("Promotion not found with proID: " + proID);
-        }
+        entityManager.remove(this.find(proID));
     }
-
 
 
     @Override
@@ -57,4 +49,13 @@ public class PromotionDAOImpl implements PromotionDAO {
         TypedQuery<PromotionDTO> query = entityManager.createQuery("From PromotionDTO", PromotionDTO.class);
         return query.getResultList();
     }
+
+    @Override
+    public List<PromotionDTO> searchPromotions(String searchTerm) {
+        String jpql = "FROM PromotionDTO WHERE LOWER(proName) LIKE :searchTerm OR LOWER(proCode) LIKE :searchTerm";
+        TypedQuery<PromotionDTO> query = entityManager.createQuery(jpql, PromotionDTO.class);
+        query.setParameter("searchTerm", "%" + searchTerm.toLowerCase() + "%");
+        return query.getResultList();
+    }
+
 }
