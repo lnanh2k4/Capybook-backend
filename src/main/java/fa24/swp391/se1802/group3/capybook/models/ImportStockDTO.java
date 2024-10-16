@@ -32,7 +32,7 @@ public class ImportStockDTO implements Serializable {
     @Column(name = "isstatus")
     private Integer iSStatus;
     @OneToMany(mappedBy = "isid")
-    @JsonManagedReference
+    @JsonBackReference
     @JsonIgnore
     private Collection<ImportStockDetailDTO> importStockDetailCollection;
     @JoinColumn(name = "staffid", referencedColumnName = "staffid")
