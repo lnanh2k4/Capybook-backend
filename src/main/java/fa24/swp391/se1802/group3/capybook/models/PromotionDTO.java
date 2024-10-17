@@ -52,11 +52,11 @@ public class PromotionDTO implements Serializable {
     @JoinColumn(name = "createdby", referencedColumnName = "staffid")
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
-//    @JsonIgnore
+    @JsonIgnore
     private StaffDTO createdBy;
     @JoinColumn(name = "approvedby", referencedColumnName = "staffid")
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
-//    @JsonIgnore
+    @JsonIgnore
     private StaffDTO approvedBy;
 }
