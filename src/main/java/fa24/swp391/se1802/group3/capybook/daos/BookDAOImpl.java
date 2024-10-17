@@ -15,13 +15,18 @@ public class BookDAOImpl implements BookDAO{
     EntityManager entityManager;
 
     @Autowired
-    public BookDAOImpl(EntityManager entityManager) { this.entityManager = entityManager; }
-
-    @Override
-    public void save(BookDTO bookDTO) {
-        entityManager.persist(bookDTO);
+    public BookDAOImpl(EntityManager entityManager) {
+        this.entityManager = entityManager;
     }
-
+    @Override
+    @Transactional
+    public void save(BookDTO bookDTO) {
+        if (bookDTO.getBookID() != null) {
+            entityManager.merge(bookDTO);  // Sử dụng merge cho đối tượng đã tồn tại
+        } else {
+            entityManager.persist(bookDTO);  // Sử dụng persist cho đối tượng mới
+        }
+    }
     @Override
     public BookDTO find(int bookID) {
         return entityManager.find(BookDTO.class,bookID);
@@ -34,8 +39,8 @@ public class BookDAOImpl implements BookDAO{
     }
 
     @Override
-    public void delete(int bookID)
-    {
+    @Transactional
+    public void delete(int bookID) {
         entityManager.remove(this.find(bookID));
     }
 
