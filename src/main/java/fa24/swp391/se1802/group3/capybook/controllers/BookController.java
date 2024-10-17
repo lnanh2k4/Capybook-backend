@@ -20,6 +20,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/books")
+@CrossOrigin(origins = "http://localhost:5175")
 public class BookController {
     private final BookDAO bookDAO;
 
@@ -48,10 +49,10 @@ public class BookController {
         }
     }
 
-    @PostMapping("/")
+    @PostMapping
     public ResponseEntity<BookDTO> addBook(
             @RequestPart("book") String bookData,
-            @RequestPart("image") MultipartFile image) {
+            @RequestPart(value = "image", required = false) MultipartFile image) {
         try {
             System.out.println("Request received");
             ObjectMapper objectMapper = new ObjectMapper();
@@ -61,52 +62,38 @@ public class BookController {
             // Đặt trạng thái bookStatus là 1
             book.setBookStatus(1);
 
-            // Lưu book trước để lấy bookID
+            // Lưu thông tin sách
             bookDAO.save(book);
             Integer bookID = book.getBookID(); // Lấy bookID sau khi lưu
 
             if (image != null && !image.isEmpty()) {
-                // Tạo một tên file độc nhất với bookID
                 String originalFileName = StringUtils.cleanPath(image.getOriginalFilename());
-                String extension = originalFileName.substring(originalFileName.lastIndexOf(".")); // Lấy đuôi file (ví dụ: .jpg, .png)
-
-                // Sử dụng bookID và ngày giờ hiện tại để tạo tên file độc nhất
+                String extension = originalFileName.substring(originalFileName.lastIndexOf("."));
                 String uniqueFileName = "book_" + bookID + "_" + System.currentTimeMillis() + extension;
 
-                System.out.println("Generated unique file name: " + uniqueFileName);
-
-                // Xác định thư mục lưu file
                 String uploadDir = System.getProperty("user.dir") + "/uploads/";
                 Path uploadPath = Paths.get(uploadDir);
 
-                // Tạo thư mục nếu chưa tồn tại
                 if (!Files.exists(uploadPath)) {
                     Files.createDirectories(uploadPath);
-                    System.out.println("Directory created: " + uploadDir);
                 }
 
-                // Lưu file ảnh vào thư mục
                 try (InputStream inputStream = image.getInputStream()) {
                     Path targetPath = uploadPath.resolve(uniqueFileName);
                     Files.copy(inputStream, targetPath, StandardCopyOption.REPLACE_EXISTING);
-                    System.out.println("File saved at: " + targetPath);
                 }
 
-                // Lưu đường dẫn của ảnh vào đối tượng book
                 book.setImage("/uploads/" + uniqueFileName);
-                System.out.println("Image path set in book object");
-
-                // Cập nhật lại thông tin book với đường dẫn ảnh
                 bookDAO.save(book);
             }
 
-            System.out.println("Book saved in database");
             return ResponseEntity.status(HttpStatus.CREATED).body(book);
         } catch (IOException e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
     @PutMapping("/{bookId}")
     public ResponseEntity<BookDTO> updateBook(
             @PathVariable int bookId,
@@ -194,5 +181,7 @@ public class BookController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Book not found");
         }
     }
+
+
 
 }
