@@ -26,20 +26,25 @@ public class ImportStockDTO implements Serializable {
     @Basic(optional = false)
     @Column(name = "isid")
     private Integer isid;
+
     @Column(name = "importdate")
     @Temporal(TemporalType.DATE)
     private Date importDate;
+
     @Column(name = "isstatus")
     private Integer iSStatus;
+
     @OneToMany(mappedBy = "isid")
     @JsonBackReference
     @JsonIgnore
     private Collection<ImportStockDetailDTO> importStockDetailCollection;
+
     @JoinColumn(name = "staffid", referencedColumnName = "staffid")
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
     @JsonIgnore
     private StaffDTO staffID;
+
     @JoinColumn(name = "supid", referencedColumnName = "supid")
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference

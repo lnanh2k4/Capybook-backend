@@ -28,26 +28,32 @@ public class OrderDTO implements Serializable {
     @Basic(optional = false)
     @Column(name = "orderid")
     private Integer orderID;
+
     @Column(name = "orderdate")
     @Temporal(TemporalType.DATE)
     private Date orderDate;
+
     @Column(name = "orderstatus")
     private Integer orderStatus;
+
     @JoinColumn(name = "username", referencedColumnName = "username")
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
     @JsonIgnore
     private AccountDTO username;
+
     @JoinColumn(name = "proid", referencedColumnName = "proid")
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
     @JsonIgnore
     private PromotionDTO proID;
+
     @JoinColumn(name = "staffid", referencedColumnName = "staffid")
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
     @JsonIgnore
     private StaffDTO staffID;
+
     @OneToMany(mappedBy = "orderID", fetch = FetchType.LAZY)
     @JsonManagedReference
     @JsonIgnore

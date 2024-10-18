@@ -22,13 +22,11 @@ public class CartDTO implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
-    @Column(name = "cartID")
+    @Column(name = "cartid")
     private Integer cartID;
 
     @Column(name = "quantity")
     private Integer quantity;
-
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
@@ -39,6 +37,6 @@ public class CartDTO implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
     @JsonIgnore
-    @JoinColumn(name = "bookID", referencedColumnName = "bookID")
+    @JoinColumn(name = "bookid", referencedColumnName = "bookid")
     private BookDTO bookID; // Ensure this points to BookDTO
 }

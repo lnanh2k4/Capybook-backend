@@ -24,16 +24,20 @@ public class ImportStockDetailDTO implements Serializable {
     @Basic(optional = false)
     @Column(name = "isdid")
     private Integer isdid;
+
     @Column(name = "isdquantity")
     private Integer iSDQuantity;
+
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "importprice")
     private BigDecimal importPrice;
+
     @JoinColumn(name = "bookid", referencedColumnName = "bookid")
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
     @JsonIgnore
     private BookDTO bookID;
+
     @JoinColumn(name = "isid", referencedColumnName = "isid")
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
