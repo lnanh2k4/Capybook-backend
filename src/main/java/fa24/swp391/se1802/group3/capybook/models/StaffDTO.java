@@ -65,5 +65,10 @@ public class StaffDTO implements Serializable {
     @JsonIgnore
     private Collection<ImportStockDTO> importStockDTOCollection;
 
+    @OneToMany(mappedBy = "staffID")
+    @JsonManagedReference
+    @JsonIgnore
+    private Collection<NotificationDTO> notificationCollection;
+
 
 }

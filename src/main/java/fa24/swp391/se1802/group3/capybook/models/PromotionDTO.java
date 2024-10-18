@@ -28,32 +28,41 @@ public class PromotionDTO implements Serializable {
     @Basic(optional = false)
     @Column(name = "proid")
     private Integer proID;
+
     @Column(name = "proname")
     private String proName;
+
     @Column(name = "procode")
     private String proCode;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "discount")
     private Double discount;
+
     @Column(name = "startdate")
     @Temporal(TemporalType.DATE)
     private Date startDate;
+
     @Column(name = "enddate")
     @Temporal(TemporalType.DATE)
     private Date endDate;
+
     @Column(name = "quantity")
     private Integer quantity;
+
     @Column(name = "prostatus")
     private Integer proStatus;
+
     @OneToMany(mappedBy = "proID")
     @JsonManagedReference
     @JsonIgnore
     private Collection<OrderDTO> orderDTO1Collection;
+
     @JoinColumn(name = "createdby", referencedColumnName = "staffid")
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
     @JsonIgnore
     private StaffDTO createdBy;
+
     @JoinColumn(name = "approvedby", referencedColumnName = "staffid")
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference

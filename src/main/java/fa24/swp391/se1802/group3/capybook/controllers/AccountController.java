@@ -61,9 +61,6 @@ public class AccountController {
 
     @PostMapping(value = "/")
     public ResponseEntity<AccountDTO> addAccount(@RequestPart("account") String account) {
-//        accountDAO.addAccount(account);
-//        return ResponseEntity.status(HttpStatus.CREATED).body(account);
-
         try {
             System.out.println("Request received");
             ObjectMapper objectMapper = new ObjectMapper();
@@ -79,9 +76,7 @@ public class AccountController {
     }
 
     @PutMapping("/{username}")
-    public ResponseEntity<AccountDTO> updateAccount(
-            @PathVariable String username,
-            @RequestPart("account") String account) {
+    public ResponseEntity<AccountDTO> updateAccount( @PathVariable String username,  @RequestPart("account") String account) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             AccountDTO accountDTO = objectMapper.readValue(account, AccountDTO.class);
@@ -110,7 +105,7 @@ public class AccountController {
         }
     }
 
-    @DeleteMapping("/delete/{username}")
+    @DeleteMapping("/{username}")
     public ResponseEntity<String> deleteAccount(@PathVariable String username) {
         AccountDTO account = accountDAO.findByUsername(username);
         if (account != null) {

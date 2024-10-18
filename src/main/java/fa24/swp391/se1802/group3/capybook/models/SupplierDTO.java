@@ -27,16 +27,22 @@ public class SupplierDTO implements Serializable {
     @Basic(optional = false)
     @Column(name = "supid")
     private Integer supID;
+
     @Column(name = "supname")
     private String supName;
+
     @Column(name = "supemail")
     private String supEmail;
+
     @Column(name = "supphone")
     private String supPhone;
+
     @Column(name = "supaddress")
     private String supAddress;
+
     @Column(name = "supstatus")
     private Integer supStatus;
+
     @OneToMany(mappedBy = "supID", fetch = FetchType.LAZY)
     @JsonManagedReference
     @JsonIgnore

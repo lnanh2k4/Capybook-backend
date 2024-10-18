@@ -25,13 +25,16 @@ public class OrderDetailDTO implements Serializable {
     @Basic(optional = false)
     @Column(name = "odid")
     private Integer odid;
+
     @Column(name = "quantity")
     private Integer quantity;
+
     @JoinColumn(name = "bookid", referencedColumnName = "bookid")
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
     @JsonIgnore
     private BookDTO bookID;
+
     @JoinColumn(name = "orderid", referencedColumnName = "orderid")
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
