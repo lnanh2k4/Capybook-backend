@@ -28,12 +28,15 @@ public class CategoryController {
             return categoryDAO.findAll();
         }
 
-    @GetMapping("/{username}")
+
+
+    @GetMapping("/{catID}")
     public CategoryDTO getCategory(@PathVariable int catID){
         if(categoryDAO.find(catID)!=null)
             return categoryDAO.find(catID);
         else throw new CategoryExceptionNotFound();
     }
+
 
     @ExceptionHandler
     public ResponseEntity<CategoryExceptionResponseDTO> handlerException(CategoryExceptionNotFound exec){
@@ -45,23 +48,49 @@ public class CategoryController {
     }
 
     @PostMapping("/")
-    public CategoryDTO addCategory(CategoryDTO category){
+    public CategoryDTO addCategory(@RequestBody CategoryDTO category){
+        System.out.println("Received category data: " + category); // Log dữ liệu category được nhận
         return categoryDAO.save(category);
     }
+
 
     @PutMapping("/")
     public CategoryDTO updateCategory(@RequestBody CategoryDTO category){
         return categoryDAO.save(category);
     }
 
-    @DeleteMapping("/{catid}")
-    public String deleteCategory(@PathVariable int catID){
-        CategoryDTO cat = categoryDAO.find(catID);
-        if(cat!=null){
-            categoryDAO.delete(catID);
-            return "Successfully!";
-        } else{
+    @PutMapping("/{catID}/soft-delete")
+    public ResponseEntity<?> softDeleteCategory(@PathVariable int catID) {
+        // Tìm category theo ID
+        CategoryDTO category = categoryDAO.find(catID);
+
+        // Kiểm tra nếu không tìm thấy category
+        if (category == null) {
             throw new CategoryExceptionNotFound();
         }
+
+        // Kiểm tra xem category này có child nào không
+        List<CategoryDTO> childCategories = categoryDAO.findByParentCatID(catID);
+
+        // Nếu tồn tại child, không cho phép xóa
+        if (!childCategories.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Cannot delete this category as it has child categories.");
+        }
+
+        // Nếu không có child, thực hiện soft delete (set catStatus = 0)
+        category.setCatStatus(0);
+        categoryDAO.save(category);
+
+        return ResponseEntity.ok("Category soft deleted successfully!");
     }
+
+
+    @GetMapping("/search")
+    public List<CategoryDTO> searchCategories(@RequestParam("term") String term) {
+        return categoryDAO.searchByName(term);
+    }
+
+
+
 }
