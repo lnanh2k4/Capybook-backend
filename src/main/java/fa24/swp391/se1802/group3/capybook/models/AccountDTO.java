@@ -69,5 +69,6 @@ public class AccountDTO implements Serializable {
 
     @OneToMany(mappedBy = "username")
     @JsonManagedReference("account-cart")
+    @JsonIgnore
     private Collection<CartDTO> cartCollection;
 }
