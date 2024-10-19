@@ -33,7 +33,7 @@ public class PromotionDAOImpl implements PromotionDAO {
     @Override
     @Transactional
     public void update(PromotionDTO promotionDTO) {
-        entityManager.merge(promotionDTO);
+        entityManager.merge(promotionDTO);  // Sử dụng merge để cập nhật
     }
 
 
@@ -57,5 +57,6 @@ public class PromotionDAOImpl implements PromotionDAO {
         query.setParameter("searchTerm", "%" + searchTerm.toLowerCase() + "%");
         return query.getResultList();
     }
+
 
 }
