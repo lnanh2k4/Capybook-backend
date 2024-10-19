@@ -67,17 +67,21 @@ public class PromotionController {
 
 
 
-    // Cập nhật thông tin khuyến mãi
     @PutMapping("/{proID}")
     public ResponseEntity<PromotionDTO> updatePromotion(@PathVariable int proID, @RequestBody PromotionDTO promotionDTO) {
         PromotionDTO existingPromotion = promotionDAO.find(proID);
         if (existingPromotion != null) {
-            promotionDAO.update(promotionDTO);
+            // Giữ nguyên proStatus nếu không có yêu cầu thay đổi từ phía client
+            promotionDTO.setProID(proID); // Đảm bảo proID đúng
+            promotionDTO.setProStatus(existingPromotion.getProStatus()); // Giữ lại giá trị proStatus gốc
+            promotionDAO.update(promotionDTO); // Thực hiện cập nhật
             return new ResponseEntity<>(promotionDTO, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
+
 
     @DeleteMapping("/{proID}")
     public ResponseEntity<String> deletePromotion(@PathVariable int proID) {
@@ -92,6 +96,10 @@ public class PromotionController {
         }
     }
 
+    @GetMapping("/search")
+    public List<PromotionDTO> searchPromotions(@RequestParam String term) {
+        return promotionDAO.searchPromotions(term); // Thực hiện tìm kiếm trong DAO
+    }
 
 
 
