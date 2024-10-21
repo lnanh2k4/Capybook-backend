@@ -94,6 +94,7 @@ public class CategoryController {
 
         // Nếu không có child, thực hiện soft delete (set catStatus = 0)
         category.setCatStatus(0);
+        category.setParentCatID(null);
         categoryDAO.save(category);
 
         return ResponseEntity.ok("Category soft deleted successfully!");
