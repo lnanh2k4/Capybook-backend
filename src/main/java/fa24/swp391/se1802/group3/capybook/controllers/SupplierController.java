@@ -93,7 +93,6 @@ public class SupplierController {
             existingSupplier.setSupEmail(supplier.getSupEmail());
             existingSupplier.setSupPhone(supplier.getSupPhone());
             existingSupplier.setSupAddress(supplier.getSupAddress());
-            existingSupplier.setSupStatus(supplier.getSupStatus());
 
             // Update supplier in the database
             supplierDAO.update(existingSupplier);
@@ -108,17 +107,8 @@ public class SupplierController {
 
     }
 
-    @DeleteMapping("/{supID}")
-    @Transactional
-    public ResponseEntity<String> deleteSupplier(@PathVariable int supID) {
-        SupplierDTO supplier = supplierDAO.find(supID);
-        if (supplier != null) {
-            supplierDAO.delete(supID);
-            return ResponseEntity.ok("Supplier deleted successfully!");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Supplier not found");
-        }
-    }
+
+
     }
 
 
