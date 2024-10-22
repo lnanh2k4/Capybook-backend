@@ -54,10 +54,24 @@ public class CategoryController {
     }
 
 
-    @PutMapping("/")
-    public CategoryDTO updateCategory(@RequestBody CategoryDTO category){
-        return categoryDAO.save(category);
+    @PutMapping("/{catID}")
+    public CategoryDTO updateCategory(@PathVariable int catID, @RequestBody CategoryDTO category) {
+        CategoryDTO existingCategory = categoryDAO.find(catID);
+        if (existingCategory == null) {
+            throw new CategoryExceptionNotFound();
+        }
+
+        // Đảm bảo catStatus không null và đặt giá trị mặc định nếu cần
+        existingCategory.setCatStatus(category.getCatStatus() != null ? category.getCatStatus() : 1);
+
+        // Cập nhật thông tin khác
+        existingCategory.setCatName(category.getCatName());
+        existingCategory.setParentCatID(category.getParentCatID());
+
+        return categoryDAO.save(existingCategory);
     }
+
+
 
     @PutMapping("/{catID}/soft-delete")
     public ResponseEntity<?> softDeleteCategory(@PathVariable int catID) {
@@ -80,6 +94,7 @@ public class CategoryController {
 
         // Nếu không có child, thực hiện soft delete (set catStatus = 0)
         category.setCatStatus(0);
+        category.setParentCatID(null);
         categoryDAO.save(category);
 
         return ResponseEntity.ok("Category soft deleted successfully!");
