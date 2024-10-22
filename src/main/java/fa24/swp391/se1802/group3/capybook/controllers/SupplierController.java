@@ -3,6 +3,7 @@ package fa24.swp391.se1802.group3.capybook.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fa24.swp391.se1802.group3.capybook.daos.SupplierDAO;
 import fa24.swp391.se1802.group3.capybook.models.BookDTO;
+import fa24.swp391.se1802.group3.capybook.models.PromotionDTO;
 import fa24.swp391.se1802.group3.capybook.models.SupplierDTO;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,7 +108,10 @@ public class SupplierController {
 
     }
 
-
+    @GetMapping("/search")
+    public List<SupplierDTO> searchSuppliers(@RequestParam String term) {
+        return supplierDAO.searchSuppliers(term); // Thực hiện tìm kiếm trong DAO
+    }
 
     }
 

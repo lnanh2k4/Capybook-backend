@@ -1,5 +1,6 @@
 package fa24.swp391.se1802.group3.capybook.daos;
 
+import fa24.swp391.se1802.group3.capybook.models.PromotionDTO;
 import fa24.swp391.se1802.group3.capybook.models.SupplierDTO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
@@ -41,5 +42,12 @@ public class SupplierDAOImpl implements SupplierDAO {
         TypedQuery<SupplierDTO> query = entityManager.createQuery("From SupplierDTO", SupplierDTO.class);
         return query.getResultList();
 
+    }
+    @Override
+    public List<SupplierDTO> searchSuppliers(String searchTerm) {
+        String jpql = "FROM SupplierDTO WHERE LOWER(supName) LIKE :SupplierDTO OR LOWER(supEmail) LIKE :searchTerm";
+        TypedQuery<SupplierDTO> query = entityManager.createQuery(jpql, SupplierDTO.class);
+        query.setParameter("searchTerm", "%" + searchTerm.toLowerCase() + "%");
+        return query.getResultList();
     }
 }
