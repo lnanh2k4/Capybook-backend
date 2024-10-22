@@ -1,6 +1,7 @@
 package fa24.swp391.se1802.group3.capybook.daos;
 
 import fa24.swp391.se1802.group3.capybook.models.AccountDTO;
+import fa24.swp391.se1802.group3.capybook.models.PromotionDTO;
 import fa24.swp391.se1802.group3.capybook.models.StaffDTO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
@@ -38,6 +39,15 @@ public class AccountDAOImpl implements AccountDAO {
     }
 
     @Override
+    public List<AccountDTO> searchAccounts(String searchKey) {
+            String str = "FROM AccountDTO WHERE LOWER(username) LIKE :searchKey OR LOWER(firstName) LIKE :searchKey OR LOWER(lastName) LIKE :searchKey";
+            TypedQuery<AccountDTO> query = entityManager.createQuery(str, AccountDTO.class);
+            query.setParameter("searchKey", "%" + searchKey.toLowerCase() + "%");
+            return query.getResultList();
+    }
+
+
+    @Override
     public AccountDTO findByUsername(String username) {
         Query query = entityManager.createQuery("Select a.username, a.firstName, a.lastName, a.dob, a.address, a.email, a.role, a.sex, a.phone From AccountDTO a WHERE a.username=:username");
         query.setParameter("username", username);
@@ -58,7 +68,11 @@ public class AccountDAOImpl implements AccountDAO {
     @Override
     @Transactional
     public void deleteByUsername(String username) {
-        entityManager.remove(this.findByUsername(username));
+        Query query = entityManager.createQuery(
+                "Delete From AccountDTO Where username = :username");
+
+        query.setParameter("username", username);
+        query.executeUpdate();
     }
 
     @Override

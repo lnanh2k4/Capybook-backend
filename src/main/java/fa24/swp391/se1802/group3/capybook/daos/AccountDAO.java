@@ -13,4 +13,5 @@ public interface AccountDAO {
     List<AccountDTO> findAll();
     public AccountDTO findDetailByUsernameAndStaff(String username, StaffDTO staff);
     public void addAccount(AccountDTO account);
+    List<AccountDTO> searchAccounts(String username);
 }

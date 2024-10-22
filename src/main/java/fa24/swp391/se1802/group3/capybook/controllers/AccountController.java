@@ -49,6 +49,11 @@ public class AccountController {
         return accountDAO.findAll();
     }
 
+    @GetMapping("/search")
+    public List<AccountDTO> searchAccounts(@RequestParam String keyword) {
+        return accountDAO.searchAccounts(keyword);
+    }
+
     @GetMapping("/{username}")
     public ResponseEntity<AccountDTO> getAccount(@PathVariable String username) {
         AccountDTO account = accountDAO.findByUsername(username);
@@ -136,4 +141,5 @@ public class AccountController {
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
     }
+
 }
