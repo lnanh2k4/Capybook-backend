@@ -65,11 +65,8 @@ public class BookDTO implements Serializable {
     @JsonManagedReference
     @JsonIgnore
     private Collection<ImportStockDetailDTO> importStockDetailCollection;
-    @JoinColumn(name = "catid", referencedColumnName = "catid")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonBackReference
-    @JsonIgnore
-    private CategoryDTO catID;
+    @Column(name = "catid")
+    private Integer catID; // This represents the category to which this book belongs
 
     @OneToMany(mappedBy = "bookID")
     @JsonManagedReference("book-cart")
