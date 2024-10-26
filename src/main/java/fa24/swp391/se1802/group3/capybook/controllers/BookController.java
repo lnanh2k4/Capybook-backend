@@ -146,11 +146,24 @@ public class BookController {
             existingBook.setBookStatus(book.getBookStatus());
             existingBook.setCatID(book.getCatID()); // Ensure catID is updated
 
+            // Handle the image upload
             if (image != null && !image.isEmpty()) {
+                System.out.println("Received image file: " + image.getOriginalFilename());
+
+                // Extract file details
                 String originalFileName = StringUtils.cleanPath(image.getOriginalFilename());
+                System.out.println("Original file name: " + originalFileName);
+
+                // Validate file extension
+                if (!originalFileName.contains(".")) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); // No extension found
+                }
+
                 String extension = originalFileName.substring(originalFileName.lastIndexOf("."));
                 String uniqueFileName = "book_" + bookId + "_" + System.currentTimeMillis() + extension;
+                System.out.println("Generated unique file name: " + uniqueFileName);
 
+                // Upload path
                 String uploadDir = System.getProperty("user.dir") + "/uploads/";
                 Path uploadPath = Paths.get(uploadDir);
 
@@ -158,12 +171,16 @@ public class BookController {
                     Files.createDirectories(uploadPath);
                 }
 
+                // Save the file
                 try (InputStream inputStream = image.getInputStream()) {
                     Path targetPath = uploadPath.resolve(uniqueFileName);
                     Files.copy(inputStream, targetPath, StandardCopyOption.REPLACE_EXISTING);
+                    System.out.println("Image saved at: " + targetPath.toString());
                 }
 
                 existingBook.setImage("/uploads/" + uniqueFileName);
+            } else {
+                System.out.println("No image file uploaded.");
             }
 
             // Update the book in the database
@@ -175,6 +192,7 @@ public class BookController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
 
 
 
