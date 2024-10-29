@@ -21,8 +21,9 @@ public class OrderDetailDAOImpl implements OrderDetailDAO{
     @Override
     @Transactional
     public void save(OrderDetailDTO orderDetailDTO) {
-        entityManager.persist(orderDetailDTO);
+        entityManager.persist(orderDetailDTO);  // Lưu chi tiết đơn hàng vào cơ sở dữ liệu
     }
+
 
     @Override
     public OrderDetailDTO find(int ODID) {
@@ -45,4 +46,14 @@ public class OrderDetailDAOImpl implements OrderDetailDAO{
         TypedQuery<OrderDetailDTO> query = entityManager.createQuery("From OrderDetailDTO", OrderDetailDTO.class);
         return query.getResultList();
     }
+
+    @Override
+    public List<OrderDetailDTO> findByOrderID(int orderID) {
+        // JPQL query to fetch order details by orderID
+        TypedQuery<OrderDetailDTO> query = entityManager.createQuery(
+                "SELECT od FROM OrderDetailDTO od WHERE od.orderID.orderID = :orderID", OrderDetailDTO.class);
+        query.setParameter("orderID", orderID);
+        return query.getResultList();
+    }
+
 }
