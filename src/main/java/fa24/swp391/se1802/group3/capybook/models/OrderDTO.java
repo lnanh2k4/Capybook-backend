@@ -39,14 +39,13 @@ public class OrderDTO implements Serializable {
     @JoinColumn(name = "username", referencedColumnName = "username")
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
-    @JsonIgnore
     private AccountDTO username;
 
     @JoinColumn(name = "proid", referencedColumnName = "proid")
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
-    @JsonIgnore
     private PromotionDTO proID;
+
 
     @JoinColumn(name = "staffid", referencedColumnName = "staffid")
     @ManyToOne(fetch = FetchType.LAZY)

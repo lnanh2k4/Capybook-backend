@@ -1,13 +1,18 @@
 package fa24.swp391.se1802.group3.capybook.controllers;
 
 import fa24.swp391.se1802.group3.capybook.daos.OrderDAO;
+import fa24.swp391.se1802.group3.capybook.daos.OrderDetailDAO;
 import fa24.swp391.se1802.group3.capybook.models.OrderDTO;
+import fa24.swp391.se1802.group3.capybook.models.OrderDetailDTO;
+import fa24.swp391.se1802.group3.capybook.models.OrderRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/orders")
@@ -15,11 +20,13 @@ public class OrderController {
 
     private final OrderDAO orderDAO;
 
-    @Autowired
-    public OrderController(OrderDAO orderDAO) {
-        this.orderDAO = orderDAO;
-    }
+    private final OrderDetailDAO orderDetailDAO;
 
+    @Autowired
+    public OrderController(OrderDAO orderDAO, OrderDetailDAO orderDetailDAO) {
+        this.orderDAO = orderDAO;
+        this.orderDetailDAO = orderDetailDAO;
+    }
     // Lấy danh sách tất cả các đơn hàng
     @GetMapping("/")
     public List<OrderDTO> getAllOrders() {
@@ -36,6 +43,7 @@ public class OrderController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
 
     // Thêm mới một đơn hàng
     @PostMapping("/")
@@ -67,4 +75,30 @@ public class OrderController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
+    @PostMapping("/createOrderWithDetails")
+    public ResponseEntity<OrderDTO> createOrderWithDetails(@RequestBody OrderRequest orderRequest) {
+
+        // Lưu thông tin đơn hàng
+        OrderDTO orderDTO = orderRequest.getOrderDTO();
+        orderDAO.save(orderDTO);  // Lưu đơn hàng
+
+        // Lưu các chi tiết đơn hàng (OrderDetail)
+        for (OrderDetailDTO detail : orderRequest.getOrderDetails()) {
+            detail.setOrderID(orderDTO);  // Gán đối tượng OrderDTO thay vì chỉ gán orderID
+            orderDetailDAO.save(detail);  // Lưu từng chi tiết đơn hàng
+        }
+
+        return new ResponseEntity<>(orderDTO, HttpStatus.CREATED);
+    }
+
+//    @GetMapping("/details/{id}")
+//    public ResponseEntity<List<OrderDetailDTO>> getOrderDetailsByOrderID(@PathVariable int id) {
+//        List<OrderDetailDTO> orderDetails = orderDetailDAO.findByOrderID(id);
+//        if (!orderDetails.isEmpty()) {
+//            return new ResponseEntity<>(orderDetails, HttpStatus.OK);
+//        } else {
+//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//        }
+//    }
 }
