@@ -27,11 +27,17 @@ public class OrderController {
         this.orderDAO = orderDAO;
         this.orderDetailDAO = orderDetailDAO;
     }
-    // Lấy danh sách tất cả các đơn hàng
     @GetMapping("/")
     public List<OrderDTO> getAllOrders() {
-        return orderDAO.findAll();  // Sử dụng JPQL để lấy danh sách đơn hàng
+        List<OrderDTO> orders = orderDAO.findAll();
+        for (OrderDTO order : orders) {
+            if (order.getUsername() != null) {
+                order.setCustomerName(order.getUsername().getFirstName() + " " + order.getUsername().getLastName());
+            }
+        }
+        return orders;
     }
+
 
     // Lấy chi tiết một đơn hàng dựa trên orderID
     @GetMapping("/{orderID}")
@@ -52,13 +58,17 @@ public class OrderController {
         return new ResponseEntity<>(orderDTO, HttpStatus.CREATED);
     }
 
-    // Cập nhật thông tin đơn hàng
     @PutMapping("/{orderID}")
-    public ResponseEntity<OrderDTO> updateOrder(@PathVariable int orderID, @RequestBody OrderDTO orderDTO) {
+    public ResponseEntity<OrderDTO> updateOrder(@PathVariable int orderID, @RequestBody Map<String, Integer> updateData) {
         OrderDTO existingOrder = orderDAO.find(orderID);
         if (existingOrder != null) {
-            orderDAO.update(orderDTO);
-            return new ResponseEntity<>(orderDTO, HttpStatus.OK);
+            if (updateData.containsKey("orderStatus")) {
+                existingOrder.setOrderStatus(updateData.get("orderStatus"));
+                orderDAO.update(existingOrder);
+                return new ResponseEntity<>(existingOrder, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -92,13 +102,14 @@ public class OrderController {
         return new ResponseEntity<>(orderDTO, HttpStatus.CREATED);
     }
 
-//    @GetMapping("/details/{id}")
-//    public ResponseEntity<List<OrderDetailDTO>> getOrderDetailsByOrderID(@PathVariable int id) {
-//        List<OrderDetailDTO> orderDetails = orderDetailDAO.findByOrderID(id);
-//        if (!orderDetails.isEmpty()) {
-//            return new ResponseEntity<>(orderDetails, HttpStatus.OK);
-//        } else {
-//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//        }
-//    }
+    @GetMapping("/search")
+    public ResponseEntity<List<OrderDTO>> searchOrders(@RequestParam("term") int orderID) {
+        List<OrderDTO> orders = orderDAO.searchByOrderId(orderID);
+        for (OrderDTO order : orders) {
+            if (order.getUsername() != null) {
+                order.setCustomerName(order.getUsername().getFirstName() + " " + order.getUsername().getLastName());
+            }
+        }
+        return new ResponseEntity<>(orders, HttpStatus.OK);
+    }
 }

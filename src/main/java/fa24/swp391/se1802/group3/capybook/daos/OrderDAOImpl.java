@@ -43,7 +43,16 @@ public class OrderDAOImpl implements OrderDAO{
 
     @Override
     public List<OrderDTO> findAll() {
-        TypedQuery<OrderDTO> query = entityManager.createQuery("From OrderDTO", OrderDTO.class);
+        TypedQuery<OrderDTO> query = entityManager.createQuery("SELECT o FROM OrderDTO o JOIN FETCH o.username", OrderDTO.class);
         return query.getResultList();
     }
+
+    @Override
+    public List<OrderDTO> searchByOrderId(int orderID) {
+        TypedQuery<OrderDTO> query = entityManager.createQuery(
+                "SELECT o FROM OrderDTO o JOIN FETCH o.username WHERE o.orderID = :orderID", OrderDTO.class);
+        query.setParameter("orderID", orderID);
+        return query.getResultList();
+    }
+
 }

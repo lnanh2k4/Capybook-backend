@@ -36,8 +36,8 @@ public class OrderDTO implements Serializable {
     @Column(name = "orderstatus")
     private Integer orderStatus;
 
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "username", referencedColumnName = "username")
-    @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
     private AccountDTO username;
 
@@ -58,4 +58,9 @@ public class OrderDTO implements Serializable {
     @JsonIgnore
     private Collection<OrderDetailDTO> orderDetailCollection;
 
+    @Transient
+    private String customerName;
+    public String getCustomerName() {
+        return username != null ? username.getFirstName() + " " + username.getLastName() : null;
+    }
 }
