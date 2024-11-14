@@ -28,7 +28,9 @@ public class StaffDAOImpl implements  StaffDAO{
 
     @Override
     public StaffDTO findByID(int staffID) {
-        return entityManager.find(StaffDTO.class,staffID);
+        StaffDTO staff = entityManager.find(StaffDTO.class, staffID);
+        System.out.println("Retrieved Staff: " + staff); // Log the entire object
+        return staff;
     }
 
     @Override
