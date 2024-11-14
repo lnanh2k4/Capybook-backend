@@ -1,7 +1,6 @@
 package fa24.swp391.se1802.group3.capybook.models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,6 +20,7 @@ import java.util.Date;
 public class ImportStockDTO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
@@ -35,20 +35,14 @@ public class ImportStockDTO implements Serializable {
     private Integer iSStatus;
 
     @OneToMany(mappedBy = "isid")
-    @JsonBackReference
-    @JsonIgnore
+    @JsonBackReference // Keep this if ImportStockDetailDTO has a reference to ImportStockDTO
     private Collection<ImportStockDetailDTO> importStockDetailCollection;
 
     @JoinColumn(name = "staffid", referencedColumnName = "staffid")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonBackReference
-    @JsonIgnore
+    @ManyToOne(fetch = FetchType.EAGER) // Change to EAGER temporarily for debugging
     private StaffDTO staffID;
 
     @JoinColumn(name = "supid", referencedColumnName = "supid")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonBackReference
-    @JsonIgnore
+    @ManyToOne(fetch = FetchType.EAGER) // Change to EAGER temporarily for debugging
     private SupplierDTO supID;
-
 }
