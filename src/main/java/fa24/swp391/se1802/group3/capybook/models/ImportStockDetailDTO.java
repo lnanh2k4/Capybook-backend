@@ -1,9 +1,6 @@
 package fa24.swp391.se1802.group3.capybook.models;
 
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,6 +16,7 @@ import java.math.BigDecimal;
 @Table(name = "importstockdetail")
 public class ImportStockDetailDTO implements Serializable {
     private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
@@ -28,22 +26,15 @@ public class ImportStockDetailDTO implements Serializable {
     @Column(name = "isdquantity")
     private Integer iSDQuantity;
 
-    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "importprice")
     private BigDecimal importPrice;
 
     @JoinColumn(name = "bookid", referencedColumnName = "bookid")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonBackReference
-    @JsonIgnore
     private BookDTO bookID;
 
     @JoinColumn(name = "isid", referencedColumnName = "isid")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonBackReference
-    @JsonIgnore
+    @JsonIgnore // Bỏ qua isid trong serialization để tránh vòng lặp
     private ImportStockDTO isid;
-
-
-
 }
