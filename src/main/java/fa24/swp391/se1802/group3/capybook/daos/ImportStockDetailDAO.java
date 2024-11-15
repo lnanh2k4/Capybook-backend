@@ -20,8 +20,9 @@ public class ImportStockDetailDAO {
 
     public List<ImportStockDetailDTO> findByImportStockId(int importStockId) {
         TypedQuery<ImportStockDetailDTO> query = entityManager.createQuery(
-                "SELECT d FROM ImportStockDetailDTO d WHERE d.isid.isid = :importStockId", ImportStockDetailDTO.class);
+                "SELECT d FROM ImportStockDetailDTO d JOIN FETCH d.bookID WHERE d.isid.isid = :importStockId", ImportStockDetailDTO.class);
         query.setParameter("importStockId", importStockId);
         return query.getResultList();
     }
+
 }

@@ -1,8 +1,6 @@
 package fa24.swp391.se1802.group3.capybook.models;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,57 +19,69 @@ import java.util.Collection;
 public class BookDTO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "bookid")
     private Integer bookID;
+
     @Column(name = "booktitle")
     private String bookTitle;
+
     @Column(name = "author")
     private String author;
+
     @Column(name = "translator")
     private String translator;
+
     @Column(name = "publisher")
     private String publisher;
+
     @Column(name = "publicationyear")
     private Integer publicationYear;
+
     @Column(name = "isbn")
     private String isbn;
+
     @Lob
     @Column(name = "image")
     private String image;
+
     @Lob
     @Column(name = "bookdescription")
     private String bookDescription;
+
     @Column(name = "hardcover")
     private Integer hardcover;
+
     @Column(name = "dimension")
     private String dimension;
-    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+
     @Column(name = "weight")
     private Double weight;
+
     @Column(name = "bookprice")
     private BigDecimal bookPrice;
+
     @Column(name = "bookquantity")
     private Integer bookQuantity;
+
     @Column(name = "bookstatus")
     private Integer bookStatus;
+
     @OneToMany(mappedBy = "bookID", fetch = FetchType.EAGER)
     @JsonIgnore
     private Collection<OrderDetailDTO> orderDetailCollection;
+
     @OneToMany(mappedBy = "bookID", fetch = FetchType.LAZY)
-    @JsonManagedReference
-    @JsonIgnore
+    @JsonIgnore // Bỏ qua importStockDetailCollection trong serialization để tránh vòng lặp
     private Collection<ImportStockDetailDTO> importStockDetailCollection;
+
     @Column(name = "catid")
-    private Integer catID; // This represents the category to which this book belongs
+    private Integer catID;
 
     @OneToMany(mappedBy = "bookID")
-    @JsonManagedReference("book-cart")
     @JsonIgnore
     private Collection<CartDTO> cartCollection;
-
-
-
 }
