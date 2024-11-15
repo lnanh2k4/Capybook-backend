@@ -6,10 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api/v1/staff")
 public class StaffController {
-
     private final StaffDAO staffDAO;
 
     @Autowired
@@ -26,5 +26,4 @@ public class StaffController {
             return ResponseEntity.notFound().build();
         }
     }
-
 }
