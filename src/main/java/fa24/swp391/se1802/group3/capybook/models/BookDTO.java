@@ -57,8 +57,7 @@ public class BookDTO implements Serializable {
     private Integer bookQuantity;
     @Column(name = "bookstatus")
     private Integer bookStatus;
-    @OneToMany(mappedBy = "bookID", fetch = FetchType.LAZY)
-    @JsonManagedReference
+    @OneToMany(mappedBy = "bookID", fetch = FetchType.EAGER)
     @JsonIgnore
     private Collection<OrderDetailDTO> orderDetailCollection;
     @OneToMany(mappedBy = "bookID", fetch = FetchType.LAZY)

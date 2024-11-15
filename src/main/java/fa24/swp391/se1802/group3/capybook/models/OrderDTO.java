@@ -60,7 +60,4 @@ public class OrderDTO implements Serializable {
 
     @Transient
     private String customerName;
-    public String getCustomerName() {
-        return username != null ? username.getFirstName() + " " + username.getLastName() : null;
-    }
 }

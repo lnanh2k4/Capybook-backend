@@ -10,4 +10,5 @@ public interface OrderDetailDAO {
     void update(OrderDetailDTO orderDetailDTO);
     void delete(int ODID);
     List<OrderDetailDTO> findAll();
+    List<OrderDetailDTO> findByOrderID(int orderID);
 }

@@ -4,15 +4,18 @@ import fa24.swp391.se1802.group3.capybook.daos.OrderDAO;
 import fa24.swp391.se1802.group3.capybook.daos.OrderDetailDAO;
 import fa24.swp391.se1802.group3.capybook.models.OrderDTO;
 import fa24.swp391.se1802.group3.capybook.models.OrderDetailDTO;
-import fa24.swp391.se1802.group3.capybook.models.OrderRequest;
+import jakarta.transaction.Transactional;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/orders")
@@ -32,23 +35,55 @@ public class OrderController {
         List<OrderDTO> orders = orderDAO.findAll();
         for (OrderDTO order : orders) {
             if (order.getUsername() != null) {
-                order.setCustomerName(order.getUsername().getFirstName() + " " + order.getUsername().getLastName());
+                order.setCustomerName(order.getUsername().getUsername()); // Sử dụng username trực tiếp
             }
         }
         return orders;
     }
 
-
-    // Lấy chi tiết một đơn hàng dựa trên orderID
     @GetMapping("/{orderID}")
-    public ResponseEntity<OrderDTO> getOrderById(@PathVariable int orderID) {
+    @Transactional
+    public ResponseEntity<Map<String, Object>> getOrderWithDetails(@PathVariable int orderID) {
         OrderDTO order = orderDAO.find(orderID);
+        List<OrderDetailDTO> orderDetails = orderDetailDAO.findByOrderID(orderID);
+
         if (order != null) {
-            return new ResponseEntity<>(order, HttpStatus.OK);
+            Map<String, Object> response = new HashMap<>();
+
+            // Thêm thông tin của đơn hàng vào phản hồi, bao gồm thông tin chiết khấu nếu có
+            Map<String, Object> orderMap = new HashMap<>();
+            orderMap.put("orderID", order.getOrderID());
+            orderMap.put("orderDate", order.getOrderDate());
+            orderMap.put("orderStatus", order.getOrderStatus());
+            orderMap.put("username", order.getUsername().getUsername()); // Đưa username vào trong order
+
+            // Kiểm tra và thêm thông tin khuyến mãi nếu có
+            if (order.getProID() != null) {
+                orderMap.put("proID", order.getProID().getProID());
+                orderMap.put("discount", order.getProID().getDiscount());
+            }
+
+            response.put("order", orderMap);
+
+            // Tạo danh sách orderDetails
+            List<Map<String, Object>> orderDetailResponses = orderDetails.stream()
+                    .map(detail -> {
+                        Map<String, Object> detailMap = new HashMap<>();
+                        detailMap.put("ODID", detail.getOdid());
+                        detailMap.put("quantity", detail.getQuantity());
+                        detailMap.put("bookID", detail.getBookID().getBookID()); // Chỉ lấy bookID
+                        return detailMap;
+                    })
+                    .collect(Collectors.toList());
+
+            response.put("orderDetails", orderDetailResponses);
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
 
 
     // Thêm mới một đơn hàng
@@ -86,21 +121,6 @@ public class OrderController {
         }
     }
 
-    @PostMapping("/createOrderWithDetails")
-    public ResponseEntity<OrderDTO> createOrderWithDetails(@RequestBody OrderRequest orderRequest) {
-
-        // Lưu thông tin đơn hàng
-        OrderDTO orderDTO = orderRequest.getOrderDTO();
-        orderDAO.save(orderDTO);  // Lưu đơn hàng
-
-        // Lưu các chi tiết đơn hàng (OrderDetail)
-        for (OrderDetailDTO detail : orderRequest.getOrderDetails()) {
-            detail.setOrderID(orderDTO);  // Gán đối tượng OrderDTO thay vì chỉ gán orderID
-            orderDetailDAO.save(detail);  // Lưu từng chi tiết đơn hàng
-        }
-
-        return new ResponseEntity<>(orderDTO, HttpStatus.CREATED);
-    }
 
     @GetMapping("/search")
     public ResponseEntity<List<OrderDTO>> searchOrders(@RequestParam("term") int orderID) {
@@ -112,4 +132,6 @@ public class OrderController {
         }
         return new ResponseEntity<>(orders, HttpStatus.OK);
     }
+
+
 }

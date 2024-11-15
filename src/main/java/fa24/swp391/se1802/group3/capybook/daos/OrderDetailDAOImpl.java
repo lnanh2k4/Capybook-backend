@@ -47,6 +47,11 @@ public class OrderDetailDAOImpl implements OrderDetailDAO{
         return query.getResultList();
     }
 
-
+    public List<OrderDetailDTO> findByOrderID(int orderID) {
+        TypedQuery<OrderDetailDTO> query = entityManager.createQuery(
+                "SELECT od FROM OrderDetailDTO od WHERE od.orderID.orderID = :orderID", OrderDetailDTO.class);
+        query.setParameter("orderID", orderID);
+        return query.getResultList();
+    }
 
 }
