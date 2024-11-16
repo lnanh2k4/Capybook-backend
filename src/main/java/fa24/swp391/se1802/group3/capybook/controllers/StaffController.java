@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api/v1/staff")
@@ -17,6 +19,7 @@ public class StaffController {
         this.staffDAO = staffDAO;
     }
 
+    // Endpoint to fetch a single staff member by ID
     @GetMapping("/{id}")
     public ResponseEntity<StaffDTO> getStaffById(@PathVariable int id) {
         StaffDTO staff = staffDAO.findByID(id);
@@ -25,5 +28,12 @@ public class StaffController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    // New endpoint to fetch all staff members
+    @GetMapping("/")
+    public ResponseEntity<List<StaffDTO>> getAllStaff() {
+        List<StaffDTO> staffList = staffDAO.findAll();
+        return ResponseEntity.ok(staffList);
     }
 }
