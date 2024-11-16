@@ -1,12 +1,25 @@
 package fa24.swp391.se1802.group3.capybook.models;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import lombok.*;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
@@ -14,16 +27,15 @@ import java.util.Date;
 @AllArgsConstructor
 @Getter
 @Setter
-@ToString
 @Entity
 @Table(name = "importstock")
 public class ImportStockDTO implements Serializable {
+
     @Serial
     private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
     @Column(name = "isid")
     private Integer isid;
 
@@ -34,15 +46,17 @@ public class ImportStockDTO implements Serializable {
     @Column(name = "isstatus")
     private Integer iSStatus;
 
-    @OneToMany(mappedBy = "isid")
-    @JsonBackReference // Keep this if ImportStockDetailDTO has a reference to ImportStockDTO
-    private Collection<ImportStockDetailDTO> importStockDetailCollection;
-
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "staffid", referencedColumnName = "staffid")
-    @ManyToOne(fetch = FetchType.EAGER) // Change to EAGER temporarily for debugging
     private StaffDTO staffID;
 
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "supid", referencedColumnName = "supid")
-    @ManyToOne(fetch = FetchType.EAGER) // Change to EAGER temporarily for debugging
     private SupplierDTO supID;
+
+    @OneToMany(mappedBy = "isid", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private Collection<ImportStockDetailDTO> importStockDetailCollection = new ArrayList<>();
+
 }
+

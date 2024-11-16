@@ -3,6 +3,7 @@ package fa24.swp391.se1802.group3.capybook.daos;
 import fa24.swp391.se1802.group3.capybook.models.ImportStockDTO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -10,20 +11,23 @@ import java.util.List;
 
 @Repository
 public class ImportStockDAOImpl implements ImportStockDAO  {
-    EntityManager entityManager;
+    private final EntityManager entityManager;
 
     @Autowired
-    public ImportStockDAOImpl(EntityManager entityManager) { this.entityManager = entityManager; }
-
+    public ImportStockDAOImpl(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
 
     @Override
-    public void save(ImportStockDTO importStockDTO) {
+    @Transactional
+    public ImportStockDTO save(ImportStockDTO importStockDTO) {
         entityManager.persist(importStockDTO);
+        return importStockDTO;  // Return the saved entity
     }
 
     @Override
     public ImportStockDTO find(int ISID) {
-        return entityManager.find(ImportStockDTO.class,ISID);
+        return entityManager.find(ImportStockDTO.class, ISID);
     }
 
     @Override
@@ -42,3 +46,4 @@ public class ImportStockDAOImpl implements ImportStockDAO  {
         return query.getResultList();
     }
 }
+
