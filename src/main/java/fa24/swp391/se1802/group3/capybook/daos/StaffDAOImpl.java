@@ -20,9 +20,11 @@ public class StaffDAOImpl implements  StaffDAO{
         this.entityManager = entityManager;
     }
 
-    @Override
     @Transactional
-    public void save(StaffDTO staffDTO) {
+    @Override
+    public void save(AccountDTO accountDTO) {
+        StaffDTO staffDTO = new StaffDTO();
+        staffDTO.setUsername(accountDTO);
         entityManager.persist(staffDTO);
     }
 
