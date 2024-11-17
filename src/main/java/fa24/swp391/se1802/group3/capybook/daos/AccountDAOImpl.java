@@ -17,6 +17,9 @@ import java.util.List;
 
 @Repository
 public class AccountDAOImpl implements AccountDAO {
+    final int ACTIVE_STATUS = 1;
+    final int INACTIVE_STATUS = 0;
+
     //define entity manager
     EntityManager entityManager;
     //inject entity manager using constructor injection
@@ -49,7 +52,7 @@ public class AccountDAOImpl implements AccountDAO {
 
     @Override
     public AccountDTO findByUsername(String username) {
-        Query query = entityManager.createQuery("Select a.username, a.firstName, a.lastName, a.dob, a.address, a.email, a.role, a.sex, a.phone From AccountDTO a WHERE a.username=:username");
+        Query query = entityManager.createQuery("Select a.username, a.firstName, a.lastName, a.dob, a.address, a.email, a.role, a.sex, a.phone, a.accStatus From AccountDTO a WHERE a.username=:username");
         query.setParameter("username", username);
         Object[] result = (Object[]) query.getSingleResult();
         AccountDTO account = new AccountDTO();
@@ -62,6 +65,7 @@ public class AccountDAOImpl implements AccountDAO {
         account.setRole((Integer) result[6]);
         account.setSex((Integer) result[7]);
         account.setPhone((String) result[8]);
+        account.setAccStatus((Integer) result[9]);
         return account;
     }
 
@@ -69,8 +73,8 @@ public class AccountDAOImpl implements AccountDAO {
     @Transactional
     public void deleteByUsername(String username) {
         Query query = entityManager.createQuery(
-                "Delete From AccountDTO Where username = :username");
-
+                "UPDATE AccountDTO SET accStatus=:accStatus Where username = :username");
+        query.setParameter("accStatus", INACTIVE_STATUS);
         query.setParameter("username", username);
         query.executeUpdate();
     }
@@ -116,8 +120,8 @@ public class AccountDAOImpl implements AccountDAO {
     @Override
     @Transactional
     public void addAccount(AccountDTO account) {
-        String jpql = "INSERT INTO AccountDTO (username, firstName, lastName, dob, email, phone, role, address, sex) "
-                + "VALUES (:username, :firstName, :lastName,  :dob, :email, :phone, :role, :address, :sex)";
+        String jpql = "INSERT INTO AccountDTO (username, firstName, lastName, dob, email, phone, role, address, sex, password, accStatus) "
+                + "VALUES (:username, :firstName, :lastName,  :dob, :email, :phone, :role, :address, :sex, :password, :accStatus)";
         Query query = entityManager.createQuery(jpql);
         query.setParameter("username", account.getUsername());
         query.setParameter("firstName", account.getFirstName());
@@ -128,6 +132,8 @@ public class AccountDAOImpl implements AccountDAO {
         query.setParameter("role", account.getRole());
         query.setParameter("address", account.getAddress());
         query.setParameter("sex", account.getSex());
+        query.setParameter("password",account.getPassword());
+        query.setParameter("accStatus",ACTIVE_STATUS);
         query.executeUpdate();
     }
 }
