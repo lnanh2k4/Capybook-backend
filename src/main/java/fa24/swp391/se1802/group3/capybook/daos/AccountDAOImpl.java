@@ -52,7 +52,7 @@ public class AccountDAOImpl implements AccountDAO {
 
     @Override
     public AccountDTO findByUsername(String username) {
-        Query query = entityManager.createQuery("Select a.username, a.firstName, a.lastName, a.dob, a.address, a.email, a.role, a.sex, a.phone, a.accStatus From AccountDTO a WHERE a.username=:username");
+        Query query = entityManager.createQuery("Select a.username, a.firstName, a.lastName, a.dob, a.address, a.email, a.role, a.sex, a.phone, a.accStatus, a.password From AccountDTO a WHERE a.username=:username");
         query.setParameter("username", username);
         Object[] result = (Object[]) query.getSingleResult();
         AccountDTO account = new AccountDTO();
@@ -66,6 +66,7 @@ public class AccountDAOImpl implements AccountDAO {
         account.setSex((Integer) result[7]);
         account.setPhone((String) result[8]);
         account.setAccStatus((Integer) result[9]);
+        account.setPassword((String) result[10]);
         return account;
     }
 
