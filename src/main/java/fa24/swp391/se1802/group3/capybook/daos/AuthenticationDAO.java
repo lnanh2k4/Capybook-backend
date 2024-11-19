@@ -5,6 +5,7 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import fa24.swp391.se1802.group3.capybook.models.AccountDTO;
 import fa24.swp391.se1802.group3.capybook.request.AuthenticationRequest;
 import fa24.swp391.se1802.group3.capybook.request.IntrospectRequest;
 import fa24.swp391.se1802.group3.capybook.response.AuthenticationResponse;
@@ -23,6 +24,7 @@ import java.time.Instant;
 
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.StringJoiner;
 
 @Repository
 @RequiredArgsConstructor
@@ -32,50 +34,51 @@ public class AuthenticationDAO {
     @Value("${jwt.signerKey}")
     protected String SIGNER_KEY;
     AccountDAO accountDAO;
-  public AuthenticationResponse authenticate(AuthenticationRequest request)  {
+
+    public AuthenticationResponse authenticate(AuthenticationRequest request) {
         try {
             var account = accountDAO.findByUsername(request.getUsername());
-            if(account==null){
+            if (account == null) {
                 throw new Exception("Account is not eixst");
             }
             PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
             boolean authenticated = passwordEncoder.matches(request.getPassword(), account.getPassword());
+            var token = generateToken(account);
 
-          if(!authenticated){
-              throw new Exception("Unauthenticated!");
-          }
+            if (!authenticated) {
+                throw new Exception("Unauthenticated!");
+            }
+            return AuthenticationResponse.builder().token(token).authenticate(true).build();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return null;
+    }
 
+    private String generateToken(AccountDTO accountDTO) {
+        JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
+        JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
+                .subject(accountDTO.getUsername())
+                .issuer("capybook")
+                .claim("scope", buildScope(accountDTO))
+                .issueTime(new Date())
+                .expirationTime(new Date(Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()))
+                .build();
+        Payload payload = new Payload(jwtClaimsSet.toJSONObject());
+
+        JWSObject jwsObject = new JWSObject(header, payload);
+
+        try {
+            jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes()));
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-      var token = generateToken(request.getUsername());
-      return AuthenticationResponse.builder().token(token).authenticate(true).build();
-    }
-
-    private String generateToken(String username) {
-        JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
-        JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                .subject(username)
-                .issuer("capybook")
-                .issueTime(new Date())
-                .expirationTime(new Date(Instant.now().plus(1, ChronoUnit.HOURS ).toEpochMilli()))
-                .build();
-        Payload payload = new Payload(jwtClaimsSet.toJSONObject());
-
-      JWSObject jwsObject = new JWSObject(header,payload);
-
-     try {
-         jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes()));
-
-     } catch (Exception e){
-         System.out.println(e.getMessage());
-     }
         return jwsObject.serialize();
     }
 
-    public IntrospectResponse introspect(IntrospectRequest request){
-      var token = request.getToken();
+    public IntrospectResponse introspect(IntrospectRequest request) {
+        var token = request.getToken();
         try {
             JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
 
@@ -93,6 +96,14 @@ public class AuthenticationDAO {
             throw new RuntimeException(e);
         }
 
+    }
+
+    private String buildScope(AccountDTO accountDTO){
+        if(accountDTO.getRole()==0) return "ADMIN WAREHOUSE_STAFF SELLER_STAFF CUSTOMER";
+        else if (accountDTO.getRole()==1) return "CUSTOMER";
+        else if (accountDTO.getRole()==2) return "SELLER_STAFF CUSTOMER";
+        else if (accountDTO.getRole()==3) return "WAREHOUSE_STAFF CUSTOMER";
+        else  return "UNKNOWN";
     }
 }
 

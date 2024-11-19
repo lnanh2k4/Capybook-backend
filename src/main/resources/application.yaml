@@ -26,9 +26,9 @@ spring:
 server:
   port: 6789
 
-logging:
-  level:
-    root: warn
+#logging:
+#  level:
+#    root: warn
 
 jwt:
   signerKey: "lIAz1lQmNF5SFv8vfKBByIeXSlgBFkptJHv+pjfckpowfs+ZXG35CDk9WHRfkiZF"

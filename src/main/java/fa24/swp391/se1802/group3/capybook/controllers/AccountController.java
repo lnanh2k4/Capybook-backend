@@ -5,9 +5,11 @@ import fa24.swp391.se1802.group3.capybook.daos.AccountDAO;
 import fa24.swp391.se1802.group3.capybook.daos.StaffDAO;
 import fa24.swp391.se1802.group3.capybook.models.AccountDTO;
 import fa24.swp391.se1802.group3.capybook.models.StaffDTO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +18,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j // cho phép sử dụng log.infor
 @RestController
 @RequestMapping("/api/v1/accounts")
 public class AccountController {
@@ -35,8 +38,6 @@ public class AccountController {
         this.accountDAO = accountDAO;
         this.staffDAO = staffDAO;
     }
-
-    @Autowired
 
 
     @GetMapping("/")
