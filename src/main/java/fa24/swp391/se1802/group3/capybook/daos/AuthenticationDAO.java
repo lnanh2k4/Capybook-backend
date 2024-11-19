@@ -2,17 +2,23 @@ package fa24.swp391.se1802.group3.capybook.daos;
 
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
 import fa24.swp391.se1802.group3.capybook.request.AuthenticationRequest;
+import fa24.swp391.se1802.group3.capybook.request.IntrospectRequest;
 import fa24.swp391.se1802.group3.capybook.response.AuthenticationResponse;
+import fa24.swp391.se1802.group3.capybook.response.IntrospectResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
+import java.text.ParseException;
 import java.time.Instant;
 
 import java.time.temporal.ChronoUnit;
@@ -23,7 +29,8 @@ import java.util.Date;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthenticationDAO {
     @NonFinal
-    protected  static final String SIGNER_KEY ="lIAz1lQmNF5SFv8vfKBByIeXSlgBFkptJHv+pjfckpowfs+ZXG35CDk9WHRfkiZF";
+    @Value("${jwt.signerKey}")
+    protected String SIGNER_KEY;
     AccountDAO accountDAO;
   public AuthenticationResponse authenticate(AuthenticationRequest request)  {
         try {
@@ -65,6 +72,27 @@ public class AuthenticationDAO {
          System.out.println(e.getMessage());
      }
         return jwsObject.serialize();
+    }
+
+    public IntrospectResponse introspect(IntrospectRequest request){
+      var token = request.getToken();
+        try {
+            JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
+
+            SignedJWT signedJWT = SignedJWT.parse(token);
+
+            Date expityTime = signedJWT.getJWTClaimsSet().getExpirationTime();
+
+            var verified = signedJWT.verify(verifier);
+            return IntrospectResponse.builder()
+                    .isValid(verified && expityTime.after(new Date()))
+                    .build();
+        } catch (JOSEException e) {
+            throw new RuntimeException(e);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 }
 
