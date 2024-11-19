@@ -28,6 +28,9 @@ public class AccountController {
     StaffDAO staffDAO;
 
     @Autowired
+    PasswordEncoder passwordEncoder;
+
+    @Autowired
     public AccountController(AccountDAO accountDAO, StaffDAO staffDAO) {
         this.accountDAO = accountDAO;
         this.staffDAO = staffDAO;
@@ -75,7 +78,6 @@ public class AccountController {
             System.out.println("Request received");
             ObjectMapper objectMapper = new ObjectMapper();
             AccountDTO accountDTO = objectMapper.readValue(account, AccountDTO.class);
-            PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
             accountDTO.setPassword(passwordEncoder.encode(DEFAULT_PASSWORD));
             accountDAO.addAccount(accountDTO);
             if(accountDTO.getRole() == ROLE_ADMIN || accountDTO.getRole() == ROLE_SELLER_STAFF || accountDTO.getRole() == ROLE_WAREHOUSE_STAFF){

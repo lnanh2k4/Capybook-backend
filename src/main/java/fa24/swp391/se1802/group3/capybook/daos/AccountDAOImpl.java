@@ -7,6 +7,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,8 @@ public class AccountDAOImpl implements AccountDAO {
     //define entity manager
     EntityManager entityManager;
     //inject entity manager using constructor injection
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     @Autowired
     public AccountDAOImpl(EntityManager entityManager) {
@@ -52,22 +55,28 @@ public class AccountDAOImpl implements AccountDAO {
 
     @Override
     public AccountDTO findByUsername(String username) {
-        Query query = entityManager.createQuery("Select a.username, a.firstName, a.lastName, a.dob, a.address, a.email, a.role, a.sex, a.phone, a.accStatus, a.password From AccountDTO a WHERE a.username=:username");
-        query.setParameter("username", username);
-        Object[] result = (Object[]) query.getSingleResult();
-        AccountDTO account = new AccountDTO();
-        account.setUsername((String) result[0]);
-        account.setFirstName((String) result[1]);
-        account.setLastName((String) result[2]);
-        account.setDob((Date) result[3]);
-        account.setAddress((String) result[4]);
-        account.setEmail((String) result[5]);
-        account.setRole((Integer) result[6]);
-        account.setSex((Integer) result[7]);
-        account.setPhone((String) result[8]);
-        account.setAccStatus((Integer) result[9]);
-        account.setPassword((String) result[10]);
-        return account;
+        try {
+            Query query = entityManager.createQuery("Select a.username, a.firstName, a.lastName, a.dob, a.address, a.email, a.role, a.sex, a.phone, a.accStatus, a.password From AccountDTO a WHERE a.username=:username");
+            query.setParameter("username", username);
+            Object[] result = (Object[]) query.getSingleResult();
+            AccountDTO account = new AccountDTO();
+            account.setUsername((String) result[0]);
+            account.setFirstName((String) result[1]);
+            account.setLastName((String) result[2]);
+            account.setDob((Date) result[3]);
+            account.setAddress((String) result[4]);
+            account.setEmail((String) result[5]);
+            account.setRole((Integer) result[6]);
+            account.setSex((Integer) result[7]);
+            account.setPhone((String) result[8]);
+            account.setAccStatus((Integer) result[9]);
+            account.setPassword((String) result[10]);
+            return account;
+        } catch (Exception e){
+            System.out.println("No found account with username = "+username);
+            System.out.println(e.getMessage());
+        }
+        return null;
     }
 
     @Override
