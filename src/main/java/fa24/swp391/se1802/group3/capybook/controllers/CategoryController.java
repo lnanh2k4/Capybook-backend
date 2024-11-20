@@ -102,10 +102,33 @@ public class CategoryController {
 
 
     @GetMapping("/search")
-    public List<CategoryDTO> searchCategories(@RequestParam("term") String term) {
-        return categoryDAO.searchByName(term);
+    public List<CategoryDTO> searchCategories(@RequestParam(required = false) Integer id,
+                                              @RequestParam(required = false) String name) {
+        // Tìm kiếm theo ID nếu chỉ có ID
+        if (id != null && (name == null || name.isEmpty())) {
+            try {
+                CategoryDTO category = categoryDAO.find(id);
+                return category != null ? List.of(category) : List.of();
+            } catch (CategoryExceptionNotFound e) {
+                return List.of(); // Nếu không tìm thấy, trả về danh sách rỗng
+            }
+        }
+
+        // Tìm kiếm theo Name nếu chỉ có Name
+        if (name != null && !name.isEmpty() && id == null) {
+            return categoryDAO.searchByName(name);
+        }
+
+        // Nếu cả ID và Name đều có
+        if (id != null && name != null && !name.isEmpty()) {
+            List<CategoryDTO> results = categoryDAO.searchByName(name);
+            return results.stream()
+                    .filter(category -> category.getCatID() == id) // Lọc thêm theo ID
+                    .toList();
+        }
+
+        // Trường hợp không có tham số, trả về danh sách rỗng
+        return List.of();
     }
-
-
 
 }

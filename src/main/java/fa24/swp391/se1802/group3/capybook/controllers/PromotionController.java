@@ -66,7 +66,6 @@ public class PromotionController {
     }
 
 
-
     @PutMapping("/{proID}")
     public ResponseEntity<PromotionDTO> updatePromotion(@PathVariable int proID, @RequestBody PromotionDTO promotionDTO) {
         PromotionDTO existingPromotion = promotionDAO.find(proID);
@@ -80,8 +79,6 @@ public class PromotionController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-
-
 
     @DeleteMapping("/{proID}")
     public ResponseEntity<String> deletePromotion(@PathVariable int proID) {
@@ -97,12 +94,24 @@ public class PromotionController {
     }
 
     @GetMapping("/search")
-    public List<PromotionDTO> searchPromotions(@RequestParam String term) {
-        return promotionDAO.searchPromotions(term); // Thực hiện tìm kiếm trong DAO
+    public ResponseEntity<List<PromotionDTO>> searchPromotions(
+            @RequestParam(required = false) Integer id,
+            @RequestParam(required = false) String term) {
+        if (id != null) {
+            PromotionDTO promotion = promotionDAO.find(id);
+            if (promotion != null) {
+                return ResponseEntity.ok(List.of(promotion));
+            } else {
+                return ResponseEntity.ok(List.of());
+            }
+        }
+
+        if (term != null && !term.isEmpty()) {
+            List<PromotionDTO> promotions = promotionDAO.searchPromotions(term);
+            return ResponseEntity.ok(promotions);
+        }
+
+        return ResponseEntity.ok(List.of());
     }
-
-
-
-
 
 }

@@ -60,8 +60,10 @@ public class CategoryDAOlmpl implements CategoryDAO {
     @Override
     public List<CategoryDTO> searchByName(String name) {
         TypedQuery<CategoryDTO> query = entityManager.createQuery(
-                "SELECT c FROM CategoryDTO c WHERE LOWER(c.catName) LIKE LOWER(:name)", CategoryDTO.class);
-        query.setParameter("name", "%" + name + "%");
+                "SELECT c FROM CategoryDTO c WHERE LOWER(c.catName) LIKE LOWER(:name)",
+                CategoryDTO.class
+        );
+        query.setParameter("name", "%" + name.trim() + "%"); // Trim để loại bỏ khoảng trắng thừa
         return query.getResultList();
     }
 }
