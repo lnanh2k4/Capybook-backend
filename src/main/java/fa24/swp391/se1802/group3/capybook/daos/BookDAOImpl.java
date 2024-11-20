@@ -28,14 +28,21 @@ public class BookDAOImpl implements BookDAO{
         }
     }
     @Override
-    public BookDTO find(int bookID) {
-        return entityManager.find(BookDTO.class,bookID);
+    public BookDTO find(int bookId) {
+        System.out.println("Finding book with ID: " + bookId);
+        BookDTO book = entityManager.find(BookDTO.class, bookId);
+        if (book == null) {
+            System.out.println("Book not found in database with ID: " + bookId);
+        }
+        return book;
     }
+
 
     @Override
     @Transactional
     public void update(BookDTO bookDTO) {
         entityManager.merge(bookDTO);
+        entityManager.flush(); // Ghi các thay đổi xuống cơ sở dữ liệu ngay lập tức
     }
 
     @Override
@@ -57,4 +64,21 @@ public class BookDAOImpl implements BookDAO{
         query.setParameter("searchTerm", "%" + searchTerm.toLowerCase() + "%");
         return query.getResultList();
     }
+
+    @Override
+    public List<BookDTO> findBooksByTitleAndAuthorAndPublisher(String bookTitle, String author, String publisher) {
+        System.out.println("Searching for book with title: " + bookTitle + ", author: " + author + ", publisher: " + publisher);
+        List<BookDTO> result = entityManager.createQuery(
+                        "SELECT b FROM BookDTO b WHERE b.bookTitle = :bookTitle AND b.author = :author AND b.publisher = :publisher",
+                        BookDTO.class)
+                .setParameter("bookTitle", bookTitle)
+                .setParameter("author", author)
+                .setParameter("publisher", publisher)
+                .getResultList();
+        System.out.println("Found books: " + result.size());
+        return result;
+    }
+
+
+
 }

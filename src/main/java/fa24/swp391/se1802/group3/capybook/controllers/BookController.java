@@ -6,9 +6,11 @@ import fa24.swp391.se1802.group3.capybook.models.BookDTO;
 import fa24.swp391.se1802.group3.capybook.models.CategoryDTO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,7 +25,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/books")
-@CrossOrigin(origins = "http://localhost:5175")
+@CrossOrigin(origins = "http://localhost:5173")
 public class BookController {
     private final BookDAO bookDAO;
 
@@ -56,51 +58,66 @@ public class BookController {
     }
 
     @PostMapping
+    @Transactional
     public ResponseEntity<BookDTO> addBook(
             @RequestPart("book") String bookData,
             @RequestPart(value = "image", required = false) MultipartFile image) {
         try {
+            System.out.println("Received request to add book.");
             ObjectMapper objectMapper = new ObjectMapper();
             BookDTO book = objectMapper.readValue(bookData, BookDTO.class);
 
-            // Ensure that the book has catID (now as an Integer)
+            // Đảm bảo rằng catID không null
             if (book.getCatID() == null) {
-                System.out.println("Error: catID is null!");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);  // Handle missing catID
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
             }
 
-            // Fetch the category using catID and associate it with the book
+            // Lấy CategoryDTO từ cơ sở dữ liệu
             CategoryDTO category = entityManager.find(CategoryDTO.class, book.getCatID());
+
+            // Lỗi xảy ra ở đây nếu CategoryDTO chứa mối quan hệ Lazy chưa khởi tạo
             if (category == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);  // Handle invalid catID
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
             }
 
-            book.setCatID(category.getCatID());  // Set the category reference as the Integer value
-            book.setBookStatus(1);  // Assuming active status
+            // Khởi tạo đầy đủ để tránh LazyInitializationException
+            Hibernate.initialize(category.getCategoryCollection());
 
-            // Save book information
+            book.setCatID(category.getCatID());
+            book.setBookStatus(1);
+
+            // Kiểm tra sách đã tồn tại
+            List<BookDTO> existingBooks = bookDAO.findBooksByTitleAndAuthorAndPublisher(
+                    book.getBookTitle(), book.getAuthor(), book.getPublisher());
+            if (!existingBooks.isEmpty()) {
+                BookDTO existingBook = existingBooks.get(0);
+                existingBook.setBookQuantity(
+                        (existingBook.getBookQuantity() == null ? 0 : existingBook.getBookQuantity())
+                                + (book.getBookQuantity() == null ? 0 : book.getBookQuantity())
+                );
+                bookDAO.update(existingBook);
+                return ResponseEntity.ok(existingBook);
+            }
+
+            // Nếu sách chưa tồn tại, tạo sách mới
             bookDAO.save(book);
 
-            // Handle image saving if provided
+            // Xử lý lưu ảnh nếu có
             if (image != null && !image.isEmpty()) {
                 String originalFileName = StringUtils.cleanPath(image.getOriginalFilename());
-                String extension = originalFileName.substring(originalFileName.lastIndexOf("."));
-                String uniqueFileName = "book_" + book.getBookID() + "_" + System.currentTimeMillis() + extension;
+                String uniqueFileName = "book_" + book.getBookID() + "_" + System.currentTimeMillis() + ".jpg";
 
                 String uploadDir = System.getProperty("user.dir") + "/uploads/";
                 Path uploadPath = Paths.get(uploadDir);
-
                 if (!Files.exists(uploadPath)) {
                     Files.createDirectories(uploadPath);
                 }
-
                 try (InputStream inputStream = image.getInputStream()) {
                     Path targetPath = uploadPath.resolve(uniqueFileName);
                     Files.copy(inputStream, targetPath, StandardCopyOption.REPLACE_EXISTING);
                 }
-
                 book.setImage("/uploads/" + uniqueFileName);
-                bookDAO.save(book);  // Save the book again with the image path
+                bookDAO.update(book);
             }
 
             return ResponseEntity.status(HttpStatus.CREATED).body(book);
@@ -109,10 +126,6 @@ public class BookController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
-
-
-
 
     @PutMapping("/{bookId}")
     public ResponseEntity<BookDTO> updateBook(
@@ -145,6 +158,7 @@ public class BookController {
             existingBook.setBookDescription(book.getBookDescription());
             existingBook.setBookStatus(book.getBookStatus());
             existingBook.setCatID(book.getCatID()); // Ensure catID is updated
+            existingBook.setBookQuantity(book.getBookQuantity());
 
             // Handle the image upload
             if (image != null && !image.isEmpty()) {
@@ -192,10 +206,6 @@ public class BookController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
-
-
-
 
     @DeleteMapping("/{bookId}")
     public ResponseEntity<String> deleteBook(@PathVariable int bookId) {
