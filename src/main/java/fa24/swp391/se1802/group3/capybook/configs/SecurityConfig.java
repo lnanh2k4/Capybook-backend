@@ -27,7 +27,7 @@ import java.util.Arrays;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
- private final String[] PUBLIC_ENDPOINTS = {"/auth/token","/api/v1/accounts/", "/auth/introspect","/auth/logout","/auth/refresh"}; // url cho guest
+ private final String[] PUBLIC_ENDPOINTS = {"/api/auth/token", "/api/auth/introspect","/api/auth/logout","/api/auth/refresh"}; // url cho guest
     private final String[] SELLER_STAFF_ENDPOINTS = {"/auth/token","/api/v1/accounts/", "/auth/introspect"}; // url cho seller
     private final String[] WAREHOUSE_STAFF_ENDPOINTS = {"/auth/token","/api/v1/accounts/", "/auth/introspect"}; // url cho warehouse
     private final String[] ADMIN_ENDPOINTS = {"/auth/token","/api/v1/accounts/", "/auth/introspect"}; // url cho admin

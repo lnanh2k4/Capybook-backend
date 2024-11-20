@@ -65,7 +65,7 @@ public class AuthenticationDAO {
             if (!authenticated) {
                 throw new Exception("Unauthenticated!");
             }
-            return AuthenticationResponse.builder().token(token).authenticate(true).build();
+            return AuthenticationResponse.builder().token(token).accountDTO(account).authenticate(true).build();
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
