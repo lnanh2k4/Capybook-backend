@@ -5,6 +5,7 @@ import fa24.swp391.se1802.group3.capybook.daos.AccountDAO;
 import fa24.swp391.se1802.group3.capybook.daos.StaffDAO;
 import fa24.swp391.se1802.group3.capybook.models.AccountDTO;
 import fa24.swp391.se1802.group3.capybook.models.StaffDTO;
+import fa24.swp391.se1802.group3.capybook.request.ChangePasswordRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -121,7 +123,9 @@ public class AccountController {
             existingAccount.setUsername(accountDTO.getUsername());
             existingAccount.setFirstName(accountDTO.getFirstName());
             existingAccount.setLastName(accountDTO.getLastName());
-            existingAccount.setRole(accountDTO.getRole());
+            if(accountDTO.getRole()!=null){
+                existingAccount.setRole(accountDTO.getRole());
+            }
             existingAccount.setSex(accountDTO.getSex());
             existingAccount.setPhone(accountDTO.getPhone());
             existingAccount.setEmail(accountDTO.getEmail());
@@ -137,6 +141,32 @@ public class AccountController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+
+    @PutMapping("/change")
+    public ResponseEntity<AccountDTO> changePassword(  @RequestPart("account") String passwordRequest) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            ChangePasswordRequest request = objectMapper.readValue( passwordRequest, ChangePasswordRequest.class);
+
+            AccountDTO existingAccount = accountDAO.findByUsername(request.getUsername());
+            if (existingAccount == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+
+            existingAccount.setPassword(request.getPassword());
+
+            accountDAO.save(existingAccount);
+
+            return ResponseEntity.ok(existingAccount);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+
 
     @DeleteMapping("/{username}")
     public ResponseEntity<String> deleteAccount(@PathVariable String username) {
