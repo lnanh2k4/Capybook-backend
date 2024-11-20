@@ -44,10 +44,28 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request ->
                         request
                                 .requestMatchers(HttpMethod.POST,PUBLIC_ENDPOINTS).permitAll()
+                                .requestMatchers(HttpMethod.GET,PUBLIC_ENDPOINTS).permitAll()
+
                                 .requestMatchers(HttpMethod.GET,ADMIN_ENDPOINTS).hasAnyAuthority("SCOPE_ADMIN")
+                                .requestMatchers(HttpMethod.POST,ADMIN_ENDPOINTS).hasAnyAuthority("SCOPE_ADMIN")
+                                .requestMatchers(HttpMethod.PUT,ADMIN_ENDPOINTS).hasAnyAuthority("SCOPE_ADMIN")
+                                .requestMatchers(HttpMethod.DELETE,ADMIN_ENDPOINTS).hasAnyAuthority("SCOPE_ADMIN")
+
                                 .requestMatchers(HttpMethod.POST,CUSTOMER_ENDPOINTS).hasAnyAuthority("SCOPE_CUSTOMER")
+                                .requestMatchers(HttpMethod.GET,CUSTOMER_ENDPOINTS).hasAnyAuthority("SCOPE_CUSTOMER")
+                                .requestMatchers(HttpMethod.PUT,CUSTOMER_ENDPOINTS).hasAnyAuthority("SCOPE_CUSTOMER")
+                                .requestMatchers(HttpMethod.DELETE,CUSTOMER_ENDPOINTS).hasAnyAuthority("SCOPE_CUSTOMER")
+
                                 .requestMatchers(HttpMethod.POST,SELLER_STAFF_ENDPOINTS).hasAnyAuthority("SCOPE_SELLER_STAFF")
+                                .requestMatchers(HttpMethod.GET,SELLER_STAFF_ENDPOINTS).hasAnyAuthority("SCOPE_SELLER_STAFF")
+                                .requestMatchers(HttpMethod.PUT,SELLER_STAFF_ENDPOINTS).hasAnyAuthority("SCOPE_SELLER_STAFF")
+                                .requestMatchers(HttpMethod.DELETE,SELLER_STAFF_ENDPOINTS).hasAnyAuthority("SCOPE_SELLER_STAFF")
+
                                 .requestMatchers(HttpMethod.POST,WAREHOUSE_STAFF_ENDPOINTS).hasAnyAuthority("SCOPE_WAREHOUSE_STAFF")
+                                .requestMatchers(HttpMethod.GET,WAREHOUSE_STAFF_ENDPOINTS).hasAnyAuthority("SCOPE_WAREHOUSE_STAFF")
+                                .requestMatchers(HttpMethod.PUT,WAREHOUSE_STAFF_ENDPOINTS).hasAnyAuthority("SCOPE_WAREHOUSE_STAFF")
+                                .requestMatchers(HttpMethod.DELETE,WAREHOUSE_STAFF_ENDPOINTS).hasAnyAuthority("SCOPE_WAREHOUSE_STAFF")
+
                                 .anyRequest().authenticated());
 
         http.oauth2ResourceServer(oauth2 ->
