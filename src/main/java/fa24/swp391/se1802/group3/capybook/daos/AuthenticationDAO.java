@@ -6,14 +6,19 @@ import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import fa24.swp391.se1802.group3.capybook.models.AccountDTO;
+import fa24.swp391.se1802.group3.capybook.models.InvalidatedTokenDTO;
 import fa24.swp391.se1802.group3.capybook.request.AuthenticationRequest;
 import fa24.swp391.se1802.group3.capybook.request.IntrospectRequest;
+import fa24.swp391.se1802.group3.capybook.request.LogoutRequest;
+import fa24.swp391.se1802.group3.capybook.request.RefreshToken;
 import fa24.swp391.se1802.group3.capybook.response.AuthenticationResponse;
 import fa24.swp391.se1802.group3.capybook.response.IntrospectResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,8 +29,9 @@ import java.time.Instant;
 
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
-import java.util.StringJoiner;
+import java.util.UUID;
 
+@Slf4j
 @Repository
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -33,7 +39,18 @@ public class AuthenticationDAO {
     @NonFinal
     @Value("${jwt.signerKey}")
     protected String SIGNER_KEY;
+
+    @NonFinal
+    @Value("${jwt.valid-duration}")
+    protected long VALID_DURATION;
+
+    @NonFinal
+    @Value("${jwt.refreshable-duration}")
+    protected long REFRESHABLE_DURATION;
+
+    @Autowired
     AccountDAO accountDAO;
+    InvalidatedTokenDAO invalidatedTokenDAO;
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         try {
@@ -62,7 +79,8 @@ public class AuthenticationDAO {
                 .issuer("capybook")
                 .claim("scope", buildScope(accountDTO))
                 .issueTime(new Date())
-                .expirationTime(new Date(Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()))
+                .jwtID(UUID.randomUUID().toString())
+                .expirationTime(new Date(Instant.now().plus(VALID_DURATION, ChronoUnit.SECONDS).toEpochMilli()))
                 .build();
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
 
@@ -79,31 +97,84 @@ public class AuthenticationDAO {
 
     public IntrospectResponse introspect(IntrospectRequest request) {
         var token = request.getToken();
+        boolean isValid = true;
         try {
-            JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
+            verifyToken(token,false );
 
-            SignedJWT signedJWT = SignedJWT.parse(token);
-
-            Date expityTime = signedJWT.getJWTClaimsSet().getExpirationTime();
-
-            var verified = signedJWT.verify(verifier);
-            return IntrospectResponse.builder()
-                    .isValid(verified && expityTime.after(new Date()))
-                    .build();
-        } catch (JOSEException e) {
-            throw new RuntimeException(e);
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            isValid = false;
         }
+        return IntrospectResponse.builder()
+                .isValid(isValid)
+                .build();
+    }
+
+    private String buildScope(AccountDTO accountDTO) {
+        if (accountDTO.getRole() == 0) return "ADMIN WAREHOUSE_STAFF SELLER_STAFF CUSTOMER";
+        else if (accountDTO.getRole() == 1) return "CUSTOMER";
+        else if (accountDTO.getRole() == 2) return "SELLER_STAFF CUSTOMER";
+        else if (accountDTO.getRole() == 3) return "WAREHOUSE_STAFF CUSTOMER";
+        else return "UNKNOWN";
+    }
+
+    private SignedJWT verifyToken(String token, boolean isRefresh ) throws Exception {
+        JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
+
+        SignedJWT signedJWT = SignedJWT.parse(token);
+
+        Date expiryTime = (isRefresh)
+                ? new Date(signedJWT.getJWTClaimsSet().getIssueTime()
+                .toInstant().plus(REFRESHABLE_DURATION,ChronoUnit.DAYS).toEpochMilli())
+                : signedJWT.getJWTClaimsSet().getExpirationTime();
+
+        var verified = signedJWT.verify(verifier);
+        System.out.println(!(verified && expiryTime.after(new Date())));
+        if (!(verified && expiryTime.after(new Date())))
+            throw new Exception("Unauthenticated");
+
+        if (invalidatedTokenDAO.existsById(signedJWT.getJWTClaimsSet().getJWTID()))
+            throw new Exception("Unauthenticated");
+
+        return signedJWT;
+    }
+
+    public void logout(LogoutRequest request) throws Exception {
+        try {
+            var signToken = verifyToken(request.getToken(),true);
+            String jit = signToken.getJWTClaimsSet().getJWTID();
+            Date expiryTime = signToken.getJWTClaimsSet().getExpirationTime();
+
+            InvalidatedTokenDTO invalidatedTokenDTO = InvalidatedTokenDTO.builder()
+                    .id(jit)
+                    .expiryTime(expiryTime)
+                    .build();
+            invalidatedTokenDAO.save(invalidatedTokenDTO);
+        } catch(Exception e){
+            log.info("Token already expired");
+        }
+
 
     }
 
-    private String buildScope(AccountDTO accountDTO){
-        if(accountDTO.getRole()==0) return "ADMIN WAREHOUSE_STAFF SELLER_STAFF CUSTOMER";
-        else if (accountDTO.getRole()==1) return "CUSTOMER";
-        else if (accountDTO.getRole()==2) return "SELLER_STAFF CUSTOMER";
-        else if (accountDTO.getRole()==3) return "WAREHOUSE_STAFF CUSTOMER";
-        else  return "UNKNOWN";
+    public AuthenticationResponse refreshToken(RefreshToken request) throws Exception {
+        var signJWT = verifyToken(request.getToken(), true);
+
+        var jit = signJWT.getJWTClaimsSet().getJWTID();
+        var expiryTime = signJWT.getJWTClaimsSet().getExpirationTime();
+        InvalidatedTokenDTO invalidatedTokenDTO = InvalidatedTokenDTO.builder()
+                .id(jit)
+                .expiryTime(expiryTime)
+                .build();
+        invalidatedTokenDAO.save(invalidatedTokenDTO);
+
+        var username = signJWT.getJWTClaimsSet().getSubject();
+        var account = accountDAO.findByUsername(username);
+                if(account== null) throw new Exception("Unauthenticate");
+
+        var token = generateToken(account);
+
+        return AuthenticationResponse.builder().token(token).authenticate(true).build();
     }
 }
 

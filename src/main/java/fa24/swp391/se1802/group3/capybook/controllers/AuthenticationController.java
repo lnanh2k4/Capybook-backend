@@ -3,6 +3,8 @@ package fa24.swp391.se1802.group3.capybook.controllers;
 import fa24.swp391.se1802.group3.capybook.daos.AuthenticationDAO;
 import fa24.swp391.se1802.group3.capybook.request.AuthenticationRequest;
 import fa24.swp391.se1802.group3.capybook.request.IntrospectRequest;
+import fa24.swp391.se1802.group3.capybook.request.LogoutRequest;
+import fa24.swp391.se1802.group3.capybook.request.RefreshToken;
 import fa24.swp391.se1802.group3.capybook.response.AuthenticationResponse;
 import fa24.swp391.se1802.group3.capybook.response.IntrospectResponse;
 import lombok.AccessLevel;
@@ -30,6 +32,16 @@ public class AuthenticationController {
     @PostMapping("/introspect")
     ResponseEntity<IntrospectResponse> authenticate(@RequestBody IntrospectRequest request){
         IntrospectResponse response = authenticationDAO.introspect(request);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+    @PostMapping("/logout")
+    void logout(@RequestBody LogoutRequest request) throws Exception {
+             authenticationDAO.logout(request);
+    }
+
+    @PostMapping("/refresh")
+    ResponseEntity<AuthenticationResponse> authenticate(@RequestBody RefreshToken request) throws Exception {
+        var response = authenticationDAO.refreshToken(request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

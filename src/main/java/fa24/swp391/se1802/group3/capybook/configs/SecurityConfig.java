@@ -1,8 +1,10 @@
 package fa24.swp391.se1802.group3.capybook.configs;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -25,14 +27,15 @@ import java.util.Arrays;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
- private final String[] PUBLIC_ENDPOINTS = {"/auth/token","/api/v1/accounts/", "/auth/introspect"}; // url cho guest
+ private final String[] PUBLIC_ENDPOINTS = {"/auth/token","/api/v1/accounts/", "/auth/introspect","/auth/logout","/auth/refresh"}; // url cho guest
     private final String[] SELLER_STAFF_ENDPOINTS = {"/auth/token","/api/v1/accounts/", "/auth/introspect"}; // url cho seller
     private final String[] WAREHOUSE_STAFF_ENDPOINTS = {"/auth/token","/api/v1/accounts/", "/auth/introspect"}; // url cho warehouse
     private final String[] ADMIN_ENDPOINTS = {"/auth/token","/api/v1/accounts/", "/auth/introspect"}; // url cho admin
     private final String[] CUSTOMER_ENDPOINTS = {"/auth/token","/api/v1/accounts/", "/auth/introspect"}; // url cho customer
 
-    @Value("${jwt.signerKey}")
-    private String signerKey;
+    @Autowired
+    private CustomerJwtDecoder customerJwtDecoder;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -48,7 +51,7 @@ public class SecurityConfig {
                                 .anyRequest().authenticated());
 
         http.oauth2ResourceServer(oauth2 ->
-                oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder()))
+                oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(customerJwtDecoder))
                 );
         return http.build();
     }
@@ -66,18 +69,5 @@ public class SecurityConfig {
         return source;
     }
 
-    @Bean
-    PasswordEncoder passwordEncoder(){
-        return  new BCryptPasswordEncoder(10);
-    }
-
-    @Bean
-    JwtDecoder jwtDecoder(){
-        SecretKeySpec secretKeySpec = new SecretKeySpec(signerKey.getBytes(),"HS512");
-
-               return NimbusJwtDecoder.withSecretKey(secretKeySpec)
-                       .macAlgorithm(MacAlgorithm.HS512)
-                       .build();
-    }
 
 }

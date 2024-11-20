@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Slf4j
@@ -18,11 +19,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 public class ApplicationInitConfig {
 
-    @Autowired
-    PasswordEncoder passwordEncoder;
+
+    PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
 
     @Bean
     ApplicationRunner applicationRunner(AccountDAO accountDAO) {
+
         return args -> {
             if (accountDAO.findByUsername("admin") == null) {
                 AccountDTO accountDTO = new AccountDTO();

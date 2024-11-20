@@ -7,6 +7,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,8 +25,8 @@ public class AccountDAOImpl implements AccountDAO {
     //define entity manager
     EntityManager entityManager;
     //inject entity manager using constructor injection
-    @Autowired
-    PasswordEncoder passwordEncoder;
+
+    PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
 
     @Autowired
     public AccountDAOImpl(EntityManager entityManager) {
