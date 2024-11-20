@@ -1,9 +1,7 @@
 package fa24.swp391.se1802.group3.capybook.controllers;
 
-import fa24.swp391.se1802.group3.capybook.daos.OrderDAO;
-import fa24.swp391.se1802.group3.capybook.daos.OrderDetailDAO;
-import fa24.swp391.se1802.group3.capybook.models.OrderDTO;
-import fa24.swp391.se1802.group3.capybook.models.OrderDetailDTO;
+import fa24.swp391.se1802.group3.capybook.daos.*;
+import fa24.swp391.se1802.group3.capybook.models.*;
 import jakarta.transaction.Transactional;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,13 +20,18 @@ import java.util.stream.Collectors;
 public class OrderController {
 
     private final OrderDAO orderDAO;
-
     private final OrderDetailDAO orderDetailDAO;
+    private final BookDAO bookDAO;
+    private final PromotionDAO promotionDAO;
+    private final AccountDAO accountDAO;
 
     @Autowired
-    public OrderController(OrderDAO orderDAO, OrderDetailDAO orderDetailDAO) {
+    public OrderController(OrderDAO orderDAO, OrderDetailDAO orderDetailDAO, BookDAO bookDAO, PromotionDAO promotionDAO, AccountDAO accountDAO) {
         this.orderDAO = orderDAO;
         this.orderDetailDAO = orderDetailDAO;
+        this.bookDAO = bookDAO;
+        this.promotionDAO = promotionDAO;
+        this.accountDAO = accountDAO;
     }
     @GetMapping("/")
     public List<OrderDTO> getAllOrders() {
@@ -84,13 +87,66 @@ public class OrderController {
         }
     }
 
-
-
-    // Thêm mới một đơn hàng
     @PostMapping("/")
-    public ResponseEntity<OrderDTO> addOrder(@RequestBody OrderDTO orderDTO) {
-        orderDAO.save(orderDTO);
-        return new ResponseEntity<>(orderDTO, HttpStatus.CREATED);
+    @Transactional
+    public ResponseEntity<String> addOrder(@RequestBody Map<String, Object> orderData) {
+        try {
+            // Lấy thông tin orderDTO từ request
+            Map<String, Object> orderDTOMap = (Map<String, Object>) orderData.get("orderDTO");
+            List<Map<String, Object>> orderDetailsList = (List<Map<String, Object>>) orderData.get("orderDetails");
+
+            // Tạo đối tượng OrderDTO
+            OrderDTO orderDTO = new OrderDTO();
+            AccountDTO account = accountDAO.findByUsername((String) orderDTOMap.get("username"));
+            orderDTO.setUsername(account);
+
+            // Xử lý khuyến mãi (nếu có)
+            if (orderDTOMap.get("proID") != null) {
+                PromotionDTO promotion = promotionDAO.find((Integer) orderDTOMap.get("proID"));
+                if (promotion.getQuantity() > 0) {
+                    promotion.setQuantity(promotion.getQuantity() - 1); // Giảm số lượng khuyến mãi
+                    promotionDAO.update(promotion);
+                    orderDTO.setProID(promotion);
+                } else {
+                    return new ResponseEntity<>("Promotion is out of stock", HttpStatus.BAD_REQUEST);
+                }
+            }
+
+            // Đặt các giá trị mặc định cho đơn hàng
+            orderDTO.setOrderDate(new Date());
+            orderDTO.setOrderStatus(1);
+
+            // Lưu OrderDTO
+            orderDAO.save(orderDTO);
+
+            // Lấy orderID vừa tạo
+            int orderID = orderDTO.getOrderID();
+
+            // Lưu các OrderDetailDTO và giảm số lượng sách
+            for (Map<String, Object> detail : orderDetailsList) {
+                OrderDetailDTO orderDetailDTO = new OrderDetailDTO();
+                orderDetailDTO.setOrderID(orderDTO);
+
+                BookDTO book = bookDAO.find((Integer) detail.get("bookID"));
+                int quantityToDeduct = (Integer) detail.get("quantity");
+
+                if (book.getBookQuantity() >= quantityToDeduct) {
+                    book.setBookQuantity(book.getBookQuantity() - quantityToDeduct); // Giảm số lượng sách
+                    bookDAO.update(book); // Cập nhật sách trong DB
+                    orderDetailDTO.setBookID(book);
+                    orderDetailDTO.setQuantity(quantityToDeduct);
+                    orderDetailDAO.save(orderDetailDTO);
+                } else {
+                    return new ResponseEntity<>("Book stock is insufficient for book ID: " + book.getBookID(),
+                            HttpStatus.BAD_REQUEST);
+                }
+            }
+
+            return new ResponseEntity<>("Order added successfully with ID: " + orderID, HttpStatus.CREATED);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to add order", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PutMapping("/{orderID}")
