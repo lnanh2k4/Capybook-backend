@@ -30,8 +30,8 @@ public class AccountController {
     AccountDAO accountDAO;
     StaffDAO staffDAO;
 
-    @Autowired
-    PasswordEncoder passwordEncoder;
+
+    PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
 
     @Autowired
     public AccountController(AccountDAO accountDAO, StaffDAO staffDAO) {
