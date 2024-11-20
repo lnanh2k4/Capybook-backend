@@ -25,21 +25,23 @@ public class ImportStockController {
     }
 
     @GetMapping("/")
-    public List<ImportStockDTO> getStocksList() {
-        return importStockDAO.findAll();
+    public ResponseEntity<List<ImportStockDTO>> getStocksList() {
+        List<ImportStockDTO> stocks = importStockDAO.findAll();
+        return ResponseEntity.ok(stocks);
     }
 
     @PostMapping("/")
     @Transactional
     public ResponseEntity<ImportStockDTO> createImportStock(@RequestBody ImportStockDTO importStockDTO) {
+        // Lưu thông tin ImportStock
         ImportStockDTO savedStock = importStockDAO.save(importStockDTO);
 
-        // Kiểm tra null cho collection trước khi lặp
-        if (importStockDTO.getImportStockDetailCollection() != null) {
-            for (ImportStockDetailDTO detail : importStockDTO.getImportStockDetailCollection()) {
-                detail.setIsid(savedStock);  // Gán stock ID
-                importStockDetailDAO.save(detail);
-            }
+        // Kiểm tra danh sách chi tiết nhập kho trước khi lưu
+        if (importStockDTO.getImportStockDetailCollection() != null && !importStockDTO.getImportStockDetailCollection().isEmpty()) {
+            importStockDTO.getImportStockDetailCollection().forEach(detail -> {
+                detail.setIsid(savedStock);  // Gán liên kết với ImportStock
+                importStockDetailDAO.save(detail); // Lưu từng chi tiết vào cơ sở dữ liệu
+            });
         }
 
         return ResponseEntity.ok(savedStock);

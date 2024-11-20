@@ -12,4 +12,6 @@ public interface BookDAO {
     void delete(int bookID);
     List<BookDTO> findAll();
     List<BookDTO> searchBooks(String searchTerm);
+    List<BookDTO> findBooksByTitleAndAuthorAndPublisher(String bookTitle, String author, String publisher);
+
 }

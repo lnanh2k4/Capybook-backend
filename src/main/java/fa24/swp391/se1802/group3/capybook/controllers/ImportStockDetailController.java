@@ -1,6 +1,7 @@
 package fa24.swp391.se1802.group3.capybook.controllers;
 
 import fa24.swp391.se1802.group3.capybook.daos.ImportStockDetailDAO;
+import fa24.swp391.se1802.group3.capybook.models.ImportStockDTO;
 import fa24.swp391.se1802.group3.capybook.models.ImportStockDetailDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,4 +39,27 @@ public class ImportStockDetailController {
                     .body("An error occurred while fetching details: " + e.getMessage());
         }
     }
+
+    @PostMapping("/{id}/details")
+    public ResponseEntity<?> addImportStockDetails(@PathVariable int id, @RequestBody List<ImportStockDetailDTO> details) {
+        try {
+            System.out.println("Received JSON: " + details);
+            for (ImportStockDetailDTO detail : details) {
+                System.out.println("Before save - Quantity: " + detail.getISDQuantity() + ", Price: " + detail.getImportPrice());
+                detail.setIsid(new ImportStockDTO(id));
+                importStockDetailDAO.save(detail);
+                System.out.println("Saved detail: " + detail);
+            }
+            return ResponseEntity.ok("Details added successfully.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred: " + e.getMessage());
+        }
+    }
+
+
+
+
+
+
 }

@@ -58,5 +58,9 @@ public class ImportStockDTO implements Serializable {
     @JsonIgnore
     private Collection<ImportStockDetailDTO> importStockDetailCollection = new ArrayList<>();
 
+
+    public ImportStockDTO(int isid) {
+        this.isid = isid;
+    }
 }
 
