@@ -102,7 +102,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.GET,PUBLIC_ENDPOINTS).hasAnyAuthority("SCOPE_WAREHOUSE_STAFF")
                                 .requestMatchers(HttpMethod.PUT,PUBLIC_ENDPOINTS).hasAnyAuthority("SCOPE_WAREHOUSE_STAFF")
                                 .requestMatchers(HttpMethod.DELETE,PUBLIC_ENDPOINTS).hasAnyAuthority("SCOPE_WAREHOUSE_STAFF")
-
+                                .requestMatchers(HttpMethod.GET, "/uploads/**").permitAll()
                                 .anyRequest().authenticated());
 
         http.oauth2ResourceServer(oauth2 ->
@@ -118,9 +118,10 @@ public class SecurityConfig {
         config.setAllowedOrigins(Arrays.asList("http://localhost:5173")); // URL của frontend
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(Arrays.asList("*"));
-
+        config.setExposedHeaders(Arrays.asList("Authorization")); // Đảm bảo client lấy được token hoặc header khác
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
+
         return source;
     }
 
