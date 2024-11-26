@@ -15,4 +15,5 @@ public interface StaffDAO {
     void update(StaffDTO staffDTO);
     void delete(int staffID);
     List<StaffDTO> findAll();
+    void addStaff(StaffDTO staff);
 }

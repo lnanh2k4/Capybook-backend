@@ -31,10 +31,10 @@ public class SecurityConfig {
          "/api/auth/introspect",
          "/api/auth/logout",
          "/api/auth/refresh",
-         "/api/v1/accounts/register" ,"/api/v1/accounts/","/api/v1/accounts/{username}", "/api/v1/accounts/search", "/api/v1/accounts/change"
+         "/api/v1/accounts/register"
          ,"/api/v1/books/", "/api/v1/books/{bookId}",
     "/api/v1/cart","/api/v1/cart/add","/api/v1/cart/update", "/api/v1/cart/delete",
-         "/api/v1/categories","/api/v1/categories/{catID}", "/api/v1/categories/{catID}/soft-delete", "/api/v1/categories/search",
+         "/api/v1/categories","/api/v1/categories/{catID}",
          "api/v1/importStock",
          "/api/v1/importStock/{id}/details",
          "/api/v1/notifications","/api/v1/notifications/detail/{notID}", "/api/v1/notifications/{notTitle}", "/api/v1/notifications/{notID}",
@@ -48,7 +48,7 @@ public class SecurityConfig {
             "/api/auth/introspect",
             "/api/auth/logout",
             "/api/auth/refresh",
-            "/api/v1/accounts/register" ,"/api/v1/accounts/","/api/v1/accounts/{username}"
+            "/api/v1/categories/{catID}/soft-delete", "/api/v1/categories/search"
             ,"/api/v1/books/"}; // url cho seller
     private final String[] WAREHOUSE_STAFF_ENDPOINTS = {"/api/auth/token",
             "/api/auth/introspect",
@@ -60,7 +60,7 @@ public class SecurityConfig {
             "/api/auth/introspect",
             "/api/auth/logout",
             "/api/auth/refresh",
-            "/api/v1/accounts/register" ,"/api/v1/accounts/","/api/v1/accounts/{username}"
+            "/api/v1/accounts/","/api/v1/accounts/{username}", "/api/v1/accounts/search", "/api/v1/accounts/change"
             ,"/api/v1/books/"}; // url cho admin
     private final String[] CUSTOMER_ENDPOINTS = {"/api/auth/token",
             "/api/auth/introspect",

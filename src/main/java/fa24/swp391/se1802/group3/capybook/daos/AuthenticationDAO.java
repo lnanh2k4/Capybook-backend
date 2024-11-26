@@ -52,6 +52,7 @@ public class AuthenticationDAO {
     AccountDAO accountDAO;
     InvalidatedTokenDAO invalidatedTokenDAO;
 
+    //authenticate
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         try {
             var account = accountDAO.findByUsername(request.getUsername());
@@ -95,6 +96,7 @@ public class AuthenticationDAO {
         return jwsObject.serialize();
     }
 
+    //check valid token
     public IntrospectResponse introspect(IntrospectRequest request) {
         var token = request.getToken();
         boolean isValid = true;
@@ -110,6 +112,7 @@ public class AuthenticationDAO {
                 .build();
     }
 
+    // build role method
     private String buildScope(AccountDTO accountDTO) {
         if (accountDTO.getRole() == 0) return "ADMIN WAREHOUSE_STAFF SELLER_STAFF CUSTOMER";
         else if (accountDTO.getRole() == 1) return "CUSTOMER";
@@ -118,6 +121,7 @@ public class AuthenticationDAO {
         else return "UNKNOWN";
     }
 
+    //veriry token
     private SignedJWT verifyToken(String token, boolean isRefresh ) throws Exception {
         JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
 
@@ -139,6 +143,7 @@ public class AuthenticationDAO {
         return signedJWT;
     }
 
+    //logout method
     public void logout(LogoutRequest request) throws Exception {
         try {
             var signToken = verifyToken(request.getToken(),true);
@@ -157,6 +162,7 @@ public class AuthenticationDAO {
 
     }
 
+    //refesh token
     public AuthenticationResponse refreshToken(RefreshToken request) throws Exception {
         var signJWT = verifyToken(request.getToken(), true);
 
