@@ -51,6 +51,7 @@ public class AuthenticationController {
 
     @PostMapping("/refresh")
     ResponseEntity<AuthenticationResponse> authenticate(@RequestBody RefreshToken request) throws Exception {
+        System.out.println("Đã vào token");
         var response = authenticationDAO.refreshToken(request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

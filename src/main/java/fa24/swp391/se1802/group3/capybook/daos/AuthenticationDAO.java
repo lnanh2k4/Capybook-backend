@@ -56,7 +56,7 @@ public class AuthenticationDAO {
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         try {
             var account = accountDAO.findByUsername(request.getUsername());
-            if (account == null) {
+            if (account == null || account.getAccStatus()==0) {
                 throw new Exception("Account is not eixst");
             }
             PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
