@@ -66,7 +66,7 @@ public class CategoryController {
 
         // Cập nhật thông tin khác
         existingCategory.setCatName(category.getCatName());
-        existingCategory.setParentCatID(category.getParentCatID());
+        existingCategory.setParentCatID(category.getParentCatID() == 0 ? null : category.getParentCatID());
 
         return categoryDAO.save(existingCategory);
     }
@@ -130,5 +130,9 @@ public class CategoryController {
         // Trường hợp không có tham số, trả về danh sách rỗng
         return List.of();
     }
-
+    @GetMapping("/searchParent")
+    public List<CategoryDTO> searchCategories(@RequestParam(required = false) Integer parent) {
+        System.out.println("Parent ID: " + parent);
+        return parent == null ? List.of() : categoryDAO.findByParentCatID(parent);
+    }
 }
