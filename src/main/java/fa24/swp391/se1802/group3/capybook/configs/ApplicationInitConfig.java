@@ -1,7 +1,9 @@
 package fa24.swp391.se1802.group3.capybook.configs;
 
 import fa24.swp391.se1802.group3.capybook.daos.AccountDAO;
+import fa24.swp391.se1802.group3.capybook.daos.StaffDAO;
 import fa24.swp391.se1802.group3.capybook.models.AccountDTO;
+import fa24.swp391.se1802.group3.capybook.models.StaffDTO;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -13,27 +15,116 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.sql.Date;
+
+
 @Slf4j
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Configuration
 public class ApplicationInitConfig {
 
-
+    @Autowired
+    StaffDAO staffDAO;
     PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
 
+    /**
+     *  Application Runner method: The method will check account in database. If database haven't any account yet.
+     *  The system will create default admin account
+     * @param accountDAO data access object of account entity
+     * @return Application Runner
+     */
     @Bean
     ApplicationRunner applicationRunner(AccountDAO accountDAO) {
-
         return args -> {
+            //if account with username equals admin has not in database, system will create admin account
             if (accountDAO.findByUsername("admin") == null) {
+                //Add account into database
                 AccountDTO accountDTO = new AccountDTO();
                 accountDTO.setUsername("admin");
+                accountDTO.setAccStatus(1);
+                accountDTO.setFirstName("Administrator");
+                accountDTO.setLastName("Capybook");
+                accountDTO.setDob(new Date(System.currentTimeMillis()));
+                accountDTO.setEmail("capybookteam@gmail.com");
+                accountDTO.setAddress("FPT University, Can Tho Campus");
                 accountDTO.setPassword(passwordEncoder.encode("admin"));
                 accountDTO.setRole(0);
+                accountDTO.setPhone("0987654321");
+                accountDTO.setSex(1);
                 accountDAO.addAccount(accountDTO);
+
+                //Add staff into database
+                StaffDTO staffDTO = new StaffDTO();
+                staffDTO.setUsername(accountDTO);
+                staffDAO.addStaff(staffDTO);
                 log.warn("admin user has been created with default password is admin. Please change password!");
             }
+            //if account with username equals seller_staff has not in database, system will create seller_staff account
+            if (accountDAO.findByUsername("seller_staff") == null) {
+                AccountDTO accountDTO = new AccountDTO();
+                accountDTO.setUsername("seller_staff");
+                accountDTO.setAccStatus(1);
+                accountDTO.setFirstName("Seller");
+                accountDTO.setLastName("Staff");
+                accountDTO.setDob(new Date(System.currentTimeMillis()));
+                accountDTO.setEmail("capybookteam@gmail.com");
+                accountDTO.setAddress("FPT University, Can Tho Campus");
+                accountDTO.setPassword(passwordEncoder.encode("seller_staff"));
+                accountDTO.setRole(2);
+                accountDTO.setPhone("0123456789");
+                accountDTO.setSex(1);
+                accountDAO.addAccount(accountDTO);
+
+                //Add staff into database
+                StaffDTO staffDTO = new StaffDTO();
+                staffDTO.setUsername(accountDTO);
+                staffDTO.setManagerID( staffDAO.findStaff(accountDAO.findByUsername("admin")));
+                staffDAO.addStaff(staffDTO);
+                log.warn("seller staff user has been created with default username and password are seller_staff. Please change password!");
+            }
+            //if account with username equals warehouse_staff has not in database, system will create warehouse_staff account
+            if (accountDAO.findByUsername("warehouse_staff") == null) {
+                //Add account into database
+                AccountDTO accountDTO = new AccountDTO();
+                accountDTO.setUsername("warehouse_staff");
+                accountDTO.setAccStatus(1);
+                accountDTO.setFirstName("Warehouse");
+                accountDTO.setLastName("Staff");
+                accountDTO.setDob(new Date(System.currentTimeMillis()));
+                accountDTO.setEmail("capybookteam@gmail.com");
+                accountDTO.setAddress("FPT University, Can Tho Campus");
+                accountDTO.setPassword(passwordEncoder.encode("warehouse_staff"));
+                accountDTO.setRole(3);
+                accountDTO.setSex(1);
+                accountDTO.setPhone("0123456789");
+                accountDAO.addAccount(accountDTO);
+
+                //Add staff into database
+                StaffDTO staffDTO = new StaffDTO();
+                staffDTO.setUsername(accountDTO);
+                staffDTO.setManagerID( staffDAO.findStaff(accountDAO.findByUsername("admin")));
+                staffDAO.addStaff(staffDTO);
+                log.warn("Warehouse staff user has been created with default username and password are warehouse_staff. Please change password!");
+            }
+            //if account with username equals customer has not in database, system will create customer account
+            if (accountDAO.findByUsername("customer") == null) {
+                AccountDTO accountDTO = new AccountDTO();
+                accountDTO.setUsername("customer");
+                accountDTO.setAccStatus(1);
+                accountDTO.setFirstName("Customer");
+                accountDTO.setLastName("Capybook");
+                accountDTO.setDob(new Date(System.currentTimeMillis()));
+                accountDTO.setEmail("capybookteam@gmail.com");
+                accountDTO.setAddress("FPT University, Can Tho Campus");
+                accountDTO.setPassword(passwordEncoder.encode("customer"));
+                accountDTO.setRole(1);
+                accountDTO.setPhone("0987654321");
+                accountDTO.setSex(1);
+                accountDAO.addAccount(accountDTO);
+                log.warn("Customer user has been created with default username and password are customer. Please change password!");
+            }
+
         };
     }
 }

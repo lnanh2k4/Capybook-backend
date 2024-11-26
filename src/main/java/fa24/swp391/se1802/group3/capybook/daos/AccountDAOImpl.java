@@ -88,6 +88,7 @@ public class AccountDAOImpl implements AccountDAO {
         query.setParameter("accStatus", INACTIVE_STATUS);
         query.setParameter("username", username);
         query.executeUpdate();
+        entityManager.flush();
     }
 
     @Override
@@ -146,5 +147,6 @@ public class AccountDAOImpl implements AccountDAO {
         query.setParameter("password",account.getPassword());
         query.setParameter("accStatus",ACTIVE_STATUS);
         query.executeUpdate();
+        entityManager.flush();
     }
 }
