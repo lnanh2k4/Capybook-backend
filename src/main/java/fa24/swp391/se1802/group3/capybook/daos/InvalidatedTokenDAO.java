@@ -21,10 +21,10 @@ public class InvalidatedTokenDAO {
 
     @Transactional
     public void save(InvalidatedTokenDTO token) {
-        String jpql = "INSERT INTO InvalidatedTokenDTO (id, expiryTime) "
+        String jpql = "INSERT INTO InvalidatedTokenDTO (ITID, expiryTime) "
                 + "VALUES ( :id, :expiryTime)";
         Query query = entityManager.createQuery(jpql);
-        query.setParameter("id", token.getId());
+        query.setParameter("id", token.getITID());
         query.setParameter("expiryTime", token.getExpiryTime());
 
         query.executeUpdate();

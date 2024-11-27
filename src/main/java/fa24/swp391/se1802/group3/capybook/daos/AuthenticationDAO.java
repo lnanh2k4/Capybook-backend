@@ -151,7 +151,7 @@ public class AuthenticationDAO {
             Date expiryTime = signToken.getJWTClaimsSet().getExpirationTime();
 
             InvalidatedTokenDTO invalidatedTokenDTO = InvalidatedTokenDTO.builder()
-                    .id(jit)
+                    .ITID(jit)
                     .expiryTime(expiryTime)
                     .build();
             invalidatedTokenDAO.save(invalidatedTokenDTO);
@@ -169,7 +169,7 @@ public class AuthenticationDAO {
         var jit = signJWT.getJWTClaimsSet().getJWTID();
         var expiryTime = signJWT.getJWTClaimsSet().getExpirationTime();
         InvalidatedTokenDTO invalidatedTokenDTO = InvalidatedTokenDTO.builder()
-                .id(jit)
+                .ITID(jit)
                 .expiryTime(expiryTime)
                 .build();
         invalidatedTokenDAO.save(invalidatedTokenDTO);

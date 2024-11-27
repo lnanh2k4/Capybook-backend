@@ -16,7 +16,7 @@ import java.util.Date;
 @Table(name = "invalidatedtoken")
 public class InvalidatedTokenDTO {
     @Id
-    String id;
+    String ITID;
     @Column(name = "expirytime")
     Date expiryTime;
     @JoinColumn(name = "username", referencedColumnName = "username")
