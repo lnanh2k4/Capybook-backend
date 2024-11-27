@@ -68,4 +68,7 @@ public class AccountDTO implements Serializable {
     @OneToMany(mappedBy = "username", fetch = FetchType.LAZY)
     @JsonIgnore
     private Collection<CartDTO> cartCollection;
+
+    @OneToMany(mappedBy = "username")
+    private Collection<InvalidatedTokenDTO> invalidatedTokenCollection;
 }

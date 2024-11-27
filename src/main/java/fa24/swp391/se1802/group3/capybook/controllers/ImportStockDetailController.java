@@ -46,7 +46,7 @@ public class ImportStockDetailController {
             System.out.println("Received JSON: " + details);
             for (ImportStockDetailDTO detail : details) {
                 System.out.println("Before save - Quantity: " + detail.getISDQuantity() + ", Price: " + detail.getImportPrice());
-                detail.setIsid(new ImportStockDTO(id));
+//                detail.setIsid(new ImportStockDTO(id));
                 importStockDetailDAO.save(detail);
                 System.out.println("Saved detail: " + detail);
             }

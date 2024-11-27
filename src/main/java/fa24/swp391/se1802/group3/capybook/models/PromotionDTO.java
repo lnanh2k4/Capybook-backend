@@ -12,6 +12,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -55,7 +56,7 @@ public class PromotionDTO implements Serializable {
     @OneToMany(mappedBy = "proID")
     @JsonManagedReference
     @JsonIgnore
-    private Collection<OrderDTO> orderDTO1Collection;
+    private List<OrderDTO> orderList;
 
     @JoinColumn(name = "createdby", referencedColumnName = "staffid")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -68,4 +69,7 @@ public class PromotionDTO implements Serializable {
     @JsonBackReference
     @JsonIgnore
     private StaffDTO approvedBy;
+
+    @OneToMany(mappedBy = "proId")
+    private List<PromotionLogDTO> promotionLogList;
 }

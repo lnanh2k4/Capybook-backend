@@ -8,6 +8,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -72,16 +73,16 @@ public class BookDTO implements Serializable {
 
     @OneToMany(mappedBy = "bookID", fetch = FetchType.EAGER)
     @JsonIgnore
-    private Collection<OrderDetailDTO> orderDetailCollection;
+    private List<OrderDetailDTO> orderDetailList;
 
     @OneToMany(mappedBy = "bookID", fetch = FetchType.LAZY)
     @JsonIgnore // Bỏ qua importStockDetailCollection trong serialization để tránh vòng lặp
-    private Collection<ImportStockDetailDTO> importStockDetailCollection;
+    private List<ImportStockDetailDTO> importStockDetailList;
 
-    @Column(name = "catid")
-    private Integer catID;
+    @OneToMany(mappedBy = "bookId")
+    private List<BookCategoryDTO> bookCategoryList;
 
     @OneToMany(mappedBy = "bookID")
     @JsonIgnore
-    private Collection<CartDTO> cartCollection;
+    private List<CartDTO> cartList;
 }

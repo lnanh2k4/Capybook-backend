@@ -11,6 +11,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 
 @NoArgsConstructor
@@ -56,7 +57,7 @@ public class OrderDTO implements Serializable {
     @OneToMany(mappedBy = "orderID", fetch = FetchType.LAZY)
     @JsonManagedReference
     @JsonIgnore
-    private Collection<OrderDetailDTO> orderDetailCollection;
+    private List<OrderDetailDTO> orderDetailList;
 
     @Transient
     private String customerName;
