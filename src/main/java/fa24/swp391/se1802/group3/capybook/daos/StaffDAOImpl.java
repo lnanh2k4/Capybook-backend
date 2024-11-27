@@ -25,7 +25,6 @@ public class StaffDAOImpl implements  StaffDAO{
     public void save(AccountDTO accountDTO) {
         StaffDTO staffDTO = new StaffDTO();
         staffDTO.setUsername(accountDTO);
-        staffDTO.setManagerID(null);
         staffDTO.setStaffID(0);
         entityManager.persist(staffDTO);
     }
@@ -62,7 +61,6 @@ public class StaffDAOImpl implements  StaffDAO{
         StaffDTO staff = new StaffDTO();
         staff.setStaffID((Integer) result[0]);
         staff.setUsername(username);
-        staff.setManagerID((StaffDTO) result[1]);
         return staff;
     }
 

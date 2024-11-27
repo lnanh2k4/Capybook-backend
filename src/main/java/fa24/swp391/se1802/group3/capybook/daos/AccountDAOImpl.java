@@ -121,7 +121,6 @@ public class AccountDAOImpl implements AccountDAO {
         accountDTO.setAddress((String) result[7]);
         accountDTO.setSex((Integer) result[8]);
         System.out.println("Staff ID: "+staff.getStaffID());
-        System.out.println("Staff manager ID: "+ staff.getManagerID().getStaffID());
         Collection<StaffDTO> collection = new ArrayList<>();
         collection.add(staff);
         System.out.println(staff.getUsername().getFirstName());
