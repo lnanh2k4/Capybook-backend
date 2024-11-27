@@ -9,9 +9,6 @@ public interface CategoryDAO {
     void delete(int catID);
     List<CategoryDTO> findAll();
 
-    // Thêm phương thức này để tìm các category con
-    List<CategoryDTO> findByParentCatID(int parentCatID);
-
     // Thêm phương thức này để tìm kiếm category theo tên
     List<CategoryDTO> searchByName(String name);
 }
