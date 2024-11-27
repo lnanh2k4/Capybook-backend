@@ -8,6 +8,7 @@ import lombok.*;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 
 @NoArgsConstructor
@@ -37,5 +38,8 @@ public class OrderDetailDTO implements Serializable {
     @ManyToOne
     @JsonBackReference
     private OrderDTO orderID;
+
+    @Column(name = "totalPrice")
+    private BigDecimal totalPrice;
 
 }
