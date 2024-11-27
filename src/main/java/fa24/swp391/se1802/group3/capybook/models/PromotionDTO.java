@@ -59,17 +59,16 @@ public class PromotionDTO implements Serializable {
     private List<OrderDTO> orderList;
 
     @JoinColumn(name = "createdby", referencedColumnName = "staffid")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonBackReference
+    @ManyToOne
     @JsonIgnore
     private StaffDTO createdBy;
 
     @JoinColumn(name = "approvedby", referencedColumnName = "staffid")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonBackReference
+    @ManyToOne
     @JsonIgnore
     private StaffDTO approvedBy;
 
     @OneToMany(mappedBy = "proId")
+    @JsonIgnore
     private List<PromotionLogDTO> promotionLogList;
 }

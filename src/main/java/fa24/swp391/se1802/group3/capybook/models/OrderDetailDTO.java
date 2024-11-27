@@ -39,7 +39,7 @@ public class OrderDetailDTO implements Serializable {
     @JsonBackReference
     private OrderDTO orderID;
 
-    @Column(name = "totalPrice")
+    @Column(name = "totalprice")
     private BigDecimal totalPrice;
 
 }
