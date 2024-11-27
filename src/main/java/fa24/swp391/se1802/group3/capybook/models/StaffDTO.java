@@ -29,10 +29,6 @@ public class StaffDTO implements Serializable {
     @JoinColumn(name = "username", referencedColumnName = "username")
     private AccountDTO username;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "managerid", referencedColumnName = "staffid")
-    private StaffDTO managerID;
-
     // Ignoring other collections that don’t need serialization
     @OneToMany(mappedBy = "staffID", fetch = FetchType.LAZY)
     @JsonIgnore

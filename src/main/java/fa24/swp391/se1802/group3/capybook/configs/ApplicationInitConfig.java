@@ -79,7 +79,6 @@ public class ApplicationInitConfig {
                 //Add staff into database
                 StaffDTO staffDTO = new StaffDTO();
                 staffDTO.setUsername(accountDTO);
-                staffDTO.setManagerID( staffDAO.findStaff(accountDAO.findByUsername("admin")));
                 staffDAO.addStaff(staffDTO);
                 log.warn("seller staff user has been created with default username and password are seller_staff. Please change password!");
             }
@@ -103,7 +102,6 @@ public class ApplicationInitConfig {
                 //Add staff into database
                 StaffDTO staffDTO = new StaffDTO();
                 staffDTO.setUsername(accountDTO);
-                staffDTO.setManagerID( staffDAO.findStaff(accountDAO.findByUsername("admin")));
                 staffDAO.addStaff(staffDTO);
                 log.warn("Warehouse staff user has been created with default username and password are warehouse_staff. Please change password!");
             }
