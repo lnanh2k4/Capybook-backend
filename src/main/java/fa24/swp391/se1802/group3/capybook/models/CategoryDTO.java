@@ -33,11 +33,9 @@ public class CategoryDTO implements Serializable {
     @Column(name = "catstatus", nullable = false)
     private Integer catStatus;
 
-    @Lob
-    @Column(name = "catDescription")
-    private String catDescription;
-
     @OneToMany(mappedBy = "catId")
+    @JsonIgnore // Ngăn Jackson tuần tự hóa danh sách này
     private List<BookCategoryDTO> bookCategoryList;
+
 }
 

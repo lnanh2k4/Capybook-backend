@@ -19,9 +19,11 @@ public class BookCategoryDTO implements Serializable {
     @Basic(optional = false)
     @Column(name = "book_cate_id")
     private Integer bookCateId;
+
     @JoinColumn(name = "book_id", referencedColumnName = "bookID")
     @ManyToOne
-    private Book bookId;
+    private BookDTO bookId; // Đổi từ Book sang BookDTO
+
     @JoinColumn(name = "cat_id", referencedColumnName = "catID")
     @ManyToOne
     private CategoryDTO catId;

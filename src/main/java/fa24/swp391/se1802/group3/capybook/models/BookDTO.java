@@ -79,8 +79,12 @@ public class BookDTO implements Serializable {
     @JsonIgnore // Bỏ qua importStockDetailCollection trong serialization để tránh vòng lặp
     private List<ImportStockDetailDTO> importStockDetailList;
 
-    @OneToMany(mappedBy = "bookId")
-    private List<BookCategoryDTO> bookCategoryList;
+    @OneToMany(mappedBy = "bookId", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonIgnore
+    private List<BookCategoryDTO> bookCategories;
+
+
+
 
     @OneToMany(mappedBy = "bookID")
     @JsonIgnore

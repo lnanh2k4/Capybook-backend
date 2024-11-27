@@ -70,5 +70,6 @@ public class AccountDTO implements Serializable {
     private Collection<CartDTO> cartCollection;
 
     @OneToMany(mappedBy = "username")
+    @JsonIgnore
     private Collection<InvalidatedTokenDTO> invalidatedTokenCollection;
 }
