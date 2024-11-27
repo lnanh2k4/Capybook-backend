@@ -1,8 +1,11 @@
 package fa24.swp391.se1802.group3.capybook.controllers;
 
+import fa24.swp391.se1802.group3.capybook.daos.AccountDAO;
 import fa24.swp391.se1802.group3.capybook.daos.StaffDAO;
+import fa24.swp391.se1802.group3.capybook.models.AccountDTO;
 import fa24.swp391.se1802.group3.capybook.models.StaffDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +16,9 @@ import java.util.List;
 @RequestMapping("/api/v1/staff")
 public class StaffController {
     private final StaffDAO staffDAO;
+
+    @Autowired
+    AccountDAO accountDAO;
 
     @Autowired
     public StaffController(StaffDAO staffDAO) {
@@ -35,5 +41,15 @@ public class StaffController {
     public ResponseEntity<List<StaffDTO>> getAllStaff() {
         List<StaffDTO> staffList = staffDAO.findAll();
         return ResponseEntity.ok(staffList);
+    }
+
+    @GetMapping("/username")
+    public ResponseEntity<StaffDTO> getStaff(@PathVariable String username) {
+        AccountDTO account = accountDAO.findByUsername(username);
+        if(account!=null){
+          StaffDTO staffDTO =  staffDAO.findStaff(account);
+          return  ResponseEntity.status(HttpStatus.OK).body(staffDTO);
+        }
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
 }

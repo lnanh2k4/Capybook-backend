@@ -53,18 +53,6 @@ public class StaffDAOImpl implements  StaffDAO{
     }
 
     @Override
-    public StaffDTO findManager(AccountDTO username) {
-        Query query = entityManager.createQuery("Select s.staffID, s.managerID From StaffDTO s WHERE s.username=:username");
-        query.setParameter("username",username);
-        Object[] result = (Object[]) query.getSingleResult();
-
-        StaffDTO staff = new StaffDTO();
-        staff.setStaffID((Integer) result[0]);
-        staff.setUsername(username);
-        return staff;
-    }
-
-    @Override
     @Transactional
     public void update(StaffDTO staffDTO) {
         entityManager.merge(staffDTO);
