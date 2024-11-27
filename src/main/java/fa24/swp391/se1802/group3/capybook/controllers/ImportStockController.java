@@ -37,12 +37,12 @@ public class ImportStockController {
         ImportStockDTO savedStock = importStockDAO.save(importStockDTO);
 
         // Kiểm tra danh sách chi tiết nhập kho trước khi lưu
-        if (importStockDTO.getImportStockDetailCollection() != null && !importStockDTO.getImportStockDetailCollection().isEmpty()) {
-            importStockDTO.getImportStockDetailCollection().forEach(detail -> {
-                detail.setIsid(savedStock);  // Gán liên kết với ImportStock
-                importStockDetailDAO.save(detail); // Lưu từng chi tiết vào cơ sở dữ liệu
-            });
-        }
+//        if (importStockDTO.getImportStockDetailCollection() != null && !importStockDTO.getImportStockDetailCollection().isEmpty()) {
+//            importStockDTO.getImportStockDetailCollection().forEach(detail -> {
+//                detail.setIsid(savedStock);  // Gán liên kết với ImportStock
+//                importStockDetailDAO.save(detail); // Lưu từng chi tiết vào cơ sở dữ liệu
+//            });
+//        }
 
         return ResponseEntity.ok(savedStock);
     }

@@ -9,6 +9,7 @@ import lombok.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -32,17 +33,11 @@ public class CategoryDTO implements Serializable {
     @Column(name = "catstatus", nullable = false)
     private Integer catStatus;
 
-    @Column(name = "parentcatid") // Thêm rõ ràng trường parentCatID
-    private Integer parentCatID;
+    @Lob
+    @Column(name = "catDescription")
+    private String catDescription;
 
-    @OneToMany(mappedBy = "parentCatID", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
-    @JsonIgnore
-    private Collection<CategoryDTO> categoryCollection;
-
-    @OneToMany(mappedBy = "catID", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
-    @JsonIgnore
-    private Collection<BookDTO> bookCollection;
+    @OneToMany(mappedBy = "catId")
+    private List<BookCategoryDTO> bookCategoryList;
 }
 

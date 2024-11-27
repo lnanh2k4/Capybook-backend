@@ -1,9 +1,6 @@
 package fa24.swp391.se1802.group3.capybook.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -22,4 +19,7 @@ public class InvalidatedTokenDTO {
     String id;
     @Column(name = "expirytime")
     Date expiryTime;
+    @JoinColumn(name = "username", referencedColumnName = "username")
+    @ManyToOne
+    private AccountDTO username;
 }

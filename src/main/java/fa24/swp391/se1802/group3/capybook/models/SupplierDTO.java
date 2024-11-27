@@ -10,6 +10,7 @@ import lombok.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -46,7 +47,7 @@ public class SupplierDTO implements Serializable {
     @OneToMany(mappedBy = "supID", fetch = FetchType.LAZY)
     @JsonManagedReference
     @JsonIgnore
-    private Collection<ImportStockDTO> importStockDTOCollection;
+    private List<ImportStockDTO> importStockList;
 
 
 }

@@ -66,7 +66,7 @@ public class CategoryController {
 
         // Cập nhật thông tin khác
         existingCategory.setCatName(category.getCatName());
-        existingCategory.setParentCatID(category.getParentCatID() == 0 ? null : category.getParentCatID());
+//        existingCategory.setParentCatID(category.getParentCatID() == 0 ? null : category.getParentCatID());
 
         return categoryDAO.save(existingCategory);
     }
@@ -94,7 +94,7 @@ public class CategoryController {
 
         // Nếu không có child, thực hiện soft delete (set catStatus = 0)
         category.setCatStatus(0);
-        category.setParentCatID(null);
+//        category.setParentCatID(null);
         categoryDAO.save(category);
 
         return ResponseEntity.ok("Category soft deleted successfully!");

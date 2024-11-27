@@ -7,6 +7,7 @@ import lombok.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -35,21 +36,21 @@ public class StaffDTO implements Serializable {
     // Ignoring other collections that don’t need serialization
     @OneToMany(mappedBy = "staffID", fetch = FetchType.LAZY)
     @JsonIgnore
-    private Collection<OrderDTO> orderDTOCollection;
+    private List<OrderDTO> orderList;
 
     @OneToMany(mappedBy = "createdBy", fetch = FetchType.LAZY)
     @JsonIgnore
-    private Collection<PromotionDTO> createByCollection;
+    private List<PromotionDTO> createByList;
 
     @OneToMany(mappedBy = "approvedBy", fetch = FetchType.LAZY)
     @JsonIgnore
-    private Collection<PromotionDTO> approveByCollection;
+    private List<PromotionDTO> approvedByList;
 
     @OneToMany(mappedBy = "staffID", fetch = FetchType.LAZY)
     @JsonIgnore
-    private Collection<ImportStockDTO> importStockDTOCollection;
+    private List<ImportStockDTO> importStockList;
 
     @OneToMany(mappedBy = "staffID", fetch = FetchType.LAZY)
     @JsonIgnore
-    private Collection<NotificationDTO> notificationCollection;
+    private List<NotificationDTO> notificationList;
 }

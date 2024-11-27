@@ -68,22 +68,22 @@ public class BookController {
             BookDTO book = objectMapper.readValue(bookData, BookDTO.class);
 
             // Đảm bảo rằng catID không null
-            if (book.getCatID() == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-            }
+//            if (book.getCatID() == null) {
+//                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+//            }
 
             // Lấy CategoryDTO từ cơ sở dữ liệu
-            CategoryDTO category = entityManager.find(CategoryDTO.class, book.getCatID());
+//            CategoryDTO category = entityManager.find(CategoryDTO.class, book.getCatID());
 
             // Lỗi xảy ra ở đây nếu CategoryDTO chứa mối quan hệ Lazy chưa khởi tạo
-            if (category == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-            }
+//            if (category == null) {
+//                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+//            }
 
             // Khởi tạo đầy đủ để tránh LazyInitializationException
-            Hibernate.initialize(category.getCategoryCollection());
+//            Hibernate.initialize(category.getCategoryCollection());
 
-            book.setCatID(category.getCatID());
+//            book.setCatID(category.getCatID());
             book.setBookStatus(1);
 
             // Kiểm tra sách đã tồn tại
@@ -157,7 +157,7 @@ public class BookController {
             existingBook.setBookPrice(book.getBookPrice());
             existingBook.setBookDescription(book.getBookDescription());
             existingBook.setBookStatus(book.getBookStatus());
-            existingBook.setCatID(book.getCatID()); // Ensure catID is updated
+//            existingBook.setCatID(book.getCatID()); // Ensure catID is updated
             existingBook.setBookQuantity(book.getBookQuantity());
 
             // Handle the image upload

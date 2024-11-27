@@ -8,8 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Date;
+import java.util.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Repository;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
@@ -56,11 +54,7 @@ public class ImportStockDTO implements Serializable {
 
     @OneToMany(mappedBy = "isid", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
-    private Collection<ImportStockDetailDTO> importStockDetailCollection = new ArrayList<>();
+    private List<ImportStockDetailDTO> importStockDetailList;
 
-
-    public ImportStockDTO(int isid) {
-        this.isid = isid;
-    }
 }
 
