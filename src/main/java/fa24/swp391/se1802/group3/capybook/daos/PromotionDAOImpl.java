@@ -36,17 +36,17 @@ public class PromotionDAOImpl implements PromotionDAO {
         entityManager.merge(promotionDTO);  // Sử dụng merge để cập nhật
     }
 
-
-
     @Override
     public void delete(int proID) {
         entityManager.remove(this.find(proID));
     }
 
-
     @Override
     public List<PromotionDTO> findAll() {
-        TypedQuery<PromotionDTO> query = entityManager.createQuery("From PromotionDTO", PromotionDTO.class);
+        TypedQuery<PromotionDTO> query = entityManager.createQuery(
+                "SELECT p FROM PromotionDTO p LEFT JOIN FETCH p.createdBy LEFT JOIN FETCH p.approvedBy",
+                PromotionDTO.class
+        );
         return query.getResultList();
     }
 

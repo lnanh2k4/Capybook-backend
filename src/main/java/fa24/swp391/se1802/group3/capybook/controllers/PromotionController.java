@@ -1,9 +1,13 @@
 package fa24.swp391.se1802.group3.capybook.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fa24.swp391.se1802.group3.capybook.daos.AccountDAO;
 import fa24.swp391.se1802.group3.capybook.daos.PromotionDAO;
+import fa24.swp391.se1802.group3.capybook.daos.StaffDAO;
+import fa24.swp391.se1802.group3.capybook.models.AccountDTO;
 import fa24.swp391.se1802.group3.capybook.models.BookDTO;
 import fa24.swp391.se1802.group3.capybook.models.PromotionDTO;
+import fa24.swp391.se1802.group3.capybook.models.StaffDTO;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,55 +15,116 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/promotions")
 public class PromotionController {
 
     private final PromotionDAO promotionDAO;
+    private final StaffDAO staffDAO;
+    private final AccountDAO accountDAO;
 
     @Autowired
-    public PromotionController(PromotionDAO promotionDAO) {
+    public PromotionController(PromotionDAO promotionDAO, StaffDAO staffDAO, AccountDAO accountDAO) {
         this.promotionDAO = promotionDAO;
+        this.staffDAO = staffDAO;
+        this.accountDAO = accountDAO; // Inject AccountDAO
     }
 
-    // Lấy danh sách tất cả các khuyến mãi
     @GetMapping("/")
-    public List<PromotionDTO> getAllPromotions() {
-        return promotionDAO.findAll();  // Sử dụng JPQL để lấy danh sách khuyến mãi
-    }
+    public ResponseEntity<?> getAllPromotions() {
+        try {
+            // Fetch all promotions from DAO
+            List<PromotionDTO> promotions = promotionDAO.findAll();
 
-    // Lấy chi tiết một khuyến mãi dựa trên proID
-    @GetMapping("/{proID}")
-    public ResponseEntity<PromotionDTO> getPromotionById(@PathVariable int proID) {
+            // Map the promotions to a response format
+            List<Map<String, Object>> responseList = promotions.stream().map(promotion -> {
+                Map<String, Object> response = new HashMap<>();
+                response.put("proID", promotion.getProID());
+                response.put("proName", promotion.getProName());
+                response.put("proCode", promotion.getProCode());
+                response.put("discount", promotion.getDiscount());
+                response.put("startDate", promotion.getStartDate());
+                response.put("endDate", promotion.getEndDate());
+                response.put("quantity", promotion.getQuantity());
+                response.put("proStatus", promotion.getProStatus());
+                response.put("createdBy", promotion.getCreatedBy() != null ? promotion.getCreatedBy().getStaffID() : null);
+                response.put("approvedBy", promotion.getApprovedBy() != null ? promotion.getApprovedBy().getStaffID() : null);
+                return response;
+            }).toList();
 
-        PromotionDTO promotion = promotionDAO.find(proID); // Gọi hàm find từ DAO
-
-        if (promotion != null) {
-            return new ResponseEntity<>(promotion, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            // Return the response
+            return ResponseEntity.ok(responseList);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while fetching promotions.");
         }
     }
 
-    @PostMapping("/")
-    public ResponseEntity<PromotionDTO> addPromotion(@RequestBody String promotionData) {
+
+    @GetMapping("/{proID}")
+    public ResponseEntity<?> getPromotionById(@PathVariable int proID) {
         try {
-            System.out.println("Request received");
-            ObjectMapper objectMapper = new ObjectMapper();
-            PromotionDTO promotion = objectMapper.readValue(promotionData, PromotionDTO.class);
-            System.out.println("Parsed promotion data: " + promotion);
+            PromotionDTO promotion = promotionDAO.find(proID); // Lấy thông tin khuyến mãi từ DAO
+            if (promotion != null) {
+                // Tạo phản hồi JSON chỉ chứa các trường cần thiết
+                Map<String, Object> response = new HashMap<>();
+                response.put("proID", promotion.getProID());
+                response.put("proName", promotion.getProName());
+                response.put("proCode", promotion.getProCode());
+                response.put("discount", promotion.getDiscount());
+                response.put("startDate", promotion.getStartDate());
+                response.put("endDate", promotion.getEndDate());
+                response.put("quantity", promotion.getQuantity());
+                response.put("proStatus", promotion.getProStatus());
 
-            // Đặt trạng thái khuyến mãi nếu cần
-            promotion.setProStatus(1);
+                // Chỉ lấy staffID cho createdBy và approvedBy
+                response.put("createdBy", promotion.getCreatedBy() != null ? promotion.getCreatedBy().getStaffID() : null);
+                response.put("approvedBy", promotion.getApprovedBy() != null ? promotion.getApprovedBy().getStaffID() : null);
 
-            // Lưu promotion vào cơ sở dữ liệu, proID sẽ tự động được gán
-            promotionDAO.save(promotion);
-            System.out.println("Promotion saved in database");
+                return ResponseEntity.ok(response); // Trả về phản hồi JSON
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Promotion not found");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred");
+        }
+    }
 
-            return ResponseEntity.status(HttpStatus.CREATED).body(promotion);
-        } catch (IOException e) {
+
+    @PostMapping("/")
+    public ResponseEntity<PromotionDTO> addPromotion(
+            @RequestBody PromotionDTO promotionDTO,
+            @RequestParam(name = "username") String username) { // @RequestParam để nhận username
+        try {
+            System.out.println("Request received: " + promotionDTO);
+
+            // Tra cứu account dựa trên username
+            AccountDTO accountDTO = accountDAO.findByUsername(username);
+            if (accountDTO == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            }
+
+            // Tra cứu staff dựa trên account
+            StaffDTO staff = staffDAO.findStaff(accountDTO);
+            if (staff == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            }
+
+            // Gắn staff vào createdBy
+            promotionDTO.setCreatedBy(staff);
+
+            // Lưu promotion vào cơ sở dữ liệu
+            promotionDTO.setProStatus(1); // Đặt trạng thái mặc định
+            promotionDAO.save(promotionDTO);
+
+            System.out.println("Promotion saved in database: " + promotionDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(promotionDTO);
+        } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
@@ -67,14 +132,35 @@ public class PromotionController {
 
 
     @PutMapping("/{proID}")
-    public ResponseEntity<PromotionDTO> updatePromotion(@PathVariable int proID, @RequestBody PromotionDTO promotionDTO) {
+    public ResponseEntity<PromotionDTO> updatePromotion(
+            @PathVariable int proID,
+            @RequestBody Map<String, Object> updates) {
         PromotionDTO existingPromotion = promotionDAO.find(proID);
         if (existingPromotion != null) {
-            // Giữ nguyên proStatus nếu không có yêu cầu thay đổi từ phía client
-            promotionDTO.setProID(proID); // Đảm bảo proID đúng
-            promotionDTO.setProStatus(existingPromotion.getProStatus()); // Giữ lại giá trị proStatus gốc
-            promotionDAO.update(promotionDTO); // Thực hiện cập nhật
-            return new ResponseEntity<>(promotionDTO, HttpStatus.OK);
+            // Kiểm tra và giữ nguyên `createdBy` nếu không thay đổi
+            if (!updates.containsKey("proName")) {
+                updates.put("proName", existingPromotion.getProName());
+            }
+            // Các trường khác tương tự...
+
+            // Xử lý `approvedByUsername`
+            if (updates.containsKey("approvedByUsername")) {
+                String approvedByUsername = (String) updates.get("approvedByUsername");
+                AccountDTO accountDTO = accountDAO.findByUsername(approvedByUsername);
+                if (accountDTO == null) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+                }
+                StaffDTO staff = staffDAO.findStaff(accountDTO);
+                if (staff == null) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+                }
+                existingPromotion.setApprovedBy(staff);
+            }
+
+            // Cập nhật các trường khác nếu cần thiết
+
+            promotionDAO.update(existingPromotion);
+            return new ResponseEntity<>(existingPromotion, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

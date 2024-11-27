@@ -112,9 +112,8 @@ public class OrderController {
                 }
             }
 
-            // Đặt các giá trị mặc định cho đơn hàng
             orderDTO.setOrderDate(new Date());
-            orderDTO.setOrderStatus(1);
+            orderDTO.setOrderStatus(0);
 
             // Lưu OrderDTO
             orderDAO.save(orderDTO);
