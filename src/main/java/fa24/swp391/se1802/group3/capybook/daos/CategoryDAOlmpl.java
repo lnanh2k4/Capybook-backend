@@ -46,16 +46,10 @@ public class CategoryDAOlmpl implements CategoryDAO {
     @Override
     public List<CategoryDTO> findAll() {
         TypedQuery<CategoryDTO> query = entityManager.createQuery("SELECT c FROM CategoryDTO c", CategoryDTO.class);
+
         return query.getResultList();
     }
 
-    @Override
-    public List<CategoryDTO> findByParentCatID(int parentCatID) {
-        TypedQuery<CategoryDTO> query = entityManager.createQuery(
-                "SELECT c FROM CategoryDTO c WHERE c.parentCatID = :parentCatID", CategoryDTO.class);
-        query.setParameter("parentCatID", parentCatID);
-        return query.getResultList();
-    }
 
     @Override
     public List<CategoryDTO> searchByName(String name) {
