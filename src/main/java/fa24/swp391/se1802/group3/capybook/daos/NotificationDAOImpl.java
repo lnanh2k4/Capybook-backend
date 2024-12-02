@@ -2,7 +2,6 @@ package fa24.swp391.se1802.group3.capybook.daos;
 
 import fa24.swp391.se1802.group3.capybook.models.NotificationDTO;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -22,13 +21,7 @@ public class NotificationDAOImpl implements NotificationDAO{
     @Override
     @Transactional
     public void save(NotificationDTO notificationDTO) {
-        System.out.println("Da zo day");
-        Query query = entityManager.createQuery("INSERT INTO NotificationDTO(notTitle, receiver, notDescription, notStatus) VALUES (:notTitle,:receiver,:notDescription,:notStatus)");
-        query.setParameter("notTitle", notificationDTO.getNotTitle());
-        query.setParameter("receiver", notificationDTO.getReceiver());
-        query.setParameter("notDescription",notificationDTO.getNotDescription());
-        query.setParameter("notStatus",notificationDTO.getNotStatus());
-        query.executeUpdate();
+        entityManager.merge(notificationDTO);
     }
 
     @Override
