@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
+import java.util.Date;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -27,4 +28,7 @@ public class PromotionLogDTO implements Serializable {
     @JoinColumn(name = "staff_id", referencedColumnName = "staffID")
     @ManyToOne
     private StaffDTO staffId;
+    @Column(name = "pro_log_date")
+    @Temporal(TemporalType.DATE)
+    private Date proLogDate;
 }
