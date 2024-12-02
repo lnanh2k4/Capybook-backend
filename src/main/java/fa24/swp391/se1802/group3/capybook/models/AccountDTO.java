@@ -15,6 +15,7 @@ import java.util.Collection;
 @Setter
 @ToString
 @Entity
+@Builder
 @Table(name = "account")
 public class AccountDTO implements Serializable {
     @Serial
