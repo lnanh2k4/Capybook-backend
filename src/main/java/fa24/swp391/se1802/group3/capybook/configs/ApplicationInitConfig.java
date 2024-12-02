@@ -43,8 +43,8 @@ public class ApplicationInitConfig {
                 AccountDTO accountDTO = new AccountDTO();
                 accountDTO.setUsername("admin");
                 accountDTO.setAccStatus(1);
-                accountDTO.setFirstName("Administrator");
-                accountDTO.setLastName("Capybook");
+                accountDTO.setFirstName("Capybook");
+                accountDTO.setLastName("Administrator's");
                 accountDTO.setDob(new Date(System.currentTimeMillis()));
                 accountDTO.setEmail("capybookteam@gmail.com");
                 accountDTO.setAddress("FPT University, Can Tho Campus");
@@ -65,8 +65,8 @@ public class ApplicationInitConfig {
                 AccountDTO accountDTO = new AccountDTO();
                 accountDTO.setUsername("seller_staff");
                 accountDTO.setAccStatus(1);
-                accountDTO.setFirstName("Seller");
-                accountDTO.setLastName("Staff");
+                accountDTO.setFirstName("Staff");
+                accountDTO.setLastName("Seller");
                 accountDTO.setDob(new Date(System.currentTimeMillis()));
                 accountDTO.setEmail("capybookteam@gmail.com");
                 accountDTO.setAddress("FPT University, Can Tho Campus");
@@ -88,8 +88,8 @@ public class ApplicationInitConfig {
                 AccountDTO accountDTO = new AccountDTO();
                 accountDTO.setUsername("warehouse_staff");
                 accountDTO.setAccStatus(1);
-                accountDTO.setFirstName("Warehouse");
-                accountDTO.setLastName("Staff");
+                accountDTO.setFirstName("Staff");
+                accountDTO.setLastName("Warehouse");
                 accountDTO.setDob(new Date(System.currentTimeMillis()));
                 accountDTO.setEmail("capybookteam@gmail.com");
                 accountDTO.setAddress("FPT University, Can Tho Campus");
@@ -110,8 +110,8 @@ public class ApplicationInitConfig {
                 AccountDTO accountDTO = new AccountDTO();
                 accountDTO.setUsername("customer");
                 accountDTO.setAccStatus(1);
-                accountDTO.setFirstName("Customer");
-                accountDTO.setLastName("Capybook");
+                accountDTO.setFirstName("Capybook");
+                accountDTO.setLastName("Customer's");
                 accountDTO.setDob(new Date(System.currentTimeMillis()));
                 accountDTO.setEmail("capybookteam@gmail.com");
                 accountDTO.setAddress("FPT University, Can Tho Campus");
