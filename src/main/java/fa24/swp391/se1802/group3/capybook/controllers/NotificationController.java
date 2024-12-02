@@ -39,17 +39,22 @@ public class NotificationController {
     }
 
     @PostMapping(value = "/")
-    public ResponseEntity<NotificationDTO> addNotification(@RequestBody NotificationDTO notification){
-//        try {
-//            ObjectMapper objectMapper = new ObjectMapper();
-//            NotificationDTO notification = objectMapper.readValue(notificationDTO,NotificationDTO.class);
-            System.out.println("Da doc du lieu");
-            notificationDAO.save(notification);
-            System.out.println("Da nap du lieu");
-            return ResponseEntity.status(HttpStatus.CREATED).body(notification);
-//        } catch (JsonProcessingException e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-//        }
+    public ResponseEntity<NotificationDTO> addNotification(@RequestPart("notification") String notification){
+       try {
+           System.out.println("Json: " + notification);
+          ObjectMapper objectMapper = new ObjectMapper();
+           System.out.println("Reading value...");
+         NotificationDTO notificationDTO = objectMapper.readValue(notification,NotificationDTO.class);
+           System.out.println("Staff name: " + notificationDTO.getStaffID());
+           System.out.println("Title: " + notificationDTO.getNotTitle());
+           System.out.println("Description:" + notificationDTO.getNotDescription());
+           System.out.println("Receiver: " + notificationDTO.getReceiver());
+
+            notificationDAO.save(notificationDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(notificationDTO);
+        } catch (JsonProcessingException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+      }
     }
 
 
