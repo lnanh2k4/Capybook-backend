@@ -20,6 +20,9 @@ public class StaffDAOImpl implements  StaffDAO{
         this.entityManager = entityManager;
     }
 
+    @Autowired
+    AccountDAO accountDAO;
+
     @Transactional
     @Override
     public void save(AccountDTO accountDTO) {
@@ -38,12 +41,9 @@ public class StaffDAOImpl implements  StaffDAO{
     @Override
     public StaffDTO findStaff(String username) {
         try {
-            Query queryForAccount = entityManager.createQuery("Select a From AccountDTO a WHERE a.username=:username");
-            queryForAccount.setParameter("username", username);
-            AccountDTO account = (AccountDTO) queryForAccount.getSingleResult();
-
+            AccountDTO account = accountDAO.findByUsername(username);
             Query query = entityManager.createQuery("Select s.staffID From StaffDTO s WHERE s.username=:username");
-            query.setParameter("username",queryForAccount.getSingleResult());
+            query.setParameter("username",account);
             StaffDTO staff = new StaffDTO();
             staff.setStaffID((Integer) query.getSingleResult());
             staff.setUsername(account);
