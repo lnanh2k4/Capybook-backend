@@ -46,18 +46,17 @@ public class StaffDAOImpl implements  StaffDAO{
     @Override
     public StaffDTO findStaff(String username) {
         try {
-            AccountDTO account = accountDAO.findByUsername(username);
-            Query query = entityManager.createQuery("Select s.staffID From StaffDTO s WHERE s.username=:username");
-            query.setParameter("username",account);
-            StaffDTO staff = new StaffDTO();
-            staff.setStaffID((Integer) query.getSingleResult());
-            staff.setUsername(account);
-            return staff;
-        } catch (Exception e){
-            System.out.println(e.getMessage());
+            TypedQuery<StaffDTO> query = entityManager.createQuery(
+                    "SELECT s FROM StaffDTO s WHERE s.username.username = :username", StaffDTO.class
+            );
+            query.setParameter("username", username); // Truyền trực tiếp chuỗi username
+            return query.getSingleResult();
+        } catch (Exception e) {
+            System.out.println("Error in findStaff: " + e.getMessage());
+            return null;
         }
-        return null;
     }
+
 
     @Override
     @Transactional
