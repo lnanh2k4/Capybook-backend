@@ -21,7 +21,7 @@ public class PromotionLogDAOIml implements PromotionLogDAO {
     @Override
     @Transactional
     public void save(PromotionLogDTO promotionLogDTO) {
-        entityManager.persist(promotionLogDTO);
+        entityManager.merge(promotionLogDTO);
     }
 
     @Override

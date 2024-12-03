@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -53,14 +54,12 @@ public class OrderController {
         if (order != null) {
             Map<String, Object> response = new HashMap<>();
 
-            // Thêm thông tin của đơn hàng vào phản hồi, bao gồm thông tin chiết khấu nếu có
             Map<String, Object> orderMap = new HashMap<>();
             orderMap.put("orderID", order.getOrderID());
             orderMap.put("orderDate", order.getOrderDate());
             orderMap.put("orderStatus", order.getOrderStatus());
-            orderMap.put("username", order.getUsername().getUsername()); // Đưa username vào trong order
+            orderMap.put("username", order.getUsername().getUsername());
 
-            // Kiểm tra và thêm thông tin khuyến mãi nếu có
             if (order.getProID() != null) {
                 orderMap.put("proID", order.getProID().getProID());
                 orderMap.put("discount", order.getProID().getDiscount());
@@ -68,13 +67,13 @@ public class OrderController {
 
             response.put("order", orderMap);
 
-            // Tạo danh sách orderDetails
             List<Map<String, Object>> orderDetailResponses = orderDetails.stream()
                     .map(detail -> {
                         Map<String, Object> detailMap = new HashMap<>();
                         detailMap.put("ODID", detail.getOdid());
                         detailMap.put("quantity", detail.getQuantity());
-                        detailMap.put("bookID", detail.getBookID().getBookID()); // Chỉ lấy bookID
+                        detailMap.put("bookID", detail.getBookID().getBookID());
+                        detailMap.put("totalPrice", detail.getTotalPrice()); // Thêm totalPrice
                         return detailMap;
                     })
                     .collect(Collectors.toList());
@@ -132,8 +131,14 @@ public class OrderController {
                 if (book.getBookQuantity() >= quantityToDeduct) {
                     book.setBookQuantity(book.getBookQuantity() - quantityToDeduct); // Giảm số lượng sách
                     bookDAO.update(book); // Cập nhật sách trong DB
+
                     orderDetailDTO.setBookID(book);
                     orderDetailDTO.setQuantity(quantityToDeduct);
+
+                    // Tính totalPrice = bookPrice * quantity
+                    BigDecimal totalPrice = book.getBookPrice().multiply(new BigDecimal(quantityToDeduct));
+                    orderDetailDTO.setTotalPrice(totalPrice);
+
                     orderDetailDAO.save(orderDetailDTO);
                 } else {
                     return new ResponseEntity<>("Book stock is insufficient for book ID: " + book.getBookID(),
@@ -147,6 +152,7 @@ public class OrderController {
             return new ResponseEntity<>("Failed to add order", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
     @PutMapping("/{orderID}")
     public ResponseEntity<OrderDTO> updateOrder(@PathVariable int orderID, @RequestBody Map<String, Integer> updateData) {
