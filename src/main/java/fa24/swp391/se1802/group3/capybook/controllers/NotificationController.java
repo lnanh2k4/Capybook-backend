@@ -29,6 +29,7 @@ public class NotificationController {
 
     @GetMapping("/detail/{notID}")
     public ResponseEntity<NotificationDTO> getNotification(@PathVariable int notID) {
+        System.out.println("Notification ID is :" + notID);
         NotificationDTO notificationDTO = notificationDAO.find(notID);
         return notificationDTO != null ? ResponseEntity.ok(notificationDTO) : ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
     }
