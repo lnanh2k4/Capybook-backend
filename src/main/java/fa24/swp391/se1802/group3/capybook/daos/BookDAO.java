@@ -13,5 +13,6 @@ public interface BookDAO {
     List<BookDTO> findAll();
     List<BookDTO> searchBooks(String searchTerm);
     List<BookDTO> findBooksByTitleAndAuthorAndPublisher(String bookTitle, String author, String publisher);
+    List<BookDTO> sortBooks(String sortBy, String sortOrder);
 
 }

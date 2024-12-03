@@ -62,6 +62,18 @@ public class BookDAOImpl implements BookDAO{
     }
 
     @Override
+    public List<BookDTO> sortBooks(String sortBy, String sortOrder) {
+        String queryString = "FROM BookDTO b WHERE b.bookStatus = 1"; // Chỉ lấy sách hợp lệ
+        if ("price".equalsIgnoreCase(sortBy)) {
+            queryString += " ORDER BY b.bookPrice " + ("desc".equalsIgnoreCase(sortOrder) ? "DESC" : "ASC");
+        } else if ("title".equalsIgnoreCase(sortBy)) {
+            queryString += " ORDER BY b.bookTitle " + ("desc".equalsIgnoreCase(sortOrder) ? "DESC" : "ASC");
+        }
+        TypedQuery<BookDTO> query = entityManager.createQuery(queryString, BookDTO.class);
+        return query.getResultList();
+    }
+
+    @Override
     public List<BookDTO> searchBooks(String searchTerm) {
         String jpql = "FROM BookDTO WHERE " +
                 "LOWER(bookTitle) LIKE :searchTerm OR " +

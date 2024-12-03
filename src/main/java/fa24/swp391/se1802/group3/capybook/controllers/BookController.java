@@ -79,6 +79,20 @@ public class BookController {
         }
     }
 
+    @GetMapping("/sort")
+    @Transactional
+    public ResponseEntity<List<BookDTO>> sortBooks(
+            @RequestParam String sortBy,
+            @RequestParam(defaultValue = "asc") String sortOrder) {
+        try {
+            List<BookDTO> sortedBooks = bookDAO.sortBooks(sortBy, sortOrder);
+            return ResponseEntity.ok(sortedBooks);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
 
     @GetMapping("/{bookId}")
     @Transactional
