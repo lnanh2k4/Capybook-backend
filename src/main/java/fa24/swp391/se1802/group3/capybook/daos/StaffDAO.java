@@ -10,7 +10,7 @@ public interface StaffDAO {
 
     void save(AccountDTO accountDTO);
     StaffDTO findByID(int staffID);
-    StaffDTO findStaff(AccountDTO username);
+    StaffDTO findStaff(String username);
     void update(StaffDTO staffDTO);
     void delete(int staffID);
     List<StaffDTO> findAll();
