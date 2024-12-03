@@ -40,9 +40,13 @@ public class BookDAOImpl implements BookDAO{
 
     @Override
     @Transactional
-    public void update(BookDTO bookDTO) {
-        entityManager.merge(bookDTO);
-        entityManager.flush(); // Ghi các thay đổi xuống cơ sở dữ liệu ngay lập tức
+    public void update(BookDTO book) {
+        BookDTO existingBook = entityManager.find(BookDTO.class, book.getBookID());
+        if (existingBook != null) {
+            entityManager.merge(book); // Chỉ merge nếu thực thể chưa bị xóa
+        } else {
+            throw new IllegalArgumentException("Book does not exist in the database.");
+        }
     }
 
     @Override

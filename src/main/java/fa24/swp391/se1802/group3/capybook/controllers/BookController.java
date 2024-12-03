@@ -43,26 +43,39 @@ public class BookController {
         this.bookDAO = bookDAO;
     }
 
+
     @GetMapping("/")
     @Transactional
     public List<BookDTO> getBooksList() {
         List<BookDTO> books = bookDAO.findAll();
-        // Khởi tạo thủ công `bookCategories` cho mỗi sách
-        books.forEach(book -> Hibernate.initialize(book.getBookCategories()));
+        // Khởi tạo `bookCategories` và các `CategoryDTO` liên quan
+        books.forEach(book -> {
+            Hibernate.initialize(book.getBookCategories());
+            book.getBookCategories().forEach(bookCategory -> {
+                Hibernate.initialize(bookCategory.getCatId());
+            });
+        });
         return books;
     }
 
 
+
     @GetMapping("/{bookId}")
+    @Transactional
     public ResponseEntity<BookDTO> getBook(@PathVariable int bookId) {
         BookDTO book = bookDAO.find(bookId);
         if (book != null) {
-            Hibernate.initialize(book.getBookCategories()); // Khởi tạo `bookCategories`
+            // Khởi tạo `bookCategories` và `CategoryDTO`
+            Hibernate.initialize(book.getBookCategories());
+            book.getBookCategories().forEach(bookCategory -> {
+                Hibernate.initialize(bookCategory.getCatId());
+            });
             return ResponseEntity.ok(book);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
+
 
 
     @PostMapping
@@ -73,7 +86,6 @@ public class BookController {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             BookDTO book = objectMapper.readValue(bookData, BookDTO.class);
-
             book.setBookStatus(1);
 
             List<BookDTO> existingBooks = bookDAO.findBooksByTitleAndAuthorAndPublisher(
@@ -87,7 +99,6 @@ public class BookController {
                 bookDAO.update(existingBook);
                 return ResponseEntity.ok(existingBook);
             }
-
             bookDAO.save(book);
 
             if (book.getBookCategories() != null && !book.getBookCategories().isEmpty()) {
@@ -126,6 +137,19 @@ public class BookController {
     }
 
 
+    @PutMapping("/{bookId}/status")
+    @Transactional
+    public ResponseEntity<BookDTO> updateBookStatus(@PathVariable int bookId, @RequestParam int status) {
+        BookDTO existingBook = bookDAO.find(bookId);
+        if (existingBook == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        existingBook.setBookStatus(status); // Chỉ cập nhật trạng thái
+        bookDAO.update(existingBook);
+        return ResponseEntity.ok(existingBook);
+    }
+
+
     @PutMapping("/{bookId}")
     @Transactional
     public ResponseEntity<BookDTO> updateBook(
@@ -134,44 +158,54 @@ public class BookController {
             @RequestPart(value = "image", required = false) MultipartFile image) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            BookDTO book = objectMapper.readValue(bookData, BookDTO.class);
+            BookDTO updatedBook = objectMapper.readValue(bookData, BookDTO.class);
 
+            // Lấy sách hiện tại từ database
             BookDTO existingBook = bookDAO.find(bookId);
             if (existingBook == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
-
-            existingBook.setBookTitle(book.getBookTitle());
-            existingBook.setAuthor(book.getAuthor());
-            existingBook.setPublisher(book.getPublisher());
-            existingBook.setPublicationYear(book.getPublicationYear());
-            existingBook.setTranslator(book.getTranslator());
-            existingBook.setHardcover(book.getHardcover());
-            existingBook.setDimension(book.getDimension());
-            existingBook.setWeight(book.getWeight());
-            existingBook.setBookPrice(book.getBookPrice());
-            existingBook.setBookDescription(book.getBookDescription());
-            existingBook.setBookStatus(book.getBookStatus());
-            existingBook.setBookQuantity(book.getBookQuantity());
-
+            // Xóa các BookCategoryDTO cũ
+            // Xóa các BookCategoryDTO cũ
             List<BookCategoryDTO> oldCategories = existingBook.getBookCategories();
             if (oldCategories != null) {
                 for (BookCategoryDTO bookCategory : oldCategories) {
-                    entityManager.remove(bookCategory);
+                    entityManager.remove(entityManager.contains(bookCategory) ? bookCategory : entityManager.merge(bookCategory));
                 }
+                oldCategories.clear(); // Làm sạch danh sách trong thực thể
             }
+            entityManager.flush(); // Đảm bảo các thực thể cũ được xóa hoàn toàn
 
-            if (book.getBookCategories() != null && !book.getBookCategories().isEmpty()) {
-                for (BookCategoryDTO bookCategory : book.getBookCategories()) {
+
+            // Thêm danh sách BookCategoryDTO mới
+            if (updatedBook.getBookCategories() != null && !updatedBook.getBookCategories().isEmpty()) {
+                for (BookCategoryDTO bookCategory : updatedBook.getBookCategories()) {
                     CategoryDTO category = entityManager.find(CategoryDTO.class, bookCategory.getCatId().getCatID());
                     if (category == null) {
-                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); // Danh mục không tồn tại
                     }
-                    bookCategory.setBookId(existingBook);
-                    entityManager.persist(bookCategory);
+                    bookCategory.setBookId(existingBook); // Liên kết với sách hiện tại
+                    entityManager.merge(bookCategory); // Sử dụng merge thay vì persist
                 }
             }
 
+
+
+            // Cập nhật thông tin sách
+            existingBook.setBookTitle(updatedBook.getBookTitle());
+            existingBook.setAuthor(updatedBook.getAuthor());
+            existingBook.setPublisher(updatedBook.getPublisher());
+            existingBook.setPublicationYear(updatedBook.getPublicationYear());
+            existingBook.setTranslator(updatedBook.getTranslator());
+            existingBook.setHardcover(updatedBook.getHardcover());
+            existingBook.setDimension(updatedBook.getDimension());
+            existingBook.setWeight(updatedBook.getWeight());
+            existingBook.setBookPrice(updatedBook.getBookPrice());
+            existingBook.setBookDescription(updatedBook.getBookDescription());
+            existingBook.setBookStatus(updatedBook.getBookStatus());
+            existingBook.setBookQuantity(updatedBook.getBookQuantity());
+
+            // Xử lý hình ảnh nếu có
             if (image != null && !image.isEmpty()) {
                 String originalFileName = StringUtils.cleanPath(image.getOriginalFilename());
                 String uniqueFileName = "book_" + bookId + "_" + System.currentTimeMillis() + ".jpg";
@@ -187,9 +221,10 @@ public class BookController {
                 existingBook.setImage("/uploads/" + uniqueFileName);
             }
 
+            // Cập nhật sách
             bookDAO.update(existingBook);
 
-            Hibernate.initialize(existingBook.getBookCategories()); // Khởi tạo thủ công
+            Hibernate.initialize(existingBook.getBookCategories()); // Khởi tạo thủ công trước khi trả về
             return ResponseEntity.ok(existingBook);
         } catch (IOException e) {
             e.printStackTrace();
@@ -209,7 +244,5 @@ public class BookController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Book not found");
         }
     }
-
-
 
 }

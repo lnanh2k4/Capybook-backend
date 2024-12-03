@@ -1,5 +1,6 @@
 package fa24.swp391.se1802.group3.capybook.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,11 +21,13 @@ public class BookCategoryDTO implements Serializable {
     @Column(name = "book_cate_id")
     private Integer bookCateId;
 
+    @ManyToOne
     @JoinColumn(name = "book_id", referencedColumnName = "bookID")
-    @ManyToOne
-    private BookDTO bookId; // Đổi từ Book sang BookDTO
+    @JsonBackReference
+    private BookDTO bookId;
 
-    @JoinColumn(name = "cat_id", referencedColumnName = "catID")
     @ManyToOne
+    @JoinColumn(name = "cat_id", referencedColumnName = "catID")
     private CategoryDTO catId;
+
 }

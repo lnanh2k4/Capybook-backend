@@ -36,8 +36,9 @@ public class ImportStockDetailDTO implements Serializable {
     private BookDTO bookID;
 
 
-    @JoinColumn(name = "isid", referencedColumnName = "isid")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnore // Bỏ qua isid trong serialization để tránh vòng lặp
+    @JoinColumn(name = "isid", referencedColumnName = "isid")
+    @JsonIgnore // Bỏ qua trong JSON để tránh vòng lặp
     private ImportStockDTO isid;
+
 }

@@ -1,6 +1,7 @@
 package fa24.swp391.se1802.group3.capybook.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -80,10 +81,8 @@ public class BookDTO implements Serializable {
     private List<ImportStockDetailDTO> importStockDetailList;
 
     @OneToMany(mappedBy = "bookId", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JsonIgnore
+    @JsonManagedReference
     private List<BookCategoryDTO> bookCategories;
-
-
 
 
     @OneToMany(mappedBy = "bookID")

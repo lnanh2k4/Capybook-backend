@@ -54,7 +54,8 @@ public class ImportStockDTO implements Serializable {
 
     @OneToMany(mappedBy = "isid", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
-    private List<ImportStockDetailDTO> importStockDetailList;
+    private List<ImportStockDetailDTO> importStockDetailCollection;
 
 }
+
 

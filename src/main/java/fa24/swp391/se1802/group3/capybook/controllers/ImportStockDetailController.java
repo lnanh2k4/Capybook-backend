@@ -43,19 +43,25 @@ public class ImportStockDetailController {
     @PostMapping("/{id}/details")
     public ResponseEntity<?> addImportStockDetails(@PathVariable int id, @RequestBody List<ImportStockDetailDTO> details) {
         try {
-            System.out.println("Received JSON: " + details);
+            // Tạo đối tượng ImportStockDTO với ID được truyền vào
+            ImportStockDTO importStock = new ImportStockDTO();
+            importStock.setIsid(id); // Gán ID từ đường dẫn
+
             for (ImportStockDetailDTO detail : details) {
-                System.out.println("Before save - Quantity: " + detail.getISDQuantity() + ", Price: " + detail.getImportPrice());
-//                detail.setIsid(new ImportStockDTO(id));
-                importStockDetailDAO.save(detail);
-                System.out.println("Saved detail: " + detail);
+                // Gán isid cho từng ImportStockDetailDTO
+                detail.setIsid(importStock);
+
+                System.out.println("Detail to save with isid: " + detail);
+                importStockDetailDAO.save(detail); // Lưu vào database
             }
+
             return ResponseEntity.ok("Details added successfully.");
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred: " + e.getMessage());
         }
     }
+
 
 
 
