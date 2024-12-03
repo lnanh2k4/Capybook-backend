@@ -58,6 +58,26 @@ public class BookController {
         return books;
     }
 
+    @GetMapping("/search")
+    @Transactional
+    public ResponseEntity<List<BookDTO>> searchBooks(@RequestParam String keyword) {
+        try {
+            List<BookDTO> books = bookDAO.searchBooks(keyword);
+
+            // Khởi tạo các liên kết `bookCategories` và `CategoryDTO` để tránh lỗi lazy initialization
+            books.forEach(book -> {
+                Hibernate.initialize(book.getBookCategories());
+                book.getBookCategories().forEach(bookCategory -> {
+                    Hibernate.initialize(bookCategory.getCatId());
+                });
+            });
+
+            return ResponseEntity.ok(books);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
 
     @GetMapping("/{bookId}")

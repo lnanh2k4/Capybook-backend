@@ -63,11 +63,15 @@ public class BookDAOImpl implements BookDAO{
 
     @Override
     public List<BookDTO> searchBooks(String searchTerm) {
-        String jpql = "FROM BookDTO WHERE LOWER(bookTitle) LIKE :searchTerm OR LOWER(author) LIKE :searchTerm";
+        String jpql = "FROM BookDTO WHERE " +
+                "LOWER(bookTitle) LIKE :searchTerm OR " +
+                "LOWER(author) LIKE :searchTerm OR " +
+                "LOWER(publisher) LIKE :searchTerm";
         TypedQuery<BookDTO> query = entityManager.createQuery(jpql, BookDTO.class);
         query.setParameter("searchTerm", "%" + searchTerm.toLowerCase() + "%");
         return query.getResultList();
     }
+
 
     @Override
     public List<BookDTO> findBooksByTitleAndAuthorAndPublisher(String bookTitle, String author, String publisher) {
