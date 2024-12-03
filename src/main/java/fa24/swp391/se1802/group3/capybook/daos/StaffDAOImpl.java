@@ -8,6 +8,8 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +18,7 @@ import java.util.List;
 @Repository
 public class StaffDAOImpl implements  StaffDAO{
     EntityManager entityManager;
+    static final String DEFAULT_PASSWORD = "12345";
 
     @Autowired
     public StaffDAOImpl(EntityManager entityManager) {
@@ -101,9 +104,39 @@ public class StaffDAOImpl implements  StaffDAO{
 
     @Override
     @Transactional
+    public void addStaffByString(String staff) {
+        try {
+            ObjectMapper obj = new ObjectMapper();
+            StaffRequest request = obj.readValue(staff,StaffRequest.class);
+            AccountDTO account = new AccountDTO();
+            account.setUsername(request.getUsername());
+            account.setDob(request.getDob());
+            account.setAddress(request.getAddress());
+            account.setSex(request.getSex());
+            account.setEmail(request.getEmail());
+            account.setPhone(request.getPhone());
+            account.setRole(request.getRole());
+            account.setLastName(request.getLastName());
+            account.setFirstName(request.getFirstName());
+            account.setAccStatus(1);
+            PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+            account.setPassword(passwordEncoder.encode(DEFAULT_PASSWORD));
+
+            StaffDTO staffDTO = new StaffDTO();
+            staffDTO.setUsername(account);
+
+            entityManager.persist(account);
+            entityManager.flush();
+            entityManager.persist(staffDTO);
+            entityManager.flush();
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+    }
+    @Override
+    @Transactional
     public void addStaff(StaffDTO staff) {
             entityManager.persist(staff);
             entityManager.flush();
     }
-
 }

@@ -29,8 +29,8 @@ public class StaffController {
 
     // Endpoint to fetch a single staff member by ID
     @GetMapping("/{id}")
-    public ResponseEntity<StaffResponse> getStaffById(@PathVariable int id) {
-        StaffDTO staff = staffDAO.findByID(id);
+    public ResponseEntity<StaffResponse> getStaffById(@PathVariable String id) {
+        StaffDTO staff = staffDAO.findByID(Integer.parseInt(id));
         if (staff != null) {
             StaffResponse staffResponse = new StaffResponse();
             staffResponse.setUsername(staff.getUsername().getUsername());
@@ -56,7 +56,7 @@ public class StaffController {
         return ResponseEntity.ok(staffList);
     }
 
-    @GetMapping("/username")
+    @GetMapping("/username/{username}")
     public ResponseEntity<StaffDTO> getStaff(@PathVariable String username) {
         AccountDTO account = accountDAO.findByUsername(username);
         if (account != null) {
@@ -67,9 +67,15 @@ public class StaffController {
     }
 
     @PutMapping("/")
-    public ResponseEntity<StaffResponse> updateAccount( @RequestPart("staff") String staff) {
+    public ResponseEntity<StaffResponse> updatestaff( @RequestPart("staff") String staff) {
         staffDAO.update(staff);
        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PostMapping("/")
+    public ResponseEntity<StaffResponse> addStaff( @RequestPart("staff") String staff) {
+        staffDAO.addStaffByString(staff);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 }
