@@ -16,4 +16,5 @@ public interface StaffDAO {
     List<StaffDTO> findAll();
     void addStaffByString(String staff);
     void addStaff(StaffDTO staffDTO);
+    List<StaffDTO> searchStaffs(String keyword);
 }
