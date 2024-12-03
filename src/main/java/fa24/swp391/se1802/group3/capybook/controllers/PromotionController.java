@@ -109,8 +109,8 @@ public class PromotionController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
             }
 
-            // Tra cứu staff dựa trên account
-            StaffDTO staff = staffDAO.findStaff(accountDTO);
+            // Tra cứu staff dựa trên username
+            StaffDTO staff = staffDAO.findStaff(username);
             if (staff == null) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
             }
@@ -150,7 +150,7 @@ public class PromotionController {
                 if (accountDTO == null) {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
                 }
-                StaffDTO staff = staffDAO.findStaff(accountDTO);
+                StaffDTO staff = staffDAO.findStaff(approvedByUsername);
                 if (staff == null) {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
                 }

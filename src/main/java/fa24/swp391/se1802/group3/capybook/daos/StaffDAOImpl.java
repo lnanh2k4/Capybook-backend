@@ -36,17 +36,19 @@ public class StaffDAOImpl implements  StaffDAO{
     }
 
     @Override
-    public StaffDTO findStaff(AccountDTO username) {
+    public StaffDTO findStaff(String username) {
         try {
-            Query query = entityManager.createQuery("Select s.staffID From StaffDTO s WHERE s.username=:username");
-            query.setParameter("username",username);
+            Query queryForAccount = entityManager.createQuery("Select a From AccountDTO a WHERE a.username=:username");
+            queryForAccount.setParameter("username", username);
+            AccountDTO account = (AccountDTO) queryForAccount.getSingleResult();
 
+            Query query = entityManager.createQuery("Select s.staffID From StaffDTO s WHERE s.username=:username");
+            query.setParameter("username",queryForAccount.getSingleResult());
             StaffDTO staff = new StaffDTO();
             staff.setStaffID((Integer) query.getSingleResult());
-            staff.setUsername(username);
+            staff.setUsername(account);
             return staff;
         } catch (Exception e){
-            System.out.println("No found staff with username = "+username.getUsername());
             System.out.println(e.getMessage());
         }
         return null;
@@ -75,4 +77,5 @@ public class StaffDAOImpl implements  StaffDAO{
             entityManager.persist(staff);
             entityManager.flush();
     }
+
 }

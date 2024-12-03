@@ -58,7 +58,7 @@ public class StaffController {
     public ResponseEntity<StaffDTO> getStaff(@PathVariable String username) {
         AccountDTO account = accountDAO.findByUsername(username);
         if (account != null) {
-            StaffDTO staffDTO = staffDAO.findStaff(account);
+            StaffDTO staffDTO = staffDAO.findStaff(username);
             return ResponseEntity.status(HttpStatus.OK).body(staffDTO);
         }
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
