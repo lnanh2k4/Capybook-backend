@@ -54,8 +54,9 @@ public class StaffController {
         return ResponseEntity.ok(staffList);
     }
 
-    @GetMapping("/username")
+    @GetMapping("/username/{username}")
     public ResponseEntity<StaffDTO> getStaff(@PathVariable String username) {
+        System.out.println("Input: " + username);
         AccountDTO account = accountDAO.findByUsername(username);
         if (account != null) {
             StaffDTO staffDTO = staffDAO.findStaff(account);
