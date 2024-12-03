@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -78,5 +79,8 @@ public class StaffController {
         staffDAO.addStaffByString(staff);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
-
+    @GetMapping("/search")
+    public List<StaffDTO> searchAccounts(@RequestParam String keyword) {
+        return staffDAO.searchStaffs(keyword);
+    }
 }

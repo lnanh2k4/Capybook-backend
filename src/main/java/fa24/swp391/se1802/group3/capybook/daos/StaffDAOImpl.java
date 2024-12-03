@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -138,5 +139,19 @@ public class StaffDAOImpl implements  StaffDAO{
     public void addStaff(StaffDTO staff) {
             entityManager.persist(staff);
             entityManager.flush();
+    }
+
+    @Override
+    public List<StaffDTO> searchStaffs(String keyword) {
+        List<StaffDTO> list = new ArrayList<>();
+        String str = "FROM StaffDTO WHERE LOWER(username.firstName) LIKE :searchKey OR LOWER(username.lastName) LIKE :searchKey";
+        TypedQuery<StaffDTO> query = entityManager.createQuery(str, StaffDTO.class);
+        query.setParameter("searchKey", "%" + keyword.toLowerCase() + "%");
+        for (StaffDTO staffDTO : query.getResultList()) {
+            if(staffDTO.getUsername().getAccStatus()!= null && staffDTO.getUsername().getAccStatus()>0){
+                list.add(staffDTO);
+            }
+        }
+        return list;
     }
 }
