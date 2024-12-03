@@ -1,7 +1,9 @@
 package fa24.swp391.se1802.group3.capybook.daos;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import fa24.swp391.se1802.group3.capybook.models.AccountDTO;
 import fa24.swp391.se1802.group3.capybook.models.StaffDTO;
+import fa24.swp391.se1802.group3.capybook.request.StaffRequest;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
@@ -56,8 +58,34 @@ public class StaffDAOImpl implements  StaffDAO{
 
     @Override
     @Transactional
-    public void update(StaffDTO staffDTO) {
-        entityManager.merge(staffDTO);
+    public void update(String staff) {
+        try {
+            System.out.println("Staff: "+ staff);
+            ObjectMapper objectMapper = new ObjectMapper();
+            StaffRequest staffDTO = objectMapper.readValue(staff,StaffRequest.class);
+
+            StaffDTO existingStaff = findByID(staffDTO.getStaffID());
+            if(existingStaff!=null){
+                //handle account of staff
+                AccountDTO account = new AccountDTO();
+                account.setDob(staffDTO.getDob());
+                account.setAddress(staffDTO.getAddress());
+                account.setSex(staffDTO.getSex());
+                account.setFirstName(staffDTO.getFirstName());
+                account.setPhone(staffDTO.getPhone());
+                account.setRole(staffDTO.getRole());
+                account.setLastName(staffDTO.getLastName());
+                account.setEmail(staffDTO.getEmail());
+                account.setPassword(existingStaff.getUsername().getPassword());
+                account.setUsername(existingStaff.getUsername().getUsername());
+                existingStaff.setUsername(account);
+
+                //update staff and account
+                entityManager.merge(account);
+            }
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+        }
     }
 
     @Override

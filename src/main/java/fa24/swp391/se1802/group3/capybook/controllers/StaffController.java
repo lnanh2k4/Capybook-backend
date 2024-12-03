@@ -1,5 +1,6 @@
 package fa24.swp391.se1802.group3.capybook.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import fa24.swp391.se1802.group3.capybook.daos.AccountDAO;
 import fa24.swp391.se1802.group3.capybook.daos.StaffDAO;
 import fa24.swp391.se1802.group3.capybook.models.AccountDTO;
@@ -10,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -63,4 +65,11 @@ public class StaffController {
         }
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
+
+    @PutMapping("/")
+    public ResponseEntity<StaffResponse> updateAccount( @RequestPart("staff") String staff) {
+        staffDAO.update(staff);
+       return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
 }
