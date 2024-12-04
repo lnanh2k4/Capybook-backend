@@ -72,22 +72,21 @@ public class CartDAOImpl implements CartDAO {
     @Override
     @Transactional
     public void editQuantity(String username, int bookID, int quantity) {
-        // Tìm sách trong giỏ hàng
-
         String jpql = "FROM CartDTO WHERE username.username = :username AND bookID.bookID = :bookID";
         TypedQuery<CartDTO> query = entityManager.createQuery(jpql, CartDTO.class);
         query.setParameter("username", username);
         query.setParameter("bookID", bookID);
 
-        if (!query.getResultList().isEmpty()) {
-            // Cập nhật số lượng nếu tìm thấy
-            CartDTO cartItem = query.getSingleResult();
-            cartItem.setQuantity(quantity);
-            entityManager.merge(cartItem);
+        List<CartDTO> resultList = query.getResultList();
+        if (!resultList.isEmpty()) {
+            CartDTO cartItem = resultList.get(0);
+            cartItem.setQuantity(quantity); // Cập nhật số lượng
+            entityManager.merge(cartItem);  // Lưu thay đổi
         } else {
-            throw new RuntimeException("Cart item not found");
+            throw new RuntimeException("Cart item with bookID " + bookID + " not found for username " + username);
         }
     }
+
 
     @Override
     @Transactional
