@@ -79,6 +79,7 @@ public class AuthenticationDAO {
                 .subject(accountDTO.getUsername())
                 .issuer("capybook")
                 .claim("scope", buildScope(accountDTO))
+                .claim("status",accountDTO.getAccStatus())
                 .issueTime(new Date())
                 .jwtID(UUID.randomUUID().toString())
                 .expirationTime(new Date(Instant.now().plus(VALID_DURATION, ChronoUnit.SECONDS).toEpochMilli()))
