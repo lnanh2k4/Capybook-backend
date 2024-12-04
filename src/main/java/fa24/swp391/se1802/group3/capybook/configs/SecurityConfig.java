@@ -31,7 +31,7 @@ public class SecurityConfig {
 //         Token endpoint
          "/api/auth/token", "/api/auth/introspect", "/api/auth/logout", "/api/auth/refresh",
 //         Account endpoint
-         "/api/v1/accounts/register", "/api/v1/accounts/email/send/"
+         "/api/v1/accounts/register", "/api/v1/accounts/email/send/", "/api/v1/accounts/change", "/api/v1/accounts/password/reset/", "/api/v1/accounts/email/verify/"
 //         Book endpoint
          ,"/api/v1/books/", "/api/v1/books/{bookId}",
 //         Cart endpoint

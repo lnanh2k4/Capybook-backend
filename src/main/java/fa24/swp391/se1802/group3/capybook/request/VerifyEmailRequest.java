@@ -8,8 +8,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ChangePasswordRequest {
+public class VerifyEmailRequest {
     String username;
-    String currentPassword;
-    String newPassword;
+    String code;
 }

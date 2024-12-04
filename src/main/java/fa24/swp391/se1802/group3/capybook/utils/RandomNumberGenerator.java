@@ -5,6 +5,6 @@ import java.util.Random;
 public class RandomNumberGenerator {
     public String generateNumber() {
         Random random = new Random();
-        return 100_000 + random.nextInt(999_999)+"";
+        return String.valueOf(100_000 + random.nextInt(900_000));
     }
 }
