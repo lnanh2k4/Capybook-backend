@@ -22,6 +22,17 @@ spring:
       password: sa
   jpa:
     open-in-view: false
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: capybookteam@gmail.com
+    password: mymgqgowzesnxgrc
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 server:
   port: 6789

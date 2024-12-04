@@ -85,7 +85,7 @@ public class StaffController {
     }
 
     @DeleteMapping("/{staffID}")
-    public ResponseEntity<String> deleteAccount(@PathVariable String staffID) {
+    public ResponseEntity<String> deleteStaff(@PathVariable String staffID) {
         staffDAO.delete(Integer.parseInt(staffID));
         return ResponseEntity.ok("Account deleted successfully!");
     }

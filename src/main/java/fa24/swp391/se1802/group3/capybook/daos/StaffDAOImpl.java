@@ -5,7 +5,6 @@ import fa24.swp391.se1802.group3.capybook.models.AccountDTO;
 import fa24.swp391.se1802.group3.capybook.models.StaffDTO;
 import fa24.swp391.se1802.group3.capybook.request.StaffRequest;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -94,11 +93,23 @@ public class StaffDAOImpl implements  StaffDAO{
     @Transactional
     @Override
     public void delete(int staffID) {
+        //Find staff
         StaffDTO staff = this.findByID(staffID);
+        //Remove staff
         entityManager.remove(staff);
-        staff.getUsername().setAccStatus(0);
-        entityManager.merge(staff.getUsername());
-        entityManager.flush();
+        //Find account
+        AccountDTO account = entityManager.find(AccountDTO.class,staff.getUsername().getUsername());
+        //Set status account
+        account.setAccStatus(0);
+        //Update status of account
+        entityManager.merge(account);
+    }
+
+    @Transactional
+    @Override
+    public void deleteStaffByUsername(String username) {
+        StaffDTO staff = this.findStaff(username);
+        entityManager.remove(staff);
     }
 
     @Override

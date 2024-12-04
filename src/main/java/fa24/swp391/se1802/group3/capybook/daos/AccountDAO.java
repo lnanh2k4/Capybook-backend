@@ -8,10 +8,24 @@ import java.util.Optional;
 
 public interface AccountDAO {
     void save(AccountDTO accountDTO);
+
     AccountDTO findByUsername(String username);
+
     void deleteByUsername(String username);
+
     List<AccountDTO> findAll();
+
     public AccountDTO findDetailByUsernameAndStaff(String username, StaffDTO staff);
-    public void addAccount(AccountDTO account);
+
+    public void addAccount(String account);
+
     List<AccountDTO> searchAccounts(String username);
+
+    public void registerAccount(String account);
+
+    boolean verifyAccount(String username, String code);
+
+    void changePassword(String username, String currentPassword, String newPassword);
+
+    void setPassword(String username, String currentPassword);
 }

@@ -52,7 +52,7 @@ public class ApplicationInitConfig {
                 accountDTO.setRole(0);
                 accountDTO.setPhone("0987654321");
                 accountDTO.setSex(1);
-                accountDAO.addAccount(accountDTO);
+                accountDAO.save(accountDTO);
 
                 //Add staff into database
                 StaffDTO staffDTO = new StaffDTO();
@@ -74,7 +74,7 @@ public class ApplicationInitConfig {
                 accountDTO.setRole(2);
                 accountDTO.setPhone("0123456789");
                 accountDTO.setSex(1);
-                accountDAO.addAccount(accountDTO);
+                accountDAO.save(accountDTO);
 
                 //Add staff into database
                 StaffDTO staffDTO = new StaffDTO();
@@ -97,7 +97,7 @@ public class ApplicationInitConfig {
                 accountDTO.setRole(3);
                 accountDTO.setSex(1);
                 accountDTO.setPhone("0123456789");
-                accountDAO.addAccount(accountDTO);
+                accountDAO.save(accountDTO);
 
                 //Add staff into database
                 StaffDTO staffDTO = new StaffDTO();
@@ -119,7 +119,7 @@ public class ApplicationInitConfig {
                 accountDTO.setRole(1);
                 accountDTO.setPhone("0987654321");
                 accountDTO.setSex(1);
-                accountDAO.addAccount(accountDTO);
+                accountDAO.save(accountDTO);
                 log.warn("Customer user has been created with default username and password are customer. Please change password!");
             }
 

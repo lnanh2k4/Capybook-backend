@@ -6,6 +6,9 @@ import fa24.swp391.se1802.group3.capybook.daos.StaffDAO;
 import fa24.swp391.se1802.group3.capybook.models.AccountDTO;
 import fa24.swp391.se1802.group3.capybook.models.StaffDTO;
 import fa24.swp391.se1802.group3.capybook.request.ChangePasswordRequest;
+import fa24.swp391.se1802.group3.capybook.utils.EmailSenderUtil;
+import fa24.swp391.se1802.group3.capybook.utils.RandomNumberGenerator;
+import jakarta.websocket.server.PathParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,7 +20,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.DataInput;
 import java.io.IOException;
+import java.time.Year;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Slf4j // cho phép sử dụng log.infor
@@ -31,8 +36,8 @@ public class AccountController {
     final String DEFAULT_PASSWORD = "12345";
     AccountDAO accountDAO;
     StaffDAO staffDAO;
-
-
+    @Autowired
+    EmailSenderUtil sender;
     PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
 
     @Autowired
@@ -46,7 +51,7 @@ public class AccountController {
     public List<AccountDTO> getAccounts() {
         List<AccountDTO> list = new ArrayList<>();
         for (AccountDTO accountDTO : accountDAO.findAll()) {
-            if(accountDTO.getAccStatus()!=null && accountDTO.getAccStatus()!=0){
+            if (accountDTO.getAccStatus() != null && accountDTO.getAccStatus() != 0) {
                 list.add(accountDTO);
             }
         }
@@ -57,7 +62,7 @@ public class AccountController {
     public List<AccountDTO> searchAccounts(@RequestParam String keyword) {
         List<AccountDTO> list = new ArrayList<>();
         for (AccountDTO accountDTO : accountDAO.searchAccounts(keyword)) {
-            if(accountDTO.getAccStatus()!=null &&accountDTO.getAccStatus()>0){
+            if (accountDTO.getAccStatus() != null && accountDTO.getAccStatus() > 0) {
                 list.add(accountDTO);
             }
         }
@@ -78,16 +83,9 @@ public class AccountController {
     @PostMapping(value = "/")
     public ResponseEntity<AccountDTO> addAccount(@RequestPart("account") String account) {
         try {
-            System.out.println("Request received");
-            ObjectMapper objectMapper = new ObjectMapper();
-            AccountDTO accountDTO = objectMapper.readValue(account, AccountDTO.class);
-            accountDTO.setPassword(passwordEncoder.encode(DEFAULT_PASSWORD));
-            accountDAO.addAccount(accountDTO);
-            if(accountDTO.getRole() == ROLE_ADMIN || accountDTO.getRole() == ROLE_SELLER_STAFF || accountDTO.getRole() == ROLE_WAREHOUSE_STAFF){
-                staffDAO.save(accountDTO);
-            }
-            return ResponseEntity.status(HttpStatus.CREATED).body(accountDTO);
-        } catch (IOException e) {
+            accountDAO.addAccount(account);
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+        } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
@@ -96,22 +94,16 @@ public class AccountController {
     @PostMapping(value = "/register")
     public ResponseEntity<AccountDTO> registeredAccount(@RequestPart("register") String account) {
         try {
-            System.out.println("Request received");
-            ObjectMapper objectMapper = new ObjectMapper();
-            AccountDTO accountDTO = objectMapper.readValue(account, AccountDTO.class);
-            accountDTO.setRole(ROLE_CUSTOMER);
-            PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
-            accountDTO.setPassword(passwordEncoder.encode(accountDTO.getPassword()));
-            accountDAO.addAccount(accountDTO);
-            return ResponseEntity.status(HttpStatus.CREATED).body(accountDTO);
-        } catch (IOException e) {
+            accountDAO.registerAccount(account);
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+        } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
     @PutMapping("/{username}")
-    public ResponseEntity<AccountDTO> updateAccount( @PathVariable String username,  @RequestPart("account") String account) {
+    public ResponseEntity<AccountDTO> updateAccount(@PathVariable String username, @RequestPart("account") String account) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             AccountDTO accountDTO = objectMapper.readValue(account, AccountDTO.class);
@@ -123,7 +115,7 @@ public class AccountController {
             existingAccount.setUsername(accountDTO.getUsername());
             existingAccount.setFirstName(accountDTO.getFirstName());
             existingAccount.setLastName(accountDTO.getLastName());
-            if(accountDTO.getRole()!=null){
+            if (accountDTO.getRole() != null) {
                 existingAccount.setRole(accountDTO.getRole());
             }
             existingAccount.setSex(accountDTO.getSex());
@@ -144,10 +136,10 @@ public class AccountController {
 
 
     @PutMapping("/change")
-    public ResponseEntity<AccountDTO> changePassword(  @RequestPart("account") String passwordRequest) {
+    public ResponseEntity<AccountDTO> changePassword(@RequestPart("account") String passwordRequest) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            ChangePasswordRequest request = objectMapper.readValue( passwordRequest, ChangePasswordRequest.class);
+            ChangePasswordRequest request = objectMapper.readValue(passwordRequest, ChangePasswordRequest.class);
 
             AccountDTO existingAccount = accountDAO.findByUsername(request.getUsername());
             if (existingAccount == null) {
@@ -166,15 +158,13 @@ public class AccountController {
         }
     }
 
-
-
     @DeleteMapping("/{username}")
     public ResponseEntity<String> deleteAccount(@PathVariable String username) {
         AccountDTO account = accountDAO.findByUsername(username);
         if (account != null) {
-            if(account.getRole()!=1){
+            if (account.getRole() != 1) {
                 staffDAO.delete(staffDAO.findStaff(username).getStaffID());
-            } else{
+            } else {
                 accountDAO.deleteByUsername(username);
             }
             return ResponseEntity.ok("Account deleted successfully!");
@@ -183,5 +173,25 @@ public class AccountController {
         }
     }
 
+    @GetMapping("/email/send/")
+    public ResponseEntity<Boolean> sendEmail(@RequestParam String receiver, @RequestParam String username) {
+        AccountDTO accountDTO = accountDAO.findByUsername(username);
+        String toEmail = receiver;
+        String subject = "VERIFY ACCOUNT OF CAPYBOOK STORE";
+        String body = "<h1 style=\"text-align: center; background-color: skyblue; color: white;\">WELCOME TO CAPYBOOK STORE</h1>\n" +
+                "    <p>Dear " + accountDTO.getFirstName() + " " + accountDTO.getLastName() + ",</p>\n" +
+                "    <p>The code is used to verify account is <strong>" + accountDTO.getCode() + "</strong></p>\n" +
+                "    <p>Please don't give this code for anyone. Thanks for using my service! Hoping you have a special experience at\n" +
+                "        Capybook! For more information please contact <strong>capybookteam@gmail.com</strong></p>\n" +
+                "    <p>Best regard,</p>\n" +
+                "    <h3>Capybook Team</h3>\n" +
+                "    <div style=\"background-color: darkblue; text-align: center;color: white;line-height: 20px;\">\n" +
+                "        <em>© Copyright " + Year.now().getValue() + "</em><br>\n" +
+                "        <em>Capybook Team</em><br>\n" +
+                "        <em>All right reserved!</em>\n" +
+                "    </div>";
+        sender.sendEmail(toEmail, subject, body);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 
 }

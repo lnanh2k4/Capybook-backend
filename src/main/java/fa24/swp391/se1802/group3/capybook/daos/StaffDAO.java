@@ -13,6 +13,7 @@ public interface StaffDAO {
     StaffDTO findStaff(String username);
     void update(String staffDTO);
     void delete(int staffID);
+    void deleteStaffByUsername(String username);
     List<StaffDTO> findAll();
     void addStaffByString(String staff);
     void addStaff(StaffDTO staffDTO);

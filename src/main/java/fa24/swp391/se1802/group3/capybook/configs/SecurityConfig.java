@@ -30,8 +30,8 @@ public class SecurityConfig {
  private final String[] PUBLIC_ENDPOINTS = {
 //         Token endpoint
          "/api/auth/token", "/api/auth/introspect", "/api/auth/logout", "/api/auth/refresh",
-//         Register endpoint
-         "/api/v1/accounts/register"
+//         Account endpoint
+         "/api/v1/accounts/register", "/api/v1/accounts/email/send/"
 //         Book endpoint
          ,"/api/v1/books/", "/api/v1/books/{bookId}",
 //         Cart endpoint
