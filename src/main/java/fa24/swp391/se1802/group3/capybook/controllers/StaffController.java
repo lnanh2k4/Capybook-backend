@@ -83,4 +83,10 @@ public class StaffController {
     public List<StaffDTO> searchAccounts(@RequestParam String keyword) {
         return staffDAO.searchStaffs(keyword);
     }
+
+    @DeleteMapping("/{staffID}")
+    public ResponseEntity<String> deleteAccount(@PathVariable String staffID) {
+        staffDAO.delete(Integer.parseInt(staffID));
+        return ResponseEntity.ok("Account deleted successfully!");
+    }
 }

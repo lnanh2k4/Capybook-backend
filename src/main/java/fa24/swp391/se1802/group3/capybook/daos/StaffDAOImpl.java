@@ -91,9 +91,14 @@ public class StaffDAOImpl implements  StaffDAO{
         }
     }
 
+    @Transactional
     @Override
     public void delete(int staffID) {
-        entityManager.remove(this.findByID(staffID));
+        StaffDTO staff = this.findByID(staffID);
+        entityManager.remove(staff);
+        staff.getUsername().setAccStatus(0);
+        entityManager.merge(staff.getUsername());
+        entityManager.flush();
     }
 
     @Override
