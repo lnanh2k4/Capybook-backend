@@ -11,8 +11,10 @@ public interface StaffDAO {
     void save(AccountDTO accountDTO);
     StaffDTO findByID(int staffID);
     StaffDTO findStaff(String username);
-    void update(StaffDTO staffDTO);
+    void update(String staffDTO);
     void delete(int staffID);
     List<StaffDTO> findAll();
-    void addStaff(StaffDTO staff);
+    void addStaffByString(String staff);
+    void addStaff(StaffDTO staffDTO);
+    List<StaffDTO> searchStaffs(String keyword);
 }

@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -53,14 +54,12 @@ public class OrderController {
         if (order != null) {
             Map<String, Object> response = new HashMap<>();
 
-            // Thêm thông tin của đơn hàng vào phản hồi, bao gồm thông tin chiết khấu nếu có
             Map<String, Object> orderMap = new HashMap<>();
             orderMap.put("orderID", order.getOrderID());
             orderMap.put("orderDate", order.getOrderDate());
             orderMap.put("orderStatus", order.getOrderStatus());
-            orderMap.put("username", order.getUsername().getUsername()); // Đưa username vào trong order
+            orderMap.put("username", order.getUsername().getUsername());
 
-            // Kiểm tra và thêm thông tin khuyến mãi nếu có
             if (order.getProID() != null) {
                 orderMap.put("proID", order.getProID().getProID());
                 orderMap.put("discount", order.getProID().getDiscount());
@@ -68,13 +67,13 @@ public class OrderController {
 
             response.put("order", orderMap);
 
-            // Tạo danh sách orderDetails
             List<Map<String, Object>> orderDetailResponses = orderDetails.stream()
                     .map(detail -> {
                         Map<String, Object> detailMap = new HashMap<>();
                         detailMap.put("ODID", detail.getOdid());
                         detailMap.put("quantity", detail.getQuantity());
-                        detailMap.put("bookID", detail.getBookID().getBookID()); // Chỉ lấy bookID
+                        detailMap.put("bookID", detail.getBookID().getBookID());
+                        detailMap.put("totalPrice", detail.getTotalPrice()); // Thêm totalPrice
                         return detailMap;
                     })
                     .collect(Collectors.toList());
@@ -91,62 +90,76 @@ public class OrderController {
     @Transactional
     public ResponseEntity<String> addOrder(@RequestBody Map<String, Object> orderData) {
         try {
-            // Lấy thông tin orderDTO từ request
             Map<String, Object> orderDTOMap = (Map<String, Object>) orderData.get("orderDTO");
             List<Map<String, Object>> orderDetailsList = (List<Map<String, Object>>) orderData.get("orderDetails");
 
+            if (orderDTOMap == null || orderDetailsList == null || orderDetailsList.isEmpty()) {
+                return new ResponseEntity<>("Invalid order data: Missing required fields.", HttpStatus.BAD_REQUEST);
+            }
+
             // Tạo đối tượng OrderDTO
             OrderDTO orderDTO = new OrderDTO();
-            AccountDTO account = accountDAO.findByUsername((String) orderDTOMap.get("username"));
+            String username = (String) orderDTOMap.get("username");
+            AccountDTO account = accountDAO.findByUsername(username);
+            if (account == null) {
+                return new ResponseEntity<>("Invalid username: User does not exist.", HttpStatus.BAD_REQUEST);
+            }
             orderDTO.setUsername(account);
 
             // Xử lý khuyến mãi (nếu có)
-            if (orderDTOMap.get("proID") != null) {
-                PromotionDTO promotion = promotionDAO.find((Integer) orderDTOMap.get("proID"));
-                if (promotion.getQuantity() > 0) {
-                    promotion.setQuantity(promotion.getQuantity() - 1); // Giảm số lượng khuyến mãi
-                    promotionDAO.update(promotion);
-                    orderDTO.setProID(promotion);
-                } else {
-                    return new ResponseEntity<>("Promotion is out of stock", HttpStatus.BAD_REQUEST);
+            Integer proID = (Integer) orderDTOMap.get("proID");
+            if (proID != null) {
+                PromotionDTO promotion = promotionDAO.find(proID);
+                if (promotion == null || promotion.getQuantity() <= 0) {
+                    return new ResponseEntity<>("Invalid promotion: Not available or out of stock.", HttpStatus.BAD_REQUEST);
                 }
+                promotion.setQuantity(promotion.getQuantity() - 1);
+                promotionDAO.update(promotion);
+                orderDTO.setProID(promotion);
             }
 
+            // Đặt ngày và trạng thái đơn hàng
             orderDTO.setOrderDate(new Date());
             orderDTO.setOrderStatus(0);
 
             // Lưu OrderDTO
             orderDAO.save(orderDTO);
 
-            // Lấy orderID vừa tạo
-            int orderID = orderDTO.getOrderID();
-
-            // Lưu các OrderDetailDTO và giảm số lượng sách
+            // Xử lý chi tiết đơn hàng
             for (Map<String, Object> detail : orderDetailsList) {
+                Integer bookID = (Integer) detail.get("bookID");
+                Integer quantity = (Integer) detail.get("quantity");
+                Object totalPriceObj = detail.get("totalPrice");
+
+                // Kiểm tra null cho các giá trị cần thiết
+                if (bookID == null || quantity == null || quantity <= 0 || totalPriceObj == null) {
+                    return new ResponseEntity<>("Invalid order details: Missing or invalid fields.", HttpStatus.BAD_REQUEST);
+                }
+
+                BigDecimal totalPrice = new BigDecimal(totalPriceObj.toString());
+
+                // Tạo OrderDetailDTO và lưu
                 OrderDetailDTO orderDetailDTO = new OrderDetailDTO();
                 orderDetailDTO.setOrderID(orderDTO);
 
-                BookDTO book = bookDAO.find((Integer) detail.get("bookID"));
-                int quantityToDeduct = (Integer) detail.get("quantity");
+                // Thiết lập bookID
+                BookDTO book = new BookDTO();
+                book.setBookID(bookID);
+                orderDetailDTO.setBookID(book);
 
-                if (book.getBookQuantity() >= quantityToDeduct) {
-                    book.setBookQuantity(book.getBookQuantity() - quantityToDeduct); // Giảm số lượng sách
-                    bookDAO.update(book); // Cập nhật sách trong DB
-                    orderDetailDTO.setBookID(book);
-                    orderDetailDTO.setQuantity(quantityToDeduct);
-                    orderDetailDAO.save(orderDetailDTO);
-                } else {
-                    return new ResponseEntity<>("Book stock is insufficient for book ID: " + book.getBookID(),
-                            HttpStatus.BAD_REQUEST);
-                }
+                orderDetailDTO.setQuantity(quantity);
+                orderDetailDTO.setTotalPrice(totalPrice);
+
+                orderDetailDAO.save(orderDetailDTO);
             }
 
-            return new ResponseEntity<>("Order added successfully with ID: " + orderID, HttpStatus.CREATED);
+            return new ResponseEntity<>("Order added successfully with ID: " + orderDTO.getOrderID(), HttpStatus.CREATED);
         } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<>("Failed to add order", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("Failed to add order: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
     @PutMapping("/{orderID}")
     public ResponseEntity<OrderDTO> updateOrder(@PathVariable int orderID, @RequestBody Map<String, Integer> updateData) {

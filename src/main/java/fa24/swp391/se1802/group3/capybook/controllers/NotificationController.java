@@ -29,6 +29,7 @@ public class NotificationController {
 
     @GetMapping("/detail/{notID}")
     public ResponseEntity<NotificationDTO> getNotification(@PathVariable int notID) {
+        System.out.println("Notification ID is :" + notID);
         NotificationDTO notificationDTO = notificationDAO.find(notID);
         return notificationDTO != null ? ResponseEntity.ok(notificationDTO) : ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
     }
@@ -53,6 +54,7 @@ public class NotificationController {
             notificationDAO.save(notificationDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(notificationDTO);
         } catch (JsonProcessingException e) {
+           System.out.println("JsonProcessingException: " + e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
       }
     }
@@ -61,13 +63,12 @@ public class NotificationController {
 
     @DeleteMapping("/{notID}")
     public ResponseEntity<String> deleteNotification(@PathVariable Integer notID){
+        System.out.println("Notification ID: " + notID);
         if(notificationDAO.find(notID)!=null) {
                 notificationDAO.delete(notID);
         return new ResponseEntity<>("Notification deleted successfully!",HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
-
     }
 
 }

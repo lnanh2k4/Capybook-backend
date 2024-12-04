@@ -49,7 +49,7 @@ public class SecurityConfig {
 //         Promotion endpoint
          "/api/v1/promotions", "/api/v1/promotions/{proID}", "/api/v1/promotions/search",
 //         Staff endpoint
-         "/api/v1/staffs", "/api/v1/staffs/{id}",
+         "/api/v1/staffs", "/api/v1/staffs/{id}","/api/v1/staffs/id",
 //         Supplier endpoint
          "api/v1/suppliers", "api/v1/suppliers/{id}", "api/v1/suppliers/{supID}", "api/v1/suppliers/search"
  }; // url cho guest

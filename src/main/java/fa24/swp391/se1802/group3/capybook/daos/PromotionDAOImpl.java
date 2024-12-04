@@ -1,5 +1,6 @@
 package fa24.swp391.se1802.group3.capybook.daos;
 
+import fa24.swp391.se1802.group3.capybook.models.OrderDTO;
 import fa24.swp391.se1802.group3.capybook.models.PromotionDTO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
@@ -30,10 +31,9 @@ public class PromotionDAOImpl implements PromotionDAO {
         return entityManager.find(PromotionDTO.class, proID);
     }
 
-    @Override
     @Transactional
     public void update(PromotionDTO promotionDTO) {
-        entityManager.merge(promotionDTO);  // Sử dụng merge để cập nhật
+        entityManager.merge(promotionDTO);
     }
 
     @Override
