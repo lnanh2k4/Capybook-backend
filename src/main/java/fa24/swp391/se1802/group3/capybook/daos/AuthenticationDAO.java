@@ -133,7 +133,6 @@ public class AuthenticationDAO {
                 : signedJWT.getJWTClaimsSet().getExpirationTime();
 
         var verified = signedJWT.verify(verifier);
-        System.out.println(!(verified && expiryTime.after(new Date())));
         if (!(verified && expiryTime.after(new Date())))
             throw new Exception("Unauthenticated");
 
