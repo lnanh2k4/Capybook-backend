@@ -255,14 +255,27 @@ public class PromotionController {
     @GetMapping("/logs")
     public ResponseEntity<?> getAllPromotionLogs(
             @RequestParam(required = false) Integer action,
+            @RequestParam(required = false) String activity,
             @RequestParam(required = false) String startDate,
             @RequestParam(required = false) String endDate
     ) {
         try {
             List<PromotionLogDTO> logs;
 
-            if (action != null) {
-                logs = promotionLogDAO.findByAction(action);
+            if (activity != null) {
+                // Mapping activity to action
+                Integer actionId = switch (activity.toLowerCase()) {
+                    case "create" -> 1;
+                    case "approve" -> 2;
+                    case "reject" -> 3;
+                    default -> null;
+                };
+
+                if (actionId == null) {
+                    return ResponseEntity.badRequest().body("Invalid activity type.");
+                }
+
+                logs = promotionLogDAO.findByAction(actionId);
             } else if (startDate != null && endDate != null) {
                 Date start = new SimpleDateFormat("yyyy-MM-dd").parse(startDate);
                 Date end = new SimpleDateFormat("yyyy-MM-dd").parse(endDate);
@@ -271,7 +284,7 @@ public class PromotionController {
                 logs = promotionLogDAO.findAll();
             }
 
-            // Chuyển đổi dữ liệu logs sang dạng response đơn giản
+            // Convert logs to response
             List<Map<String, Object>> responseLogs = logs.stream().map(log -> {
                 Map<String, Object> response = new HashMap<>();
                 response.put("proLogId", log.getProLogId());

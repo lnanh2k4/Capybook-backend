@@ -10,4 +10,5 @@ public interface PromotionLogDAO {
     List<PromotionLogDTO> findAll();
     List<PromotionLogDTO> findByAction(Integer action);
     List<PromotionLogDTO> findByDateRange(Date startDate, Date endDate);
+    
 }
