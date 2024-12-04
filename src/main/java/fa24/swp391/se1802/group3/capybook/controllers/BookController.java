@@ -93,7 +93,17 @@ public class BookController {
         }
     }
 
-
+    @GetMapping("/category")
+    @Transactional
+    public ResponseEntity<List<BookDTO>> filterBooksByCategory(@RequestParam String categoryID) {
+        System.out.println("categoryID " + categoryID);
+        List<BookDTO> books = bookDAO.filterBooksByCategory(Integer.parseInt(categoryID));
+        if (!books.isEmpty()) {
+            return ResponseEntity.ok(books);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
     @GetMapping("/{bookId}")
     @Transactional
     public ResponseEntity<BookDTO> getBook(@PathVariable int bookId) {
