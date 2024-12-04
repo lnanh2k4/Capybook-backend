@@ -114,19 +114,8 @@ public class PromotionController {
             @RequestBody PromotionDTO promotionDTO,
             @RequestParam(name = "username") String username) {
         try {
-            System.out.println("Received promotion data: " + promotionDTO);
-            System.out.println("Received username: " + username);
-
-            // Kiểm tra account
-            AccountDTO accountDTO = accountDAO.findByUsername(username);
-            if (accountDTO == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("Invalid username: Account not found.");
-            }
-
-            // Kiểm tra staff
+            // Kiểm tra username và lấy thông tin Staff
             StaffDTO staff = staffDAO.findStaff(username);
-            System.out.println("Received staff: " + staff);
             if (staff == null) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body("Invalid username: Staff not found.");
@@ -138,22 +127,20 @@ public class PromotionController {
                         .body("Promotion name and code are required.");
             }
 
-            // Lưu promotion
+            // Gắn Staff vào Promotion
             promotionDTO.setCreatedBy(staff);
             promotionDTO.setProStatus(1); // Mặc định là Active
+
+            // Lưu promotion vào cơ sở dữ liệu
             promotionDAO.save(promotionDTO);
 
-            System.out.println("Promotion saved successfully: " + promotionDTO);
-
-            // Tạo log cho action "Create"
+            // Tạo log cho hành động "Create"
             PromotionLogDTO promotionLog = new PromotionLogDTO();
             promotionLog.setProId(promotionDTO);
             promotionLog.setProAction(1); // Action ID cho "Create"
             promotionLog.setProLogDate(new Date());
             promotionLog.setStaffId(staff);
             promotionLogDAO.save(promotionLog); // Lưu log vào cơ sở dữ liệu
-
-            System.out.println("Promotion log saved successfully: " + promotionLog);
 
             return ResponseEntity.status(HttpStatus.CREATED).body(promotionDTO);
         } catch (Exception e) {
@@ -179,33 +166,21 @@ public class PromotionController {
                         .body("Promotion with ID " + proID + " not found.");
             }
 
-            // Ghi log hoạt động nếu có proAction
+            // Ghi log hoạt động nếu có actionId
             if (updates.containsKey("actionId")) {
                 Integer actionId = (Integer) updates.get("actionId");
+
                 if (actionId == 2 || actionId == 3) { // Approved hoặc Rejected
-                    PromotionLogDTO promotionLog = new PromotionLogDTO();
-                    promotionLog.setProId(existingPromotion);
-                    promotionLog.setProAction(actionId);
-                    promotionLog.setProLogDate(new Date());
-
-                    // Kiểm tra và thiết lập staffUsername
-                    if (!updates.containsKey("username")) {
+                    if (!updates.containsKey("staffID")) {
                         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                                .body("Missing username in request.");
+                                .body("Missing staffID in request.");
                     }
 
-                    String staffUsername = (String) updates.get("username");
-                    System.out.println("Looking for staff with username: " + staffUsername);
-                    StaffDTO staff = staffDAO.findStaff(staffUsername);
+                    Integer staffID = (Integer) updates.get("staffID");
 
-                    if (staff == null) {
-                        System.out.println("Staff not found for username: " + staffUsername);
-                        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                                .body("Invalid staffUsername: Staff not found.");
-                    }
-
-                    System.out.println("Found staff: " + staff);
-                    System.out.println("Staff ID: " + staff.getStaffID());
+                    // Không cần tìm staff, chỉ cần lưu staffID
+                    StaffDTO staff = new StaffDTO();
+                    staff.setStaffID(staffID);
 
                     // Nếu actionId là approve
                     if (actionId == 2) {
@@ -214,19 +189,20 @@ public class PromotionController {
                         existingPromotion.setProStatus(0); // Đánh dấu là đã từ chối
                     }
 
-                    // Lưu log
+                    // Ghi log
+                    PromotionLogDTO promotionLog = new PromotionLogDTO();
+                    promotionLog.setProId(existingPromotion);
+                    promotionLog.setProAction(actionId);
+                    promotionLog.setProLogDate(new Date());
                     promotionLog.setStaffId(staff);
-                    System.out.println("Saving promotion log: " + promotionLog);
                     promotionLogDAO.save(promotionLog);
 
                     // Cập nhật promotion
                     promotionDAO.update(existingPromotion);
 
                     String actionMessage = actionId == 2 ? "approved" : "declined";
-                    System.out.println("Promotion " + actionMessage + " successfully: " + existingPromotion);
                     return ResponseEntity.ok("Promotion " + actionMessage + " successfully.");
                 } else {
-                    System.out.println("Invalid actionId: " + actionId);
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                             .body("Invalid actionId. Must be 2 (approve) or 3 (reject).");
                 }
@@ -275,6 +251,7 @@ public class PromotionController {
 
         return ResponseEntity.ok(List.of());
     }
+
     @GetMapping("/logs")
     public ResponseEntity<?> getAllPromotionLogs(
             @RequestParam(required = false) Integer action,
@@ -294,13 +271,23 @@ public class PromotionController {
                 logs = promotionLogDAO.findAll();
             }
 
-            return ResponseEntity.ok(logs);
+            // Chuyển đổi dữ liệu logs sang dạng response đơn giản
+            List<Map<String, Object>> responseLogs = logs.stream().map(log -> {
+                Map<String, Object> response = new HashMap<>();
+                response.put("proLogId", log.getProLogId());
+                response.put("proId", log.getProId().getProID());
+                response.put("proAction", log.getProAction());
+                response.put("proLogDate", log.getProLogDate());
+                response.put("staffId", log.getStaffId().getStaffID());
+                return response;
+            }).toList();
+
+            return ResponseEntity.ok(responseLogs);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("An error occurred while fetching promotion logs.");
         }
     }
-
 
 }

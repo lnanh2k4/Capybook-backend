@@ -59,6 +59,7 @@ public class OrderController {
             orderMap.put("orderDate", order.getOrderDate());
             orderMap.put("orderStatus", order.getOrderStatus());
             orderMap.put("username", order.getUsername().getUsername());
+            orderMap.put("orderAddress", order.getOrderAddress()); // Thêm orderAddress
 
             if (order.getProID() != null) {
                 orderMap.put("proID", order.getProID().getProID());
@@ -85,6 +86,7 @@ public class OrderController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
 
     @PostMapping("/")
     @Transactional
