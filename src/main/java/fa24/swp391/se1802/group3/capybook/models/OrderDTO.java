@@ -59,6 +59,9 @@ public class OrderDTO implements Serializable {
     @JsonIgnore
     private List<OrderDetailDTO> orderDetailList;
 
+    @Column(name = "orderaddress")
+    private String orderAddress;
+
     @Transient
     private String customerName;
 }
