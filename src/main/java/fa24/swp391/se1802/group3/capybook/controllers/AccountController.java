@@ -36,8 +36,7 @@ public class AccountController {
     final String DEFAULT_PASSWORD = "12345";
     AccountDAO accountDAO;
     StaffDAO staffDAO;
-    @Autowired
-    EmailSenderUtil sender;
+
     PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
 
     @Autowired
@@ -136,26 +135,12 @@ public class AccountController {
 
 
     @PutMapping("/change")
-    public ResponseEntity<AccountDTO> changePassword(@RequestPart("account") String passwordRequest) {
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            ChangePasswordRequest request = objectMapper.readValue(passwordRequest, ChangePasswordRequest.class);
+    public ResponseEntity<AccountDTO> changePassword(@RequestPart("password-request") String passwordRequest) {
 
-            AccountDTO existingAccount = accountDAO.findByUsername(request.getUsername());
-            if (existingAccount == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-            }
-
-            existingAccount.setPassword(request.getPassword());
-
-            accountDAO.save(existingAccount);
-
-            return ResponseEntity.ok(existingAccount);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        if (accountDAO.changePassword(passwordRequest)) {
+            return ResponseEntity.status(HttpStatus.OK).build();
         }
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
 
     @DeleteMapping("/{username}")
@@ -173,24 +158,22 @@ public class AccountController {
         }
     }
 
-    @GetMapping("/email/send/")
-    public ResponseEntity<Boolean> sendEmail(@RequestParam String receiver, @RequestParam String username) {
-        AccountDTO accountDTO = accountDAO.findByUsername(username);
-        String toEmail = receiver;
-        String subject = "VERIFY ACCOUNT OF CAPYBOOK STORE";
-        String body = "<h1 style=\"text-align: center; background-color: skyblue; color: white;\">WELCOME TO CAPYBOOK STORE</h1>\n" +
-                "    <p>Dear " + accountDTO.getFirstName() + " " + accountDTO.getLastName() + ",</p>\n" +
-                "    <p>The code is used to verify account is <strong>" + accountDTO.getCode() + "</strong></p>\n" +
-                "    <p>Please don't give this code for anyone. Thanks for using my service! Hoping you have a special experience at\n" +
-                "        Capybook! For more information please contact <strong>capybookteam@gmail.com</strong></p>\n" +
-                "    <p>Best regard,</p>\n" +
-                "    <h3>Capybook Team</h3>\n" +
-                "    <div style=\"background-color: darkblue; text-align: center;color: white;line-height: 20px;\">\n" +
-                "        <em>© Copyright " + Year.now().getValue() + "</em><br>\n" +
-                "        <em>Capybook Team</em><br>\n" +
-                "        <em>All right reserved!</em>\n" +
-                "    </div>";
-        sender.sendEmail(toEmail, subject, body);
+    @PostMapping("/email/send/")
+    public ResponseEntity<Boolean> sendEmail(@RequestPart("forgot-password") String sendEmailRequest) {
+        accountDAO.sendEmail(sendEmailRequest);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PostMapping("/password/reset/")
+    public ResponseEntity<Boolean> resetPassword(@RequestPart("password") String passwordRequest) {
+        accountDAO.setPassword(passwordRequest);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PostMapping("/email/verify/")
+    public ResponseEntity<Boolean> verifyEmail(@RequestPart("code") String otpCodeRequest) {
+        System.out.println(otpCodeRequest);
+        accountDAO.verifyEmail(otpCodeRequest);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 

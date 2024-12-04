@@ -1,8 +1,14 @@
 package fa24.swp391.se1802.group3.capybook.daos;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fa24.swp391.se1802.group3.capybook.models.AccountDTO;
 import fa24.swp391.se1802.group3.capybook.models.StaffDTO;
+import fa24.swp391.se1802.group3.capybook.request.ChangePasswordRequest;
+import fa24.swp391.se1802.group3.capybook.request.ResetPasswordRequest;
+import fa24.swp391.se1802.group3.capybook.request.SendEmailRequest;
+import fa24.swp391.se1802.group3.capybook.request.VerifyEmailRequest;
+import fa24.swp391.se1802.group3.capybook.utils.EmailSenderUtil;
 import fa24.swp391.se1802.group3.capybook.utils.RandomNumberGenerator;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
@@ -14,6 +20,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Date;
+import java.time.Year;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -27,7 +34,8 @@ public class AccountDAOImpl implements AccountDAO {
     //define entity manager
     EntityManager entityManager;
     PasswordEncoder password = new BCryptPasswordEncoder(10);
-
+    @Autowired
+    EmailSenderUtil sender;
 
     @Autowired
     public AccountDAOImpl(EntityManager entityManager) {
@@ -58,7 +66,7 @@ public class AccountDAOImpl implements AccountDAO {
     @Override
     public AccountDTO findByUsername(String username) {
         try {
-            Query query = entityManager.createQuery("Select a.username, a.firstName, a.lastName, a.dob, a.address, a.email, a.role, a.sex, a.phone, a.accStatus, a.password From AccountDTO a WHERE a.username=:username");
+            Query query = entityManager.createQuery("Select a.username, a.firstName, a.lastName, a.dob, a.address, a.email, a.role, a.sex, a.phone, a.accStatus, a.password, a.code From AccountDTO a WHERE a.username=:username");
             query.setParameter("username", username);
             Object[] result = (Object[]) query.getSingleResult();
             AccountDTO account = new AccountDTO();
@@ -73,6 +81,7 @@ public class AccountDAOImpl implements AccountDAO {
             account.setPhone((String) result[8]);
             account.setAccStatus((Integer) result[9]);
             account.setPassword((String) result[10]);
+            account.setCode((String) result[11]);
             return account;
         } catch (Exception e) {
             System.out.println("No found account with username = " + username);
@@ -188,25 +197,89 @@ public class AccountDAOImpl implements AccountDAO {
 
 
     @Override
-    public boolean verifyAccount(String username, String code) {
-        AccountDTO account = this.findByUsername(username);
-        return account.getCode().equals(code);
+    public boolean verifyEmail(String otpCodeRequest) {
+        try {
+            ObjectMapper obj = new ObjectMapper();
+            VerifyEmailRequest request = obj.readValue(otpCodeRequest, VerifyEmailRequest.class);
+            AccountDTO account = this.findByUsername(request.getUsername());
+            return account.getCode().equals(request.getCode());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return false;
     }
 
+    @Transactional
     @Override
-    public void changePassword(String username, String currentPassword, String newPassword) {
-        AccountDTO account = this.findByUsername(username);
-        if(account.getPassword().equals(password.encode(currentPassword))){
-            account.setPassword(password.encode(newPassword));
-            entityManager.merge(account);
+    public boolean changePassword(String passwordRequest) {
+        try {
+            System.out.println(passwordRequest);
+            ObjectMapper obj = new ObjectMapper();
+            ChangePasswordRequest request = obj.readValue(passwordRequest, ChangePasswordRequest.class);
+            AccountDTO account = this.findByUsername(request.getUsername());
+            System.out.println("Current password: " + request.getCurrentPassword());
+            System.out.println(password.matches(request.getCurrentPassword(), account.getPassword()));
+            if (password.matches(request.getCurrentPassword(), account.getPassword())) {
+                account.setPassword(password.encode(request.getNewPassword()));
+                System.out.println(request.getNewPassword());
+                entityManager.merge(account);
+                System.out.println("Success");
+                return true;
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return false;
+    }
+
+    @Transactional
+    @Override
+    public void setPassword(String passwordRequest) {
+        try {
+            ObjectMapper obj = new ObjectMapper();
+            ResetPasswordRequest request = obj.readValue(passwordRequest, ResetPasswordRequest.class);
+            AccountDTO accountDTO = this.findByUsername(request.getUsername());
+            accountDTO.setAccStatus(1);
+            accountDTO.setPassword(password.encode(request.getPassword()));
+            entityManager.merge(accountDTO);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
     }
 
+    @Transactional
     @Override
-    public void setPassword(String username, String currentPassword) {
-        AccountDTO accountDTO = this.findByUsername(username);
-        accountDTO.setAccStatus(1);
-        accountDTO.setPassword(password.encode(currentPassword));
-        entityManager.merge(accountDTO);
+    public boolean sendEmail(String sendEmailRequest) {
+        try {
+            ObjectMapper obj = new ObjectMapper();
+            SendEmailRequest request = obj.readValue(sendEmailRequest, SendEmailRequest.class);
+            AccountDTO accountDTO = findByUsername(request.getUsername());
+            RandomNumberGenerator randomNumberGenerator = new RandomNumberGenerator();
+            accountDTO.setCode(randomNumberGenerator.generateNumber());
+            entityManager.merge(accountDTO);
+            if (accountDTO.getEmail().equals(request.getEmail())) {
+                String toEmail = request.getEmail();
+                String subject = "VERIFY ACCOUNT OF CAPYBOOK STORE";
+                String body = "<h1 style=\"text-align: center; background-color: skyblue; color: white;\">WELCOME TO CAPYBOOK STORE</h1>\n" +
+                        "    <p>Dear " + accountDTO.getFirstName() + " " + accountDTO.getLastName() + ",</p>\n" +
+                        "    <p>The code is used to verify account is <strong>" + accountDTO.getCode() + "</strong></p>\n" +
+                        "    <p>Please don't give this code for anyone. Thanks for using my service! Hoping you have a special experience at\n" +
+                        "        Capybook! For more information please contact <strong>capybookteam@gmail.com</strong></p>\n" +
+                        "    <p>Best regard,</p>\n" +
+                        "    <h3>Capybook Team</h3>\n" +
+                        "    <div style=\"background-color: darkblue; text-align: center;color: white;line-height: 20px;\">\n" +
+                        "        <em>© Copyright " + Year.now().getValue() + "</em><br>\n" +
+                        "        <em>Capybook Team</em><br>\n" +
+                        "        <em>All right reserved!</em>\n" +
+                        "    </div>";
+
+                sender.sendEmail(toEmail, subject, body);
+                System.out.println("Succsess");
+            }
+
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        return false;
     }
 }

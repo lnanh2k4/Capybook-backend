@@ -23,9 +23,11 @@ public interface AccountDAO {
 
     public void registerAccount(String account);
 
-    boolean verifyAccount(String username, String code);
+    boolean verifyEmail(String otpCodeRequest);
 
-    void changePassword(String username, String currentPassword, String newPassword);
+    boolean changePassword(String passwordRequest);
 
-    void setPassword(String username, String currentPassword);
+    void setPassword(String passwordRequest);
+
+    boolean sendEmail(String sendEmailRequest);
 }
