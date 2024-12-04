@@ -172,7 +172,11 @@ public class AccountController {
     public ResponseEntity<String> deleteAccount(@PathVariable String username) {
         AccountDTO account = accountDAO.findByUsername(username);
         if (account != null) {
-            accountDAO.deleteByUsername(username);
+            if(account.getRole()!=1){
+                staffDAO.delete(staffDAO.findStaff(username).getStaffID());
+            } else{
+                accountDAO.deleteByUsername(username);
+            }
             return ResponseEntity.ok("Account deleted successfully!");
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account not found");

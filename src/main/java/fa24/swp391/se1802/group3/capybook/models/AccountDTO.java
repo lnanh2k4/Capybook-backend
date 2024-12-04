@@ -57,6 +57,9 @@ public class AccountDTO implements Serializable {
     @Column(name = "accstatus")
     private Integer accStatus;
 
+    @Column(name = "code")
+    private Integer code;
+
     // Ignoring lazy-loaded collections that don’t need serialization
     @OneToMany(mappedBy = "username", fetch = FetchType.LAZY)
     @JsonIgnore
