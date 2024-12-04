@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -144,6 +145,16 @@ public class PromotionController {
 
             System.out.println("Promotion saved successfully: " + promotionDTO);
 
+            // Tạo log cho action "Create"
+            PromotionLogDTO promotionLog = new PromotionLogDTO();
+            promotionLog.setProId(promotionDTO);
+            promotionLog.setProAction(1); // Action ID cho "Create"
+            promotionLog.setProLogDate(new Date());
+            promotionLog.setStaffId(staff);
+            promotionLogDAO.save(promotionLog); // Lưu log vào cơ sở dữ liệu
+
+            System.out.println("Promotion log saved successfully: " + promotionLog);
+
             return ResponseEntity.status(HttpStatus.CREATED).body(promotionDTO);
         } catch (Exception e) {
             e.printStackTrace();
@@ -265,9 +276,24 @@ public class PromotionController {
         return ResponseEntity.ok(List.of());
     }
     @GetMapping("/logs")
-    public ResponseEntity<?> getAllPromotionLogs() {
+    public ResponseEntity<?> getAllPromotionLogs(
+            @RequestParam(required = false) Integer action,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate
+    ) {
         try {
-            List<PromotionLogDTO> logs = promotionLogDAO.findAll();
+            List<PromotionLogDTO> logs;
+
+            if (action != null) {
+                logs = promotionLogDAO.findByAction(action);
+            } else if (startDate != null && endDate != null) {
+                Date start = new SimpleDateFormat("yyyy-MM-dd").parse(startDate);
+                Date end = new SimpleDateFormat("yyyy-MM-dd").parse(endDate);
+                logs = promotionLogDAO.findByDateRange(start, end);
+            } else {
+                logs = promotionLogDAO.findAll();
+            }
+
             return ResponseEntity.ok(logs);
         } catch (Exception e) {
             e.printStackTrace();
@@ -275,5 +301,6 @@ public class PromotionController {
                     .body("An error occurred while fetching promotion logs.");
         }
     }
+
 
 }
