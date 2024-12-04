@@ -5,6 +5,7 @@ import fa24.swp391.se1802.group3.capybook.models.CartDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,15 +34,22 @@ public class CartController {
         }
     }
 
-    @GetMapping
-    public ResponseEntity<List<CartDTO>> viewCart(@RequestParam String username) {
+    @GetMapping("/{username}")
+    @Transactional
+    public ResponseEntity<List<CartDTO>> viewCart(@PathVariable String username) {
         try {
+            System.out.println("Received username: " + username);
+            // Log giá trị username
             List<CartDTO> cart = cartDAO.viewCart(username);
+
             return ResponseEntity.ok(cart);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            System.err.println("Error fetching cart: " + e.getMessage()); // Log lỗi
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
+
 
     @PutMapping("/update")
     public ResponseEntity<String> editQuantity(@RequestParam String username,
@@ -65,4 +73,6 @@ public class CartController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
         }
     }
+
 }
+

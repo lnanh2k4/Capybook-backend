@@ -21,22 +21,20 @@ public class CartDTO implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
+
     @Column(name = "cartid")
     private Integer cartID;
 
     @Column(name = "quantity")
     private Integer quantity;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonBackReference
-    @JsonIgnore
+    @ManyToOne(fetch = FetchType.EAGER)
+
     @JoinColumn(name = "username", referencedColumnName = "username")
     private AccountDTO username;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonBackReference
-    @JsonIgnore
+    @ManyToOne(fetch = FetchType.EAGER)
+
     @JoinColumn(name = "bookid", referencedColumnName = "bookid")
     private BookDTO bookID; // Ensure this points to BookDTO
 }

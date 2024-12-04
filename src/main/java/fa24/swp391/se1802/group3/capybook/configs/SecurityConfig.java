@@ -35,7 +35,7 @@ public class SecurityConfig {
 //         Book endpoint
          ,"/api/v1/books/", "/api/v1/books/{bookId}",
 //         Cart endpoint
-    "/api/v1/cart","/api/v1/cart/add","/api/v1/cart/update", "/api/v1/cart/delete",
+    "/api/v1/cart/{username}","/api/v1/cart/add","/api/v1/cart/update", "/api/v1/cart/delete",
 //         Category endpoint
          "/api/v1/categories","/api/v1/categories/{catID}",
 //         Import stock endpoint
@@ -76,7 +76,8 @@ public class SecurityConfig {
             "/api/auth/logout",
             "/api/auth/refresh",
             "/api/v1/accounts/register" ,"/api/v1/accounts/","/api/v1/accounts/{username}"
-            ,"/api/v1/books/"}; // url cho customer
+            ,"/api/v1/books/","/api/v1/cart/{username}","/api/v1/cart/add","/api/v1/cart/update/{username}", "/api/v1/cart/delete",}; // url cho customer
+
 
     @Autowired
     private CustomerJwtDecoder customerJwtDecoder;
