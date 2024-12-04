@@ -85,7 +85,7 @@ public class BookDTO implements Serializable {
     private List<BookCategoryDTO> bookCategories;
 
 
-    @OneToMany(mappedBy = "bookID")
+    @OneToMany(mappedBy = "bookID",cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonIgnore
     private List<CartDTO> cartList;
 }

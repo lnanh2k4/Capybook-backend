@@ -49,17 +49,31 @@ public class CartDAOImpl implements CartDAO {
 
     @Override
     public List<CartDTO> viewCart(String username) {
-        // Lấy tất cả sách trong giỏ hàng của người dùng
-        String jpql = "FROM CartDTO WHERE username.username = :username";
+        String jpql = "SELECT c FROM CartDTO c WHERE c.username.username = :username";
         TypedQuery<CartDTO> query = entityManager.createQuery(jpql, CartDTO.class);
         query.setParameter("username", username);
-        return query.getResultList();
+        List<CartDTO> cartList = query.getResultList();
+
+        // In ra console để kiểm tra
+        cartList.forEach(cart -> {
+            System.out.println("CartID: " + cart.getCartID());
+            System.out.println("Username: " + cart.getUsername().getUsername());
+            System.out.println("BookID: " + cart.getBookID().getBookID());
+            System.out.println("BookTitle: " + cart.getBookID().getBookTitle());
+            System.out.println("Quantity: " + cart.getQuantity());
+            System.out.println("Price: " + cart.getBookID().getBookPrice());
+            System.out.println("Image: " + cart.getBookID().getImage());
+        });
+
+        return cartList;
     }
+
 
     @Override
     @Transactional
     public void editQuantity(String username, int bookID, int quantity) {
         // Tìm sách trong giỏ hàng
+
         String jpql = "FROM CartDTO WHERE username.username = :username AND bookID.bookID = :bookID";
         TypedQuery<CartDTO> query = entityManager.createQuery(jpql, CartDTO.class);
         query.setParameter("username", username);
