@@ -2,6 +2,7 @@ package fa24.swp391.se1802.group3.capybook.controllers;
 
 import fa24.swp391.se1802.group3.capybook.daos.*;
 import fa24.swp391.se1802.group3.capybook.models.*;
+import fa24.swp391.se1802.group3.capybook.utils.EmailSenderUtil;
 import jakarta.transaction.Transactional;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+
 @RestController
 @RequestMapping("/api/v1/orders")
 public class OrderController {
@@ -25,14 +27,16 @@ public class OrderController {
     private final BookDAO bookDAO;
     private final PromotionDAO promotionDAO;
     private final AccountDAO accountDAO;
+    private final EmailSenderUtil emailSenderUtil;
 
     @Autowired
-    public OrderController(OrderDAO orderDAO, OrderDetailDAO orderDetailDAO, BookDAO bookDAO, PromotionDAO promotionDAO, AccountDAO accountDAO) {
+    public OrderController(OrderDAO orderDAO, OrderDetailDAO orderDetailDAO, BookDAO bookDAO, PromotionDAO promotionDAO, AccountDAO accountDAO,EmailSenderUtil emailSenderUtil) {
         this.orderDAO = orderDAO;
         this.orderDetailDAO = orderDetailDAO;
         this.bookDAO = bookDAO;
         this.promotionDAO = promotionDAO;
         this.accountDAO = accountDAO;
+        this.emailSenderUtil = emailSenderUtil;
     }
     @GetMapping("/")
     public List<OrderDTO> getAllOrders() {
@@ -87,14 +91,16 @@ public class OrderController {
         }
     }
 
-
     @PostMapping("/")
     @Transactional
     public ResponseEntity<String> addOrder(@RequestBody Map<String, Object> orderData) {
+        System.out.println("Request received: " + orderData); // Log dữ liệu nhận được
         try {
+            // Lấy thông tin order và chi tiết order từ request body
             Map<String, Object> orderDTOMap = (Map<String, Object>) orderData.get("orderDTO");
             List<Map<String, Object>> orderDetailsList = (List<Map<String, Object>>) orderData.get("orderDetails");
 
+            // Kiểm tra dữ liệu đầu vào
             if (orderDTOMap == null || orderDetailsList == null || orderDetailsList.isEmpty()) {
                 return new ResponseEntity<>("Invalid order data: Missing required fields.", HttpStatus.BAD_REQUEST);
             }
@@ -107,6 +113,19 @@ public class OrderController {
                 return new ResponseEntity<>("Invalid username: User does not exist.", HttpStatus.BAD_REQUEST);
             }
             orderDTO.setUsername(account);
+
+            // Lấy địa chỉ và email từ orderDTOMap
+            String orderAddress = (String) orderDTOMap.get("orderAddress");
+            String email = (String) orderDTOMap.get("email");
+
+            if (orderAddress == null || orderAddress.trim().isEmpty()) {
+                return new ResponseEntity<>("Order address is required.", HttpStatus.BAD_REQUEST);
+            }
+            if (email == null || email.trim().isEmpty()) {
+                return new ResponseEntity<>("Email is required.", HttpStatus.BAD_REQUEST);
+            }
+
+            orderDTO.setOrderAddress(orderAddress);
 
             // Xử lý khuyến mãi (nếu có)
             Integer proID = (Integer) orderDTOMap.get("proID");
@@ -127,13 +146,20 @@ public class OrderController {
             // Lưu OrderDTO
             orderDAO.save(orderDTO);
 
-            // Xử lý chi tiết đơn hàng
+            // Chuẩn bị nội dung email
+            StringBuilder emailContent = new StringBuilder();
+            emailContent.append("<h2>Thank you for your order!</h2>");
+            emailContent.append("<p>Order ID: ").append(orderDTO.getOrderID()).append("</p>");
+            emailContent.append("<p>Order Date: ").append(orderDTO.getOrderDate()).append("</p>");
+            emailContent.append("<p>Order Address: ").append(orderDTO.getOrderAddress()).append("</p>");
+            emailContent.append("<h3>Order Details:</h3>");
+            emailContent.append("<ul>");
+
             for (Map<String, Object> detail : orderDetailsList) {
                 Integer bookID = (Integer) detail.get("bookID");
                 Integer quantity = (Integer) detail.get("quantity");
                 Object totalPriceObj = detail.get("totalPrice");
 
-                // Kiểm tra null cho các giá trị cần thiết
                 if (bookID == null || quantity == null || quantity <= 0 || totalPriceObj == null) {
                     return new ResponseEntity<>("Invalid order details: Missing or invalid fields.", HttpStatus.BAD_REQUEST);
                 }
@@ -144,24 +170,38 @@ public class OrderController {
                 OrderDetailDTO orderDetailDTO = new OrderDetailDTO();
                 orderDetailDTO.setOrderID(orderDTO);
 
-                // Thiết lập bookID
-                BookDTO book = new BookDTO();
-                book.setBookID(bookID);
+                BookDTO book = bookDAO.find(bookID);
+                if (book == null) {
+                    return new ResponseEntity<>("Invalid book ID: Book not found.", HttpStatus.BAD_REQUEST);
+                }
                 orderDetailDTO.setBookID(book);
-
                 orderDetailDTO.setQuantity(quantity);
                 orderDetailDTO.setTotalPrice(totalPrice);
-
                 orderDetailDAO.save(orderDetailDTO);
-            }
 
-            return new ResponseEntity<>("Order added successfully with ID: " + orderDTO.getOrderID(), HttpStatus.CREATED);
+                emailContent.append("<li>")
+                        .append("Book: ").append(book.getBookTitle()).append(" - ")
+                        .append("Quantity: ").append(quantity).append(" - ")
+                        .append("Total Price: ").append(totalPrice).append("</li>");
+            }
+            emailContent.append("</ul>");
+
+            // Gửi email
+            String subject = "Order Confirmation";
+            String body = emailContent.toString();
+
+            System.out.println("Email to: " + email);
+            System.out.println("Email subject: " + subject);
+            System.out.println("Email body: " + body);
+
+            emailSenderUtil.sendEmail(email, subject, body);
+
+            return ResponseEntity.status(HttpStatus.CREATED).body("Order created successfully.");
         } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<>("Failed to add order: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create order: " + e.getMessage());
         }
     }
-
 
     @PutMapping("/{orderID}")
     public ResponseEntity<OrderDTO> updateOrder(@PathVariable int orderID, @RequestBody Map<String, Integer> updateData) {
