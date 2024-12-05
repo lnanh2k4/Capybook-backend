@@ -39,7 +39,12 @@ public class SecurityConfig {
  }; // url cho guest
 
     private final String[] SELLER_STAFF_ENDPOINTS = {}; // url cho seller
-    private final String[] WAREHOUSE_STAFF_ENDPOINTS = {}; // url cho warehouse
+    private final String[] WAREHOUSE_STAFF_ENDPOINTS = {
+            //Import stock endpoint
+            "api/v1/importStock", "/api/v1/importStock/{id}/details",
+
+
+    }; // url cho warehouse
     private final String[] ADMIN_ENDPOINTS = {}; // url cho admin
     private final String[] CUSTOMER_ENDPOINTS = {}; // url cho customer
 
