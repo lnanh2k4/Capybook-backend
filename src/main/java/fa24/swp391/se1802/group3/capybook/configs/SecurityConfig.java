@@ -38,11 +38,16 @@ public class SecurityConfig {
          "/api/v1/accounts/register", "/api/v1/accounts/email/send/", "/api/v1/accounts/change", "/api/v1/accounts/password/reset/", "/api/v1/accounts/email/verify/"
  }; // url cho guest
 
-    private final String[] SELLER_STAFF_ENDPOINTS = {}; // url cho seller
+    private final String[] SELLER_STAFF_ENDPOINTS = {
+            //         Promotion endpoint
+            "/api/v1/promotions", "/api/v1/promotions/{proID}", "/api/v1/promotions/search",
+            //         Category endpoint
+            "/api/v1/categories/","/api/v1/categories/{catID}",
+    };
+
     private final String[] WAREHOUSE_STAFF_ENDPOINTS = {
             //Import stock endpoint
             "api/v1/importStock", "/api/v1/importStock/{id}/details",
-
 
     }; // url cho warehouse
     private final String[] ADMIN_ENDPOINTS = {}; // url cho admin
