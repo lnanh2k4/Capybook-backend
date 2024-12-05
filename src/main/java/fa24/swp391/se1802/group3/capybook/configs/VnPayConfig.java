@@ -12,51 +12,47 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 
-@Configuration
+
 public class VnPayConfig {
     public static String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-    public static String vnp_Returnurl = "/vnpay-payment";
-    public static String vnp_TmnCode = "J5DDWBN4";
-    public static String vnp_HashSecret = "S6CUUMJR53G5YXA6XKRQP47R8P40EZSA";
+    public static String vnp_Returnurl = "";
+    public static String vnp_TmnCode = "4FEYIVW6";
+    public static String vnp_HashSecret = "9WRHA3E2PSWNDT7I20U0CUURYYYBCLS8";
     public static String vnp_apiUrl = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
-
-
 
     public static String md5(String message) {
         String digest = null;
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
-            byte[] hash = md.digest(message.getBytes("UTF-8"));
+            byte[] hash = md.digest(message.getBytes(StandardCharsets.UTF_8));
             StringBuilder sb = new StringBuilder(2 * hash.length);
             for (byte b : hash) {
                 sb.append(String.format("%02x", b & 0xff));
             }
             digest = sb.toString();
-        } catch (UnsupportedEncodingException ex) {
-            digest = "";
         } catch (NoSuchAlgorithmException ex) {
             digest = "";
         }
         return digest;
     }
 
-    public static String Sha256(String message) {
-        String digest = null;
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] hash = md.digest(message.getBytes("UTF-8"));
-            StringBuilder sb = new StringBuilder(2 * hash.length);
-            for (byte b : hash) {
-                sb.append(String.format("%02x", b & 0xff));
-            }
-            digest = sb.toString();
-        } catch (UnsupportedEncodingException ex) {
-            digest = "";
-        } catch (NoSuchAlgorithmException ex) {
-            digest = "";
-        }
-        return digest;
-    }
+//    public static String Sha256(String message) {
+//        String digest = null;
+//        try {
+//            MessageDigest md = MessageDigest.getInstance("SHA-256");
+//            byte[] hash = md.digest(message.getBytes("UTF-8"));
+//            StringBuilder sb = new StringBuilder(2 * hash.length);
+//            for (byte b : hash) {
+//                sb.append(String.format("%02x", b & 0xff));
+//            }
+//            digest = sb.toString();
+//        } catch (UnsupportedEncodingException ex) {
+//            digest = "";
+//        } catch (NoSuchAlgorithmException ex) {
+//            digest = "";
+//        }
+//        return digest;
+//    }
 
     //Util for VNPAY
     public static String hashAllFields(Map fields) {
@@ -67,7 +63,7 @@ public class VnPayConfig {
         while (itr.hasNext()) {
             String fieldName = (String) itr.next();
             String fieldValue = (String) fields.get(fieldName);
-            if ((fieldValue != null) && (fieldValue.length() > 0)) {
+            if ((fieldValue != null) && (!fieldValue.isEmpty())) {
                 sb.append(fieldName);
                 sb.append("=");
                 sb.append(fieldValue);
@@ -76,7 +72,7 @@ public class VnPayConfig {
                 sb.append("&");
             }
         }
-        return hmacSHA512(vnp_HashSecret, sb.toString());
+        return hmacSHA512(vnp_HashSecret,sb.toString());
     }
 
     public static String hmacSHA512(final String key, final String data) {
