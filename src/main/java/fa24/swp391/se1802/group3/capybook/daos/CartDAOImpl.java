@@ -55,15 +55,7 @@ public class CartDAOImpl implements CartDAO {
         List<CartDTO> cartList = query.getResultList();
 
         // In ra console để kiểm tra
-        cartList.forEach(cart -> {
-            System.out.println("CartID: " + cart.getCartID());
-            System.out.println("Username: " + cart.getUsername().getUsername());
-            System.out.println("BookID: " + cart.getBookID().getBookID());
-            System.out.println("BookTitle: " + cart.getBookID().getBookTitle());
-            System.out.println("Quantity: " + cart.getQuantity());
-            System.out.println("Price: " + cart.getBookID().getBookPrice());
-            System.out.println("Image: " + cart.getBookID().getImage());
-        });
+
 
         return cartList;
     }
@@ -71,38 +63,43 @@ public class CartDAOImpl implements CartDAO {
 
     @Override
     @Transactional
-    public void editQuantity(String username, int bookID, int quantity) {
-        String jpql = "FROM CartDTO WHERE username.username = :username AND bookID.bookID = :bookID";
+    public void editQuantity(String username, int cartID, int quantity) {
+        String jpql = "FROM CartDTO WHERE username.username = :username AND cartID = :cartID";
         TypedQuery<CartDTO> query = entityManager.createQuery(jpql, CartDTO.class);
         query.setParameter("username", username);
-        query.setParameter("bookID", bookID);
+        query.setParameter("cartID", cartID);
 
-        List<CartDTO> resultList = query.getResultList();
-        if (!resultList.isEmpty()) {
-            CartDTO cartItem = resultList.get(0);
-            cartItem.setQuantity(quantity); // Cập nhật số lượng
-            entityManager.merge(cartItem);  // Lưu thay đổi
+        if (!query.getResultList().isEmpty()) {
+            CartDTO cartItem = query.getSingleResult();
+            cartItem.setQuantity(quantity);
+            entityManager.merge(cartItem);
         } else {
-            throw new RuntimeException("Cart item with bookID " + bookID + " not found for username " + username);
+            throw new RuntimeException("Cart item not found with ID: " + cartID);
         }
     }
+
 
 
     @Override
     @Transactional
-    public void deleteBookFromCart(String username, int bookID) {
-        // Tìm sách cần xóa
-        String jpql = "FROM CartDTO WHERE username.username = :username AND bookID.bookID = :bookID";
-        TypedQuery<CartDTO> query = entityManager.createQuery(jpql, CartDTO.class);
-        query.setParameter("username", username);
-        query.setParameter("bookID", bookID);
-
-        if (!query.getResultList().isEmpty()) {
-            // Xóa nếu tìm thấy
-            CartDTO cartItem = query.getSingleResult();
-            entityManager.remove(cartItem);
+    public void deleteBookFromCart(String username, int cartID) {
+        // Tìm thực thể bằng cartID
+        CartDTO cartItem = entityManager.find(CartDTO.class, cartID);
+        if (cartItem != null) {
+            // Xác nhận username hợp lệ trước khi xóa
+            if (cartItem.getUsername().getUsername().equals(username)) {
+                entityManager.remove(cartItem); // Xóa thực thể
+            } else {
+                throw new RuntimeException("Username does not match the cart item.");
+            }
         } else {
-            throw new RuntimeException("Cart item not found");
+            throw new RuntimeException("Cart item not found for cartID: " + cartID);
         }
     }
+
+
+
+
+
+
 }
