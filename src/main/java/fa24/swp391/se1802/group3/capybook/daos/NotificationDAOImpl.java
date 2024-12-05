@@ -37,13 +37,13 @@ public class NotificationDAOImpl implements NotificationDAO{
 
     @Override
     public List<NotificationDTO> findAll() {
-        TypedQuery<NotificationDTO> query = entityManager.createQuery("SELECT n FROM NotificationDTO n",NotificationDTO.class);
+        TypedQuery<NotificationDTO> query = entityManager.createQuery("SELECT n FROM NotificationDTO n ORDER BY n.notID DESC",NotificationDTO.class);
         return query.getResultList();
     }
 
     @Override
     public List<NotificationDTO> search(String notTitle) {
-        TypedQuery<NotificationDTO> query = entityManager.createQuery("SELECT n FROM NotificationDTO n WHERE n.notTitle LIKE :nottitle",NotificationDTO.class);
+        TypedQuery<NotificationDTO> query = entityManager.createQuery("SELECT n FROM NotificationDTO n WHERE n.notTitle LIKE :nottitle ORDER BY n.notID DESC",NotificationDTO.class);
         query.setParameter("nottitle","%"+notTitle+"%");
         return query.getResultList();
     }
