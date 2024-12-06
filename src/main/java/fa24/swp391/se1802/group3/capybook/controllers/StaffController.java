@@ -9,6 +9,7 @@ import fa24.swp391.se1802.group3.capybook.response.StaffResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -28,6 +29,7 @@ public class StaffController {
         this.staffDAO = staffDAO;
     }
 
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     // Endpoint to fetch a single staff member by ID
     @GetMapping("/{id}")
     public ResponseEntity<StaffResponse> getStaffById(@PathVariable String id) {
@@ -50,6 +52,7 @@ public class StaffController {
         }
     }
 
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     // New endpoint to fetch all staff members
     @GetMapping("/")
     public ResponseEntity<List<StaffDTO>> getAllStaff() {
@@ -57,6 +60,7 @@ public class StaffController {
         return ResponseEntity.ok(staffList);
     }
 
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     @GetMapping("/username/{username}")
     public ResponseEntity<StaffDTO> getStaff(@PathVariable String username) {
         System.out.println("Input: " + username);
@@ -68,22 +72,27 @@ public class StaffController {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
 
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     @PutMapping("/")
-    public ResponseEntity<StaffResponse> updatestaff( @RequestPart("staff") String staff) {
+    public ResponseEntity<StaffResponse> updatestaff(@RequestPart("staff") String staff) {
         staffDAO.update(staff);
-       return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     @PostMapping("/")
-    public ResponseEntity<StaffResponse> addStaff( @RequestPart("staff") String staff) {
+    public ResponseEntity<StaffResponse> addStaff(@RequestPart("staff") String staff) {
         staffDAO.addStaffByString(staff);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     @GetMapping("/search")
     public List<StaffDTO> searchAccounts(@RequestParam String keyword) {
         return staffDAO.searchStaffs(keyword);
     }
 
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     @DeleteMapping("/{staffID}")
     public ResponseEntity<String> deleteStaff(@PathVariable String staffID) {
         staffDAO.delete(Integer.parseInt(staffID));

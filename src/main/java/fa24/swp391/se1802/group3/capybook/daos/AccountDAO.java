@@ -25,6 +25,8 @@ public interface AccountDAO {
 
     boolean verifyEmail(String otpCodeRequest);
 
+    boolean verifyAccount(String otpCodeRequest);
+
     boolean changePassword(String passwordRequest);
 
     void setPassword(String passwordRequest);

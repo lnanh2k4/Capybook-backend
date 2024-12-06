@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -26,6 +27,7 @@ import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
  private final String[] PUBLIC_ENDPOINTS = {
          // Category endpoint
@@ -35,7 +37,7 @@ public class SecurityConfig {
          // Token endpoint
          "/api/auth/token", "/api/auth/introspect", "/api/auth/logout", "/api/auth/refresh",
          // Account endpoint
-         "/api/v1/accounts/register", "/api/v1/accounts/email/send/", "/api/v1/accounts/change", "/api/v1/accounts/password/reset/", "/api/v1/accounts/email/verify/"
+         "/api/v1/accounts/register", "/api/v1/accounts/email/send/", "/api/v1/accounts/change", "/api/v1/accounts/password/reset/", "/api/v1/accounts/email/verify/", "/api/v1/accounts/account/verify/"
  }; // url cho guest
 
     private final String[] SELLER_STAFF_ENDPOINTS = {
@@ -55,7 +57,10 @@ public class SecurityConfig {
             //Supplier endpoint
             "api/v1/suppliers", "api/v1/suppliers/{id}", "api/v1/suppliers/{supID}", "api/v1/suppliers/search"
     }; // url cho warehouse staff
-    private final String[] ADMIN_ENDPOINTS = {}; // url cho admin
+    private final String[] ADMIN_ENDPOINTS = {
+//            Account endpoint
+            "api/v1/accounts","api/v1/accounts/${username}",
+    }; // url cho admin
     private final String[] CUSTOMER_ENDPOINTS = {
             //         Payment endpoint
             "/api/v1/payment", "/api/v1/payment/create", "/api/v1/payment/return",
@@ -83,11 +88,6 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.GET,PUBLIC_ENDPOINTS).permitAll()
                                 .requestMatchers(HttpMethod.PUT,PUBLIC_ENDPOINTS).permitAll()
 
-                                .requestMatchers(HttpMethod.GET,ADMIN_ENDPOINTS).hasAnyAuthority("SCOPE_ADMIN")
-                                .requestMatchers(HttpMethod.POST,ADMIN_ENDPOINTS).hasAnyAuthority("SCOPE_ADMIN")
-                                .requestMatchers(HttpMethod.PUT,ADMIN_ENDPOINTS).hasAnyAuthority("SCOPE_ADMIN")
-                                .requestMatchers(HttpMethod.DELETE,ADMIN_ENDPOINTS).hasAnyAuthority("SCOPE_ADMIN")
-
                                 .requestMatchers(HttpMethod.POST,CUSTOMER_ENDPOINTS).hasAnyAuthority("SCOPE_CUSTOMER")
                                 .requestMatchers(HttpMethod.GET,CUSTOMER_ENDPOINTS).hasAnyAuthority("SCOPE_CUSTOMER")
                                 .requestMatchers(HttpMethod.PUT,CUSTOMER_ENDPOINTS).hasAnyAuthority("SCOPE_CUSTOMER")
@@ -102,6 +102,14 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.GET,WAREHOUSE_STAFF_ENDPOINTS).hasAnyAuthority("SCOPE_WAREHOUSE_STAFF")
                                 .requestMatchers(HttpMethod.PUT,WAREHOUSE_STAFF_ENDPOINTS).hasAnyAuthority("SCOPE_WAREHOUSE_STAFF")
                                 .requestMatchers(HttpMethod.DELETE,WAREHOUSE_STAFF_ENDPOINTS).hasAnyAuthority("SCOPE_WAREHOUSE_STAFF")
+
+                                .requestMatchers(HttpMethod.GET,ADMIN_ENDPOINTS).hasAnyAuthority("SCOPE_ADMIN")
+                                .requestMatchers(HttpMethod.POST,ADMIN_ENDPOINTS).hasAnyAuthority("SCOPE_ADMIN")
+                                .requestMatchers(HttpMethod.PUT,ADMIN_ENDPOINTS).hasAnyAuthority("SCOPE_ADMIN")
+                                .requestMatchers(HttpMethod.DELETE,ADMIN_ENDPOINTS).hasAnyAuthority("SCOPE_ADMIN")
+
+
+
                                 .requestMatchers(HttpMethod.GET, "/uploads/**").permitAll()
                                 .anyRequest().authenticated());
 

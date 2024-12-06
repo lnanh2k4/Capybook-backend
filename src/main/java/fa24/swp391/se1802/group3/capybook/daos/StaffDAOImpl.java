@@ -159,9 +159,9 @@ public class StaffDAOImpl implements  StaffDAO{
     @Override
     public List<StaffDTO> searchStaffs(String keyword) {
         List<StaffDTO> list = new ArrayList<>();
-        String str = "FROM StaffDTO WHERE LOWER(username.firstName) LIKE :searchKey OR LOWER(username.lastName) LIKE :searchKey";
+        String str = "FROM StaffDTO s WHERE CAST(s.staffID AS string) LIKE :keyword OR LOWER(s.username.firstName) LIKE :keyword OR LOWER(s.username.lastName) LIKE :keyword";
         TypedQuery<StaffDTO> query = entityManager.createQuery(str, StaffDTO.class);
-        query.setParameter("searchKey", "%" + keyword.toLowerCase() + "%");
+        query.setParameter("keyword", "%" + keyword.toLowerCase() + "%");
         for (StaffDTO staffDTO : query.getResultList()) {
             if(staffDTO.getUsername().getAccStatus()!= null && staffDTO.getUsername().getAccStatus()>0){
                 list.add(staffDTO);
