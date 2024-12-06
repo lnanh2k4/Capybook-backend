@@ -48,8 +48,9 @@ public class SecurityConfig {
     private final String[] WAREHOUSE_STAFF_ENDPOINTS = {
             //Import stock endpoint
             "api/v1/importStock", "/api/v1/importStock/{id}/details",
-
-    }; // url cho warehouse
+            //Supplier endpoint
+            "api/v1/suppliers", "api/v1/suppliers/{id}", "api/v1/suppliers/{supID}", "api/v1/suppliers/search"
+    }; // url cho warehouse staff
     private final String[] ADMIN_ENDPOINTS = {}; // url cho admin
     private final String[] CUSTOMER_ENDPOINTS = {
             //         Payment endpoint
