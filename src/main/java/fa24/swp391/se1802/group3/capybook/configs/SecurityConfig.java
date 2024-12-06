@@ -49,6 +49,8 @@ public class SecurityConfig {
             "/api/v1/orders","/api/v1/orders/{orderID}", "/api/v1/orders/search",
             //Import stock endpoint
             "api/v1/importStock", "/api/v1/importStock/{id}/details",
+//            Staff endpoint
+            "api/v1/staffs/{id}","api/v1/staffs/username/{username}"
     };
 
     private final String[] WAREHOUSE_STAFF_ENDPOINTS = {
@@ -60,6 +62,8 @@ public class SecurityConfig {
     private final String[] ADMIN_ENDPOINTS = {
 //            Account endpoint
             "api/v1/accounts","api/v1/accounts/${username}",
+            //            Staff endpoint
+            "api/v1/staffs","api/v1/staffs/{id}","api/v1/staffs/username/{username}","api/v1/staffs/search/","api/v1/staffs/{staffID}"
     }; // url cho admin
     private final String[] CUSTOMER_ENDPOINTS = {
             //         Payment endpoint
@@ -107,8 +111,6 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.POST,ADMIN_ENDPOINTS).hasAnyAuthority("SCOPE_ADMIN")
                                 .requestMatchers(HttpMethod.PUT,ADMIN_ENDPOINTS).hasAnyAuthority("SCOPE_ADMIN")
                                 .requestMatchers(HttpMethod.DELETE,ADMIN_ENDPOINTS).hasAnyAuthority("SCOPE_ADMIN")
-
-
 
                                 .requestMatchers(HttpMethod.GET, "/uploads/**").permitAll()
                                 .anyRequest().authenticated());
