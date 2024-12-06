@@ -40,9 +40,13 @@ public class SecurityConfig {
 
     private final String[] SELLER_STAFF_ENDPOINTS = {
             //         Promotion endpoint
-            "/api/v1/promotions", "/api/v1/promotions/{proID}", "/api/v1/promotions/search",
+            "/api/v1/promotions", "/api/v1/promotions/{proID}", "/api/v1/promotions/search","/api/v1/promotions/logs",
             //         Category endpoint
             "/api/v1/categories/","/api/v1/categories/{catID}",
+            //         Order endpoint
+            "/api/v1/orders","/api/v1/orders/{orderID}", "/api/v1/orders/search",
+            //Import stock endpoint
+            "api/v1/importStock", "/api/v1/importStock/{id}/details",
     };
 
     private final String[] WAREHOUSE_STAFF_ENDPOINTS = {
