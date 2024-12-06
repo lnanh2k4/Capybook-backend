@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -46,6 +47,7 @@ public class AccountController {
     }
 
 
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     @GetMapping("/")
     public List<AccountDTO> getAccounts() {
         List<AccountDTO> list = new ArrayList<>();
@@ -57,6 +59,7 @@ public class AccountController {
         return list;
     }
 
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     @GetMapping("/search")
     public List<AccountDTO> searchAccounts(@RequestParam String keyword) {
         List<AccountDTO> list = new ArrayList<>();
@@ -78,7 +81,7 @@ public class AccountController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
-
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     @PostMapping(value = "/")
     public ResponseEntity<AccountDTO> addAccount(@RequestPart("account") String account) {
         try {
@@ -101,6 +104,7 @@ public class AccountController {
         }
     }
 
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     @PutMapping("/{username}")
     public ResponseEntity<AccountDTO> updateAccount(@PathVariable String username, @RequestPart("account") String account) {
         try {
@@ -143,6 +147,7 @@ public class AccountController {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
 
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     @DeleteMapping("/{username}")
     public ResponseEntity<String> deleteAccount(@PathVariable String username) {
         AccountDTO account = accountDAO.findByUsername(username);
@@ -172,8 +177,13 @@ public class AccountController {
 
     @PostMapping("/email/verify/")
     public ResponseEntity<Boolean> verifyEmail(@RequestPart("code") String otpCodeRequest) {
-        System.out.println(otpCodeRequest);
         accountDAO.verifyEmail(otpCodeRequest);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PostMapping("/account/verify/")
+    public ResponseEntity<Boolean> verifyAccount(@RequestPart("code") String otpCodeRequest) {
+        accountDAO.verifyAccount(otpCodeRequest);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 

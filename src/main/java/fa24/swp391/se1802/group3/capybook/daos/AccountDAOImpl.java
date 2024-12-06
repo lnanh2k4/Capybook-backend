@@ -185,6 +185,7 @@ public class AccountDAOImpl implements AccountDAO {
             //Convert String to account object
             AccountDTO accountDTO = obj.readValue(account, AccountDTO.class);
             accountDTO.setAccStatus(UNVERIFIED_STATUS);
+            accountDTO.setRole(1);
             accountDTO.setPassword(password.encode(accountDTO.getPassword()));
             RandomNumberGenerator random = new RandomNumberGenerator();
             String number = random.generateNumber();
@@ -203,6 +204,25 @@ public class AccountDAOImpl implements AccountDAO {
             VerifyEmailRequest request = obj.readValue(otpCodeRequest, VerifyEmailRequest.class);
             AccountDTO account = this.findByUsername(request.getUsername());
             return account.getCode().equals(request.getCode());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return false;
+    }
+
+    @Transactional
+    @Override
+    public boolean verifyAccount(String otpCodeRequest) {
+        try {
+            ObjectMapper obj = new ObjectMapper();
+            VerifyEmailRequest request = obj.readValue(otpCodeRequest, VerifyEmailRequest.class);
+            System.out.println(otpCodeRequest);
+            AccountDTO account = this.findByUsername(request.getUsername());
+            if( account.getCode().equals(request.getCode())){
+                account.setAccStatus(1);
+                entityManager.merge(account);
+            };
+            return true;
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
