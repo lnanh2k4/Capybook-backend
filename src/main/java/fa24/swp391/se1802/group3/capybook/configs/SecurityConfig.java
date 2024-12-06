@@ -52,7 +52,17 @@ public class SecurityConfig {
             "api/v1/suppliers", "api/v1/suppliers/{id}", "api/v1/suppliers/{supID}", "api/v1/suppliers/search"
     }; // url cho warehouse staff
     private final String[] ADMIN_ENDPOINTS = {}; // url cho admin
-    private final String[] CUSTOMER_ENDPOINTS = {}; // url cho customer
+    private final String[] CUSTOMER_ENDPOINTS = {
+            //         Payment endpoint
+            "/api/v1/payment", "/api/v1/payment/create", "/api/v1/payment/return",
+            //         Order endpoint
+            "/api/v1/orders/search" , "/api/v1/orders",
+            //         Cart endpoint
+            "/api/v1/cart/{username}","/api/v1/cart/add","/api/v1/cart/update", "/api/v1/cart/delete",
+            //         Account endpoint
+            "/api/v1/accounts/email/send/","/api/v1/accounts/change", "/api/v1/accounts/password/reset/", "/api/v1/accounts/email/verify/",
+
+    }; // url cho customer
 
 
     @Autowired
