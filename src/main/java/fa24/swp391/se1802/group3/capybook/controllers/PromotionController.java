@@ -166,7 +166,30 @@ public class PromotionController {
                         .body("Promotion with ID " + proID + " not found.");
             }
 
-            // Ghi log hoạt động nếu có actionId
+            // Kiểm tra và cập nhật các trường
+            if (updates.containsKey("quantity")) {
+                Integer quantity = (Integer) updates.get("quantity");
+                existingPromotion.setQuantity(quantity);
+            }
+
+            if (updates.containsKey("startDate")) {
+                String startDateString = (String) updates.get("startDate");
+                Date startDate = new SimpleDateFormat("yyyy-MM-dd").parse(startDateString);
+                existingPromotion.setStartDate(startDate);
+            }
+
+            if (updates.containsKey("endDate")) {
+                String endDateString = (String) updates.get("endDate");
+                Date endDate = new SimpleDateFormat("yyyy-MM-dd").parse(endDateString);
+                existingPromotion.setEndDate(endDate);
+            }
+
+            if (updates.containsKey("proStatus")) {
+                Integer proStatus = (Integer) updates.get("proStatus");
+                existingPromotion.setProStatus(proStatus);
+            }
+
+            // Ghi log nếu có actionId
             if (updates.containsKey("actionId")) {
                 Integer actionId = (Integer) updates.get("actionId");
 
@@ -177,8 +200,6 @@ public class PromotionController {
                     }
 
                     Integer staffID = (Integer) updates.get("staffID");
-
-                    // Không cần tìm staff, chỉ cần lưu staffID
                     StaffDTO staff = new StaffDTO();
                     staff.setStaffID(staffID);
 
@@ -196,21 +217,16 @@ public class PromotionController {
                     promotionLog.setProLogDate(new Date());
                     promotionLog.setStaffId(staff);
                     promotionLogDAO.save(promotionLog);
-
-                    // Cập nhật promotion
-                    promotionDAO.update(existingPromotion);
-
-                    String actionMessage = actionId == 2 ? "approved" : "declined";
-                    return ResponseEntity.ok("Promotion " + actionMessage + " successfully.");
                 } else {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                             .body("Invalid actionId. Must be 2 (approve) or 3 (reject).");
                 }
             }
 
-            // Nếu không có actionId, trả về lỗi
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Missing or invalid actionId in request.");
+            // Cập nhật promotion
+            promotionDAO.update(existingPromotion);
+            return ResponseEntity.ok("Promotion updated successfully.");
+
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

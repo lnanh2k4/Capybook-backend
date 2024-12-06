@@ -70,5 +70,6 @@ public class PromotionDTO implements Serializable {
 
     @OneToMany(mappedBy = "proId")
     @JsonIgnore
+    @ToString.Exclude
     private List<PromotionLogDTO> promotionLogList;
 }
