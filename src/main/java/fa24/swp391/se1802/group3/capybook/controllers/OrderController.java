@@ -101,7 +101,6 @@ public class OrderController {
         System.out.println("Request received: " + orderData); // Log dữ liệu nhận được
         try {
             emailContent.setLength(0); // Reset nội dung emailContent
-
             // Lấy thông tin order và chi tiết order từ request body
             Map<String, Object> orderDTOMap = (Map<String, Object>) orderData.get("orderDTO");
             List<Map<String, Object>> orderDetailsList = (List<Map<String, Object>>) orderData.get("orderDetails");
@@ -151,6 +150,24 @@ public class OrderController {
 
             // Lưu OrderDTO
             orderDAO.save(orderDTO);
+
+            for (Map<String, Object> detail : orderDetailsList) {
+                Integer bookID = (Integer) detail.get("bookID");
+                Integer quantity = (Integer) detail.get("quantity");
+                BigDecimal totalPrice = new BigDecimal(detail.get("totalPrice").toString());
+
+                BookDTO book = bookDAO.find(bookID);
+                if (book == null) {
+                    return new ResponseEntity<>("Invalid book ID: Book not found.", HttpStatus.BAD_REQUEST);
+                }
+
+                OrderDetailDTO orderDetail = new OrderDetailDTO();
+                orderDetail.setOrderID(orderDTO);
+                orderDetail.setBookID(book);
+                orderDetail.setQuantity(quantity);
+                orderDetail.setTotalPrice(totalPrice);
+                orderDetailDAO.save(orderDetail);
+            }
 
             // Bắt đầu xây dựng nội dung email
             emailContent.append("<html><body>");
