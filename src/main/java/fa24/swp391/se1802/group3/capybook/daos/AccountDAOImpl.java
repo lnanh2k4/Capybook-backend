@@ -29,7 +29,7 @@ import java.util.List;
 public class AccountDAOImpl implements AccountDAO {
     final int ACTIVE_STATUS = 1;
     final int INACTIVE_STATUS = 0;
-    final int UNVERIFIED_STATUS = 3;
+    final int UNVERIFIED_STATUS = 2;
     final String DEFAULT_PASSWORD = "12345";
     //define entity manager
     EntityManager entityManager;
@@ -162,9 +162,6 @@ public class AccountDAOImpl implements AccountDAO {
             AccountDTO accountDTO = obj.readValue(account, AccountDTO.class);
             accountDTO.setAccStatus(UNVERIFIED_STATUS);
             accountDTO.setPassword(password.encode(DEFAULT_PASSWORD));
-            RandomNumberGenerator random = new RandomNumberGenerator();
-            String number = random.generateNumber();
-            accountDTO.setCode(number);
             entityManager.persist(accountDTO);
             if (accountDTO.getRole() != 1) {
                 StaffDTO staff = new StaffDTO();
@@ -187,9 +184,6 @@ public class AccountDAOImpl implements AccountDAO {
             accountDTO.setAccStatus(UNVERIFIED_STATUS);
             accountDTO.setRole(1);
             accountDTO.setPassword(password.encode(accountDTO.getPassword()));
-            RandomNumberGenerator random = new RandomNumberGenerator();
-            String number = random.generateNumber();
-            accountDTO.setCode(number);
             entityManager.persist(accountDTO);
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -280,7 +274,7 @@ public class AccountDAOImpl implements AccountDAO {
             if (accountDTO.getEmail().equals(request.getEmail())) {
                 String toEmail = request.getEmail();
                 String subject = "VERIFY ACCOUNT OF CAPYBOOK STORE";
-                String body = "<h1 style=\"text-align: center; background-color: skyblue; color: white;\">WELCOME TO CAPYBOOK STORE</h1>\n" +
+                String body = "<h1 style=\"text-align: center; background-color: skyblue; color: white;\">CAPYBOOK STORE</h1>\n" +
                         "    <p>Dear " + accountDTO.getFirstName() + " " + accountDTO.getLastName() + ",</p>\n" +
                         "    <p>The code is used to verify account is <strong>" + accountDTO.getCode() + "</strong></p>\n" +
                         "    <p>Please don't give this code for anyone. Thanks for using my service! Hoping you have a special experience at\n" +
