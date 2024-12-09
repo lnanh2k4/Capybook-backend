@@ -19,6 +19,7 @@ import java.util.List;
 public class StaffDAOImpl implements  StaffDAO{
     EntityManager entityManager;
     static final String DEFAULT_PASSWORD = "12345";
+    final int UNVERIFIED_STATUS = 2;
 
     @Autowired
     public StaffDAOImpl(EntityManager entityManager) {
@@ -134,7 +135,7 @@ public class StaffDAOImpl implements  StaffDAO{
             account.setRole(request.getRole());
             account.setLastName(request.getLastName());
             account.setFirstName(request.getFirstName());
-            account.setAccStatus(1);
+            account.setAccStatus(UNVERIFIED_STATUS);
             PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
             account.setPassword(passwordEncoder.encode(DEFAULT_PASSWORD));
 
