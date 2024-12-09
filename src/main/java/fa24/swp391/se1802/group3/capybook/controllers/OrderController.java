@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 
 @RestController
@@ -28,6 +30,8 @@ public class OrderController {
     private final PromotionDAO promotionDAO;
     private final AccountDAO accountDAO;
     private final EmailSenderUtil emailSenderUtil;
+    StringBuilder emailContent = new StringBuilder();
+
 
     @Autowired
     public OrderController(OrderDAO orderDAO, OrderDetailDAO orderDetailDAO, BookDAO bookDAO, PromotionDAO promotionDAO, AccountDAO accountDAO,EmailSenderUtil emailSenderUtil) {
@@ -96,6 +100,8 @@ public class OrderController {
     public ResponseEntity<String> addOrder(@RequestBody Map<String, Object> orderData) {
         System.out.println("Request received: " + orderData); // Log dữ liệu nhận được
         try {
+            emailContent.setLength(0); // Reset nội dung emailContent
+
             // Lấy thông tin order và chi tiết order từ request body
             Map<String, Object> orderDTOMap = (Map<String, Object>) orderData.get("orderDTO");
             List<Map<String, Object>> orderDetailsList = (List<Map<String, Object>>) orderData.get("orderDetails");
@@ -146,53 +152,115 @@ public class OrderController {
             // Lưu OrderDTO
             orderDAO.save(orderDTO);
 
-            // Chuẩn bị nội dung email
-            StringBuilder emailContent = new StringBuilder();
-            emailContent.append("<h2>Thank you for your order!</h2>");
-            emailContent.append("<p>Order ID: ").append(orderDTO.getOrderID()).append("</p>");
-            emailContent.append("<p>Order Date: ").append(orderDTO.getOrderDate()).append("</p>");
-            emailContent.append("<p>Order Address: ").append(orderDTO.getOrderAddress()).append("</p>");
-            emailContent.append("<h3>Order Details:</h3>");
-            emailContent.append("<ul>");
+            // Bắt đầu xây dựng nội dung email
+            emailContent.append("<html><body>");
+            emailContent.append("<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);'>");
+
+// Tiêu đề chính
+            emailContent.append("<div style='background-color: #2e6c80; color: #fff; padding: 16px; text-align: center; border-radius: 8px 8px 0 0;'>");
+            emailContent.append("<h1 style='margin: 0;'>Capybook Store</h1>");
+            emailContent.append("</div>");
+
+// Thông báo thành công
+            emailContent.append("<div style='padding: 16px; background-color: #f9f9f9;'>");
+            emailContent.append("<h2 style='color: #2e6c80; text-align: center;'>You have successfully placed your order!</h2>");
+            emailContent.append("</div>");
+
+// Thông tin khách hàng
+            emailContent.append("<div style='padding: 16px;'>");
+            emailContent.append("<h3 style='color: #333;'>Customer Information</h3>");
+            emailContent.append("<p><strong>Name:</strong> ").append(account.getFirstName()).append(" ").append(account.getLastName()).append("</p>");
+            emailContent.append("<p><strong>Phone Number:</strong> ").append(account.getPhone()).append("</p>");
+            emailContent.append("<p><strong>Address:</strong> ").append(orderDTO.getOrderAddress()).append("</p>");
+            emailContent.append("</div>");
+
+// Bảng thông tin sách trong đơn hàng
+            emailContent.append("<div style='padding: 16px;'>");
+            emailContent.append("<h3 style='color: #333;'>Books in Your Order</h3>");
+            emailContent.append("<table border='1' style='border-collapse: collapse; width: 100%; font-family: Arial, sans-serif;'>");
+
+// Tiêu đề bảng
+            emailContent.append("<thead>");
+            emailContent.append("<tr style='background-color: #e6f7ff; color: #333;'>");
+            emailContent.append("<th style='padding: 8px; text-align: left;'>#</th>");
+            emailContent.append("<th style='padding: 8px; text-align: left;'>Book Title</th>");
+            emailContent.append("<th style='padding: 8px; text-align: center;'>Quantity</th>");
+            emailContent.append("<th style='padding: 8px; text-align: right;'>Unit Price</th>");
+            emailContent.append("<th style='padding: 8px; text-align: right;'>Total Price</th>");
+            emailContent.append("</tr>");
+            emailContent.append("</thead>");
+
+// Nội dung bảng
+            emailContent.append("<tbody>");
+            int index = 1;
+            BigDecimal totalPrice = BigDecimal.ZERO;
 
             for (Map<String, Object> detail : orderDetailsList) {
                 Integer bookID = (Integer) detail.get("bookID");
                 Integer quantity = (Integer) detail.get("quantity");
-                Object totalPriceObj = detail.get("totalPrice");
-
-                if (bookID == null || quantity == null || quantity <= 0 || totalPriceObj == null) {
-                    return new ResponseEntity<>("Invalid order details: Missing or invalid fields.", HttpStatus.BAD_REQUEST);
-                }
-
-                BigDecimal totalPrice = new BigDecimal(totalPriceObj.toString());
-
-                // Tạo OrderDetailDTO và lưu
-                OrderDetailDTO orderDetailDTO = new OrderDetailDTO();
-                orderDetailDTO.setOrderID(orderDTO);
-
+                BigDecimal unitPrice = new BigDecimal(detail.get("totalPrice").toString()).divide(BigDecimal.valueOf(quantity));
+                BigDecimal itemTotalPrice = new BigDecimal(detail.get("totalPrice").toString());
                 BookDTO book = bookDAO.find(bookID);
-                if (book == null) {
-                    return new ResponseEntity<>("Invalid book ID: Book not found.", HttpStatus.BAD_REQUEST);
-                }
-                orderDetailDTO.setBookID(book);
-                orderDetailDTO.setQuantity(quantity);
-                orderDetailDTO.setTotalPrice(totalPrice);
-                orderDetailDAO.save(orderDetailDTO);
 
-                emailContent.append("<li>")
-                        .append("Book: ").append(book.getBookTitle()).append(" - ")
-                        .append("Quantity: ").append(quantity).append(" - ")
-                        .append("Total Price: ").append(totalPrice).append("</li>");
+                totalPrice = totalPrice.add(itemTotalPrice);
+
+                emailContent.append("<tr>");
+                emailContent.append("<td style='padding: 8px;'>").append(index++).append("</td>");
+                emailContent.append("<td style='padding: 8px;'>").append(book.getBookTitle()).append("</td>");
+                emailContent.append("<td style='padding: 8px; text-align: center;'>").append(quantity).append("</td>");
+                emailContent.append("<td style='padding: 8px; text-align: right;'>").append(formatCurrency(unitPrice)).append("</td>");
+                emailContent.append("<td style='padding: 8px; text-align: right;'>").append(formatCurrency(itemTotalPrice)).append("</td>");
+                emailContent.append("</tr>");
             }
-            emailContent.append("</ul>");
 
-            // Gửi email
-            String subject = "Order Confirmation";
+// Tổng giá trị đơn hàng
+            emailContent.append("<tr style='background-color: #f2f2f2;'>");
+            emailContent.append("<td colspan='4' style='padding: 8px; text-align: right; font-weight: bold;'>Total Books Price:</td>");
+            emailContent.append("<td style='padding: 8px; text-align: right; font-weight: bold;'>").append(formatCurrency(totalPrice)).append("</td>");
+            emailContent.append("</tr>");
+
+            BigDecimal finalPrice = totalPrice; // Giá trị cuối cùng
+            BigDecimal discountPercent = BigDecimal.ZERO; // Giá trị mặc định của discount
+            BigDecimal discountAmount = BigDecimal.ZERO; // Giá trị mặc định của discount amount
+
+            if (orderDTO.getProID() != null && orderDTO.getProID().getDiscount() > 0) {
+                // Nếu có Promotion, tính Discount
+                discountPercent = BigDecimal.valueOf(orderDTO.getProID().getDiscount());
+                discountAmount = totalPrice.multiply(discountPercent).divide(BigDecimal.valueOf(100));
+                finalPrice = totalPrice.subtract(discountAmount);
+            }
+
+// Hiển thị Discount
+            emailContent.append("<tr style='background-color: #f2f2f2;'>");
+            emailContent.append("<td colspan='4' style='padding: 8px; text-align: right; font-weight: bold;'>Discount (")
+                    .append(discountPercent).append("%):</td>");
+            emailContent.append("<td style='padding: 8px; text-align: right; font-weight: bold;'>-").append(formatCurrency(discountAmount)).append("</td>");
+            emailContent.append("</tr>");
+
+// Hiển thị tổng giá trị cuối cùng
+            emailContent.append("<tr style='background-color: #e6f7ff;'>");
+            emailContent.append("<td colspan='4' style='padding: 8px; text-align: right; font-weight: bold;'>Final Total Price:</td>");
+            emailContent.append("<td style='padding: 8px; text-align: right; font-weight: bold;'>").append(formatCurrency(finalPrice)).append("</td>");
+            emailContent.append("</tr>");
+            emailContent.append("</tbody>");
+            emailContent.append("</table>");
+            emailContent.append("</div>");
+
+
+// Lời cảm ơn
+            emailContent.append("<div style='padding: 16px; text-align: center;'>");
+            emailContent.append("<p>Thank you for choosing Capybook!</p>");
+            emailContent.append("<p>We are committed to delivering your order as quickly as possible.</p>");
+            emailContent.append("<p style='font-weight: bold;'>Best regards,<br/>The Capybook Team</p>");
+            emailContent.append("</div>");
+
+// Kết thúc khung
+            emailContent.append("</div>");
+            emailContent.append("</body></html>");
+
+// Gửi email
+            String subject = "Order Confirmation - Capybook";
             String body = emailContent.toString();
-
-            System.out.println("Email to: " + email);
-            System.out.println("Email subject: " + subject);
-            System.out.println("Email body: " + body);
 
             emailSenderUtil.sendEmail(email, subject, body);
 
@@ -204,15 +272,48 @@ public class OrderController {
     }
 
     @PutMapping("/{orderID}")
+    @Transactional
     public ResponseEntity<OrderDTO> updateOrder(@PathVariable int orderID, @RequestBody Map<String, Integer> updateData) {
         OrderDTO existingOrder = orderDAO.find(orderID);
         if (existingOrder != null) {
-            if (updateData.containsKey("orderStatus")) {
-                existingOrder.setOrderStatus(updateData.get("orderStatus"));
-                orderDAO.update(existingOrder);
-                return new ResponseEntity<>(existingOrder, HttpStatus.OK);
-            } else {
+            Integer newStatus = updateData.get("orderStatus");
+            if (newStatus == null) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
+            // Lấy danh sách OrderDetail theo OrderID
+            List<OrderDetailDTO> orderDetails = orderDetailDAO.findByOrderID(orderID);
+
+            try {
+                // Logic giảm số lượng sách khi chuyển từ "Processing" sang "Delivering"
+                if (existingOrder.getOrderStatus() == 0 && newStatus == 2) {
+                    for (OrderDetailDTO detail : orderDetails) {
+                        BookDTO book = detail.getBookID();
+                        if (book.getBookQuantity() < detail.getQuantity()) {
+                            return new ResponseEntity<>(HttpStatus.BAD_REQUEST); // Không đủ sách trong kho
+                        }
+                        book.setBookQuantity(book.getBookQuantity() - detail.getQuantity());
+                        bookDAO.update(book);
+                    }
+                }
+
+                // Logic tăng số lượng sách khi chuyển từ "Delivering" sang "Returned"
+                if (existingOrder.getOrderStatus() == 2 && newStatus == 4) {
+                    for (OrderDetailDTO detail : orderDetails) {
+                        BookDTO book = detail.getBookID();
+                        book.setBookQuantity(book.getBookQuantity() + detail.getQuantity());
+                        bookDAO.update(book);
+                    }
+                }
+
+                // Cập nhật trạng thái đơn hàng
+                existingOrder.setOrderStatus(newStatus);
+                orderDAO.update(existingOrder);
+
+                return new ResponseEntity<>(existingOrder, HttpStatus.OK);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -242,6 +343,10 @@ public class OrderController {
         }
         return new ResponseEntity<>(orders, HttpStatus.OK);
     }
-
+    // Phương thức định dạng giá trị
+    private String formatCurrency(BigDecimal amount) {
+        NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
+        return formatter.format(amount) + " VND";
+    }
 
 }
