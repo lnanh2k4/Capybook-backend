@@ -7,9 +7,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/v1/payment")
-@CrossOrigin(origins = "http://localhost:5175")
+
 public class PaymentController {
 
     private final VnPayService vnPayService;
@@ -26,8 +29,7 @@ public class PaymentController {
     public ResponseEntity<String> createPayment(@RequestParam long totalAmount, HttpServletRequest request) {
         try {
             // Xác định URL trả về sau khi thanh toán
-            String returnUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/api/v1/payment/return";
-
+            String returnUrl = "http://localhost:5173/PaymentSuccessPage";
             // Gọi service để tạo URL thanh toán
             String paymentUrl = vnPayService.createOrder(totalAmount, "Thanh toán đơn hàng", returnUrl, request);
 
@@ -38,31 +40,36 @@ public class PaymentController {
         }
     }
 
-    /**
-     * Xử lý trả về từ VNPay sau thanh toán
-     */
     @GetMapping("/return")
-    public ResponseEntity<String> handlePaymentReturn(HttpServletRequest request) {
+    public ResponseEntity<Map<String, Object>> handlePaymentReturn(HttpServletRequest request) {
+        Map<String, Object> response = new HashMap<>();
         try {
-            // Ghi log toàn bộ tham số trả về từ VNPay
-            request.getParameterMap().forEach((key, value) -> {
-                System.out.println("VNPay Response Parameter: " + key + " = " + String.join(", ", value));
-            });
-
             // Xác minh giao dịch
             int paymentStatus = vnPayService.orderReturn(request);
 
-            // Phản hồi kết quả
+            String transactionId = request.getParameter("vnp_TransactionNo");
+            String amount = request.getParameter("vnp_Amount");
+            String formattedAmount = String.valueOf(Long.parseLong(amount) / 100);
+
             if (paymentStatus == 1) {
-                return ResponseEntity.status(HttpStatus.OK).body("Payment successful!");
-            } else if (paymentStatus == 0) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Payment failed. Please try again.");
+                response.put("status", "success");
+                response.put("message", "Payment successful!");
+                response.put("transactionId", transactionId);
+                response.put("amount", formattedAmount);
             } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid payment signature.");
+                response.put("status", "error");
+                response.put("message", "Payment failed. Please try again.");
+                response.put("transactionId", transactionId);
+                response.put("amount", formattedAmount);
             }
+
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
-            System.err.println("Error while verifying payment: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
+            response.put("status", "error");
+            response.put("message", "An error occurred while processing the payment.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+
 }
+

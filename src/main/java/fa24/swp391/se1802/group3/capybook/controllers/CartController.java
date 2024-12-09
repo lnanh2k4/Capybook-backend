@@ -12,7 +12,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/cart")
-@CrossOrigin(origins = "http://localhost:5175")
 public class CartController {
 
     private final CartDAO cartDAO;
