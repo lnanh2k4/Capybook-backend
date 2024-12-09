@@ -31,7 +31,9 @@ import java.util.Arrays;
 public class SecurityConfig {
  private final String[] PUBLIC_ENDPOINTS = {
          // Category endpoint
-         "/api/v1/categories/"
+         "/api/v1/categories/",
+         //         Payment endpoint
+         "/api/v1/payment", "/api/v1/payment/create", "/api/v1/payment/return"
          // Book endpoint
          ,"/api/v1/books/", "/api/v1/books/{bookId}",
          // Token endpoint

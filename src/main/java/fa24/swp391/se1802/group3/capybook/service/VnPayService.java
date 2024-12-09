@@ -18,7 +18,7 @@ public class VnPayService {
     public String createOrder(long totalAmount, String orderInfor, String urlReturn, HttpServletRequest request){
 
         System.out.println("Received totalAmount: " + totalAmount);
-        System.out.println("Return URL" + orderInfor);
+        System.out.println("Return URL" + urlReturn);
         String vnp_Version = "2.1.0";
         String vnp_Command = "pay";
         String vnp_TxnRef = VnPayConfig.getRandomNumber(8);
@@ -38,7 +38,7 @@ public class VnPayService {
         vnp_Params.put("vnp_OrderInfo", orderInfor);
         vnp_Params.put("vnp_OrderType", orderType);
 
-        String locate = "vn";
+        String locate = "en";
         vnp_Params.put("vnp_Locale", locate);
 
         urlReturn += VnPayConfig.vnp_Returnurl;
