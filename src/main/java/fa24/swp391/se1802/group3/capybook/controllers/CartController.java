@@ -72,9 +72,9 @@ public class CartController {
 
     @DeleteMapping("/delete")
     public ResponseEntity<String> deleteBookFromCart(@RequestParam String username,
-                                                     @RequestParam int bookID) {
+                                                     @RequestParam int cartID) {
         try {
-            cartDAO.deleteBookFromCart(username, bookID);
+            cartDAO.deleteBookFromCart(username, cartID);
             return ResponseEntity.ok("Book removed from cart successfully.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
