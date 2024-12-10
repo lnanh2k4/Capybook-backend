@@ -79,27 +79,28 @@ public class CartDAOImpl implements CartDAO {
     }
 
 
-
     @Override
     @Transactional
     public void deleteBookFromCart(String username, int cartID) {
-        // Tìm thực thể bằng cartID
-        CartDTO cartItem = entityManager.find(CartDTO.class, cartID);
-        if (cartItem != null) {
-            // Xác nhận username hợp lệ trước khi xóa
-            if (cartItem.getUsername().getUsername().equals(username)) {
-                entityManager.remove(cartItem); // Xóa thực thể
-            } else {
-                throw new RuntimeException("Username does not match the cart item.");
-            }
+        // Logic xóa (sử dụng JPQL hoặc Native Query như trên)
+        String jpql = "DELETE FROM CartDTO c WHERE c.id = :cartID AND c.username.username = :username";
+        int deletedCount = entityManager.createQuery(jpql)
+                .setParameter("cartID", cartID)
+                .setParameter("username", username)
+                .executeUpdate();
+        if (deletedCount > 0) {
+            System.out.println("Cart item deleted successfully with cartID: " + cartID);
         } else {
-            throw new RuntimeException("Cart item not found for cartID: " + cartID);
+            throw new RuntimeException("Cart item not found or username does not match.");
         }
     }
-
-
-
-
-
-
 }
+
+
+
+
+
+
+
+
+
