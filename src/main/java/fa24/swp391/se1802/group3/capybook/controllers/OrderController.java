@@ -67,7 +67,10 @@ public class OrderController {
             orderMap.put("orderDate", order.getOrderDate());
             orderMap.put("orderStatus", order.getOrderStatus());
             orderMap.put("username", order.getUsername().getUsername());
-            orderMap.put("orderAddress", order.getOrderAddress()); // Thêm orderAddress
+            orderMap.put("orderAddress", order.getOrderAddress());
+
+            // Thêm staffID vào phản hồi
+            orderMap.put("processedBy", order.getStaffID() != null ? order.getStaffID().getStaffID() : null);
 
             if (order.getProID() != null) {
                 orderMap.put("proID", order.getProID().getProID());
@@ -82,7 +85,7 @@ public class OrderController {
                         detailMap.put("ODID", detail.getOdid());
                         detailMap.put("quantity", detail.getQuantity());
                         detailMap.put("bookID", detail.getBookID().getBookID());
-                        detailMap.put("totalPrice", detail.getTotalPrice()); // Thêm totalPrice
+                        detailMap.put("totalPrice", detail.getTotalPrice());
                         return detailMap;
                     })
                     .collect(Collectors.toList());
@@ -161,6 +164,19 @@ public class OrderController {
                     return new ResponseEntity<>("Invalid book ID: Book not found.", HttpStatus.BAD_REQUEST);
                 }
 
+                // Kiểm tra số lượng sách
+                if (book.getBookQuantity() < quantity) {
+                    return new ResponseEntity<>(
+                            "Insufficient stock for book ID: " + bookID,
+                            HttpStatus.BAD_REQUEST
+                    );
+                }
+
+                // Trừ số lượng sách trong kho
+                book.setBookQuantity(book.getBookQuantity() - quantity);
+                bookDAO.update(book);
+
+                // Tạo OrderDetail
                 OrderDetailDTO orderDetail = new OrderDetailDTO();
                 orderDetail.setOrderID(orderDTO);
                 orderDetail.setBookID(book);
@@ -290,52 +306,49 @@ public class OrderController {
 
     @PutMapping("/{orderID}")
     @Transactional
-    public ResponseEntity<OrderDTO> updateOrder(@PathVariable int orderID, @RequestBody Map<String, Integer> updateData) {
+    public ResponseEntity<OrderDTO> updateOrder(@PathVariable int orderID, @RequestBody Map<String, Object> updateData) {
         OrderDTO existingOrder = orderDAO.find(orderID);
-        if (existingOrder != null) {
-            Integer newStatus = updateData.get("orderStatus");
-            if (newStatus == null) {
+
+        if (existingOrder == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        try {
+            Integer newStatus = (Integer) updateData.get("orderStatus");
+            Integer staffID = (Integer) updateData.get("staffID");
+
+            if (newStatus == null || staffID == null) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
 
             // Lấy danh sách OrderDetail theo OrderID
             List<OrderDetailDTO> orderDetails = orderDetailDAO.findByOrderID(orderID);
 
-            try {
-                // Logic giảm số lượng sách khi chuyển từ "Processing" sang "Delivering"
-                if (existingOrder.getOrderStatus() == 0 && newStatus == 2) {
-                    for (OrderDetailDTO detail : orderDetails) {
-                        BookDTO book = detail.getBookID();
-                        if (book.getBookQuantity() < detail.getQuantity()) {
-                            return new ResponseEntity<>(HttpStatus.BAD_REQUEST); // Không đủ sách trong kho
-                        }
-                        book.setBookQuantity(book.getBookQuantity() - detail.getQuantity());
-                        bookDAO.update(book);
-                    }
+            // Logic tăng số lượng sách khi chuyển từ "Delivering" sang "Returned"
+            if (existingOrder.getOrderStatus() == 2 && newStatus == 4) {
+                for (OrderDetailDTO detail : orderDetails) {
+                    BookDTO book = detail.getBookID();
+                    book.setBookQuantity(book.getBookQuantity() + detail.getQuantity());
+                    bookDAO.update(book);
                 }
-
-                // Logic tăng số lượng sách khi chuyển từ "Delivering" sang "Returned"
-                if (existingOrder.getOrderStatus() == 2 && newStatus == 4) {
-                    for (OrderDetailDTO detail : orderDetails) {
-                        BookDTO book = detail.getBookID();
-                        book.setBookQuantity(book.getBookQuantity() + detail.getQuantity());
-                        bookDAO.update(book);
-                    }
-                }
-
-                // Cập nhật trạng thái đơn hàng
-                existingOrder.setOrderStatus(newStatus);
-                orderDAO.update(existingOrder);
-
-                return new ResponseEntity<>(existingOrder, HttpStatus.OK);
-            } catch (Exception e) {
-                e.printStackTrace();
-                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+            // Gắn trực tiếp staffID vào đơn hàng
+            StaffDTO staff = new StaffDTO();
+            staff.setStaffID(staffID);
+            existingOrder.setStaffID(staff);
+
+            // Cập nhật trạng thái đơn hàng
+            existingOrder.setOrderStatus(newStatus);
+            orderDAO.update(existingOrder);
+
+            return new ResponseEntity<>(existingOrder, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
     // Xóa đơn hàng
     @DeleteMapping("/{orderID}")
