@@ -118,7 +118,7 @@ public class AccountDAOImpl implements AccountDAO {
 
     @Override
     public List<AccountDTO> findAll() {
-        TypedQuery<AccountDTO> query = entityManager.createQuery("From AccountDTO", AccountDTO.class);
+        TypedQuery<AccountDTO> query = entityManager.createQuery("From AccountDTO a WHERE a.accStatus=1", AccountDTO.class);
         return query.getResultList();
     }
 
