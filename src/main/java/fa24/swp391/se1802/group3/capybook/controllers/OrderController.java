@@ -324,6 +324,15 @@ public class OrderController {
             // Lấy danh sách OrderDetail theo OrderID
             List<OrderDetailDTO> orderDetails = orderDetailDAO.findByOrderID(orderID);
 
+            // Logic tăng số lượng sách khi chuyển từ "Proccessing" sang "Cancle"
+            if (existingOrder.getOrderStatus() == 0 && newStatus == 1) {
+                for (OrderDetailDTO detail : orderDetails) {
+                    BookDTO book = detail.getBookID();
+                    book.setBookQuantity(book.getBookQuantity() + detail.getQuantity());
+                    bookDAO.update(book);
+                }
+            }
+            
             // Logic tăng số lượng sách khi chuyển từ "Delivering" sang "Returned"
             if (existingOrder.getOrderStatus() == 2 && newStatus == 4) {
                 for (OrderDetailDTO detail : orderDetails) {
