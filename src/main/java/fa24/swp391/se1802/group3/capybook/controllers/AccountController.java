@@ -103,8 +103,7 @@ public class AccountController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
-    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    
     @PutMapping("/{username}")
     public ResponseEntity<AccountDTO> updateAccount(@PathVariable String username, @RequestPart("account") String account) {
         try {
