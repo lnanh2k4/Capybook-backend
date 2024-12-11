@@ -235,17 +235,56 @@ public class PromotionController {
     }
 
     @DeleteMapping("/{proID}")
-    public ResponseEntity<String> deletePromotion(@PathVariable int proID) {
-        PromotionDTO existingPromotion = promotionDAO.find(proID);
-        if (existingPromotion != null) {
-            // Thay vì xóa, chúng ta sẽ cập nhật proStatus thành 0
-            existingPromotion.setProStatus(0);  // Đánh dấu đã xóa
-            promotionDAO.update(existingPromotion);  // Cập nhật thông tin khuyến mãi
-            return ResponseEntity.ok("Promotion marked as deleted successfully!");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Promotion not found");
+    @Transactional
+    public ResponseEntity<String> deletePromotion(
+            @PathVariable int proID,
+            @RequestParam(name = "staffID") int staffID) {
+        try {
+            System.out.println("Received DELETE request:");
+            System.out.println("Promotion ID: " + proID);
+            System.out.println("Staff ID: " + staffID);
+
+            // Tìm promotion theo ID
+            PromotionDTO existingPromotion = promotionDAO.find(proID);
+            if (existingPromotion == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Promotion not found.");
+            }
+
+            // Kiểm tra trạng thái hiện tại
+            if (existingPromotion.getProStatus() == 0) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("Promotion is already marked as deleted.");
+            }
+
+            // Cập nhật trạng thái thành 0
+            existingPromotion.setProStatus(0);
+            promotionDAO.update(existingPromotion);
+
+            // Ghi log hành động "Delete"
+            logPromotionAction(4, existingPromotion, staffID); // Action ID = 4 cho "Delete"
+
+            return ResponseEntity.ok("Promotion deleted successfully.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An error occurred while deleting the promotion.");
         }
     }
+
+    // Phương thức ghi log hành động
+    private void logPromotionAction(int actionId, PromotionDTO promotion, int staffID) {
+        PromotionLogDTO promotionLog = new PromotionLogDTO();
+        promotionLog.setProId(promotion);
+        promotionLog.setProAction(actionId); // ID hành động (1 = Create, 2 = Approve, 3 = Reject, 4 = Delete)
+        promotionLog.setProLogDate(new Date());
+
+        StaffDTO staff = new StaffDTO();
+        staff.setStaffID(staffID);
+        promotionLog.setStaffId(staff);
+
+        promotionLogDAO.save(promotionLog);
+    }
+
 
     @GetMapping("/search")
     public ResponseEntity<List<PromotionDTO>> searchPromotions(
@@ -284,6 +323,7 @@ public class PromotionController {
                     case "create" -> 1;
                     case "approve" -> 2;
                     case "reject" -> 3;
+                    case "delete" -> 4; // Thêm action delete
                     default -> null;
                 };
 
