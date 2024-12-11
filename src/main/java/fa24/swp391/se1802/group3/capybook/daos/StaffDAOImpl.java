@@ -19,7 +19,7 @@ import java.util.List;
 public class StaffDAOImpl implements  StaffDAO{
     EntityManager entityManager;
     static final String DEFAULT_PASSWORD = "12345";
-    final int UNVERIFIED_STATUS = 2;
+    final int UNVERIFIED_STATUS = 4;
 
     @Autowired
     public StaffDAOImpl(EntityManager entityManager) {
