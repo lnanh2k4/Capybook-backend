@@ -71,7 +71,7 @@ public class SecurityConfig {
             //         Payment endpoint
             "/api/v1/payment", "/api/v1/payment/create", "/api/v1/payment/return",
             //         Order endpoint
-            "/api/v1/orders/search" , "/api/v1/orders",
+            "/api/v1/orders","/api/v1/orders/{orderID}", "/api/v1/orders/search",
             //         Cart endpoint
             "/api/v1/cart/{username}","/api/v1/cart/add","/api/v1/cart/update", "/api/v1/cart/delete",
             //         Account endpoint
