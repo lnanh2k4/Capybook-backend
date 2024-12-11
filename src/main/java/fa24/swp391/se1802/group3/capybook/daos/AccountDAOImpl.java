@@ -30,6 +30,7 @@ public class AccountDAOImpl implements AccountDAO {
     final int ACTIVE_STATUS = 1;
     final int INACTIVE_STATUS = 0;
     final int UNVERIFIED_STATUS = 2;
+    final int UNVERIFIED_ADMIN_CREATED_STATUS = 4;
     final String DEFAULT_PASSWORD = "12345";
     //define entity manager
     EntityManager entityManager;
@@ -160,7 +161,7 @@ public class AccountDAOImpl implements AccountDAO {
             ObjectMapper obj = new ObjectMapper();
             //Convert String to account object
             AccountDTO accountDTO = obj.readValue(account, AccountDTO.class);
-            accountDTO.setAccStatus(UNVERIFIED_STATUS);
+            accountDTO.setAccStatus(UNVERIFIED_ADMIN_CREATED_STATUS);
             accountDTO.setPassword(password.encode(DEFAULT_PASSWORD));
             entityManager.persist(accountDTO);
             if (accountDTO.getRole() != 1) {
