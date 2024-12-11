@@ -248,6 +248,7 @@ public class BookController {
             existingBook.setBookDescription(updatedBook.getBookDescription());
             existingBook.setBookStatus(updatedBook.getBookStatus());
             existingBook.setBookQuantity(updatedBook.getBookQuantity());
+            existingBook.setIsbn(updatedBook.getIsbn());
 
             // Xử lý hình ảnh nếu có
             if (image != null && !image.isEmpty()) {
