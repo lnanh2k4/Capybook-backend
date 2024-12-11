@@ -52,7 +52,7 @@ public class AccountController {
     public List<AccountDTO> getAccounts() {
         List<AccountDTO> list = new ArrayList<>();
         for (AccountDTO accountDTO : accountDAO.findAll()) {
-            if (accountDTO.getAccStatus() != null && accountDTO.getAccStatus() != 0) {
+            if (accountDTO.getAccStatus() != null && accountDTO.getAccStatus() > 0) {
                 list.add(accountDTO);
             }
         }
