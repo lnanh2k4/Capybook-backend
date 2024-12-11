@@ -95,7 +95,7 @@ public class AccountDAOImpl implements AccountDAO {
     @Transactional
     public void deleteByUsername(String username) {
         AccountDTO account = this.findByUsername(username);
-        if (account.getRole() != 1) {
+        if (account.getRole() == 1) {
             account.setAccStatus(0);
             entityManager.merge(account);
         } else {
@@ -111,7 +111,6 @@ public class AccountDAOImpl implements AccountDAO {
             } catch (Exception e) {
                 System.out.println("Error in findStaff: " + e.getMessage());
             }
-
         }
 
     }
