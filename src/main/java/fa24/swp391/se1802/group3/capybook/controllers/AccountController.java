@@ -128,6 +128,10 @@ public class AccountController {
 
             accountDAO.save(existingAccount);
 
+            if(existingAccount.getRole()==1){
+                staffDAO.delete(staffDAO.findStaff(username).getStaffID());
+            }
+
             return ResponseEntity.ok(existingAccount);
 
         } catch (IOException e) {
