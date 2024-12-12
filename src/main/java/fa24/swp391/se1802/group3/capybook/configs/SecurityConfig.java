@@ -41,7 +41,7 @@ public class SecurityConfig {
          // Account endpoint
          "/api/v1/accounts/register", "/api/v1/accounts/email/send/", "/api/v1/accounts/change", "/api/v1/accounts/password/reset/", "/api/v1/accounts/email/verify/", "/api/v1/accounts/account/verify/",
          // Order endpoint
-         "/api/v1/orders","/api/v1/orders/{orderID}", "/api/v1/orders/search",
+         "/api/v1/orders/","/api/v1/orders/{orderID}",
          //Promotion endpoint
          "/api/v1/promotions/", "/api/v1/promotions/{proID}"
 
