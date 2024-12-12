@@ -107,6 +107,7 @@ public class AccountController {
     @PutMapping("/{username}")
     public ResponseEntity<AccountDTO> updateAccount(@PathVariable String username, @RequestPart("account") String account) {
         try {
+            int oldRole=0;
             ObjectMapper objectMapper = new ObjectMapper();
             AccountDTO accountDTO = objectMapper.readValue(account, AccountDTO.class);
 
@@ -114,6 +115,7 @@ public class AccountController {
             if (existingAccount == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
+            oldRole = existingAccount.getRole();
             existingAccount.setUsername(accountDTO.getUsername());
             existingAccount.setFirstName(accountDTO.getFirstName());
             existingAccount.setLastName(accountDTO.getLastName());
@@ -125,11 +127,16 @@ public class AccountController {
             existingAccount.setEmail(accountDTO.getEmail());
             existingAccount.setAddress(accountDTO.getAddress());
             existingAccount.setDob(accountDTO.getDob());
-
+            existingAccount.setAccStatus(1);
             accountDAO.save(existingAccount);
 
-            if(existingAccount.getRole()==1){
+            if(existingAccount.getRole()==1 && oldRole!=1){
                 staffDAO.delete(staffDAO.findStaff(username).getStaffID());
+            }
+            if(existingAccount.getRole()!=1 && oldRole==1){
+                StaffDTO staff = new StaffDTO();
+                staff.setUsername(accountDTO);
+                staffDAO.addStaff(staff);
             }
 
             return ResponseEntity.ok(existingAccount);
