@@ -32,14 +32,19 @@ public class SecurityConfig {
  private final String[] PUBLIC_ENDPOINTS = {
          // Category endpoint
          "/api/v1/categories/",
-         //         Payment endpoint
+         // Payment endpoint
          "/api/v1/payment", "/api/v1/payment/create", "/api/v1/payment/return"
          // Book endpoint
          ,"/api/v1/books/", "/api/v1/books/{bookId}",
          // Token endpoint
          "/api/auth/token", "/api/auth/introspect", "/api/auth/logout", "/api/auth/refresh",
          // Account endpoint
-         "/api/v1/accounts/register", "/api/v1/accounts/email/send/", "/api/v1/accounts/change", "/api/v1/accounts/password/reset/", "/api/v1/accounts/email/verify/", "/api/v1/accounts/account/verify/"
+         "/api/v1/accounts/register", "/api/v1/accounts/email/send/", "/api/v1/accounts/change", "/api/v1/accounts/password/reset/", "/api/v1/accounts/email/verify/", "/api/v1/accounts/account/verify/",
+         // Order endpoint
+         "/api/v1/orders","/api/v1/orders/{orderID}", "/api/v1/orders/search",
+         //Promotion endpoint
+         "/api/v1/promotions/", "/api/v1/promotions/{proID}"
+
  }; // url cho guest
 
     private final String[] SELLER_STAFF_ENDPOINTS = {
