@@ -43,8 +43,9 @@ public class SecurityConfig {
          // Order endpoint
          "/api/v1/orders/","/api/v1/orders/{orderID}",
          //Promotion endpoint
-         "/api/v1/promotions/", "/api/v1/promotions/{proID}"
-
+         "/api/v1/promotions/", "/api/v1/promotions/{proID}",
+//Import stock endpoint
+         "api/v1/importStock", "/api/v1/importStock/{id}/details",
  }; // url cho guest
 
     private final String[] SELLER_STAFF_ENDPOINTS = {
@@ -54,8 +55,7 @@ public class SecurityConfig {
             "/api/v1/categories/","/api/v1/categories/{catID}",
             //         Order endpoint
             "/api/v1/orders","/api/v1/orders/{orderID}", "/api/v1/orders/search",
-            //Import stock endpoint
-            "api/v1/importStock", "/api/v1/importStock/{id}/details",
+
 //            Staff endpoint
             "api/v1/staffs/{id}","api/v1/staffs/username/{username}"
     };
