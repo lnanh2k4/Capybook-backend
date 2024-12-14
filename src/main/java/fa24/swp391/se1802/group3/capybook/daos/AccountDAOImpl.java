@@ -105,7 +105,6 @@ public class AccountDAOImpl implements AccountDAO {
                 );
                 query.setParameter("username", username);
                 StaffDTO staff = query.getSingleResult();
-                entityManager.remove(staff);
                 account.setAccStatus(0);
                 entityManager.merge(account);
             } catch (Exception e) {
@@ -117,7 +116,7 @@ public class AccountDAOImpl implements AccountDAO {
 
     @Override
     public List<AccountDTO> findAll() {
-        TypedQuery<AccountDTO> query = entityManager.createQuery("From AccountDTO a WHERE a.accStatus=1", AccountDTO.class);
+        TypedQuery<AccountDTO> query = entityManager.createQuery("From AccountDTO a WHERE a.accStatus>0", AccountDTO.class);
         return query.getResultList();
     }
 

@@ -70,7 +70,7 @@ public class StaffController {
     }
 
     @PutMapping("/")
-    public ResponseEntity<StaffResponse> updatestaff(@RequestPart("staff") String staff) {
+    public ResponseEntity<StaffResponse> updateStaff(@RequestPart("staff") String staff) {
         staffDAO.update(staff);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
