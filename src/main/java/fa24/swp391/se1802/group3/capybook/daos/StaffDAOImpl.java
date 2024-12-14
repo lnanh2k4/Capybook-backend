@@ -82,6 +82,7 @@ public class StaffDAOImpl implements  StaffDAO{
                 account.setPassword(existingStaff.getUsername().getPassword());
                 account.setUsername(existingStaff.getUsername().getUsername());
                 existingStaff.setUsername(account);
+                account.setAccStatus(1);
 
                 //update staff and account
                 entityManager.merge(account);
@@ -96,8 +97,6 @@ public class StaffDAOImpl implements  StaffDAO{
     public void delete(int staffID) {
         //Find staff
         StaffDTO staff = this.findByID(staffID);
-        //Remove staff
-        entityManager.remove(staff);
         //Find account
         AccountDTO account = entityManager.find(AccountDTO.class,staff.getUsername().getUsername());
         //Set status account
@@ -115,7 +114,7 @@ public class StaffDAOImpl implements  StaffDAO{
 
     @Override
     public List<StaffDTO> findAll() {
-        TypedQuery<StaffDTO> query = entityManager.createQuery("From StaffDTO", StaffDTO.class);
+        TypedQuery<StaffDTO> query = entityManager.createQuery("From StaffDTO s WHERE s.username.accStatus>0", StaffDTO.class);
         return query.getResultList();
     }
 
